@@ -3,6 +3,16 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { AlertTriangle } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 
 function AuthErrorContent() {
     const searchParams = useSearchParams();
@@ -29,47 +39,35 @@ function AuthErrorContent() {
         : errorMessages.Default;
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-                <div className="text-center">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                        <svg
-                            className="h-6 w-6 text-red-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            />
-                        </svg>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-destructive/10 via-background to-destructive/5 p-4 sm:p-6 lg:p-8">
+            <Card className="w-full max-w-md shadow-xl">
+                <CardHeader className="text-center space-y-4 pb-2">
+                    <div className="mx-auto flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-destructive/10">
+                        <AlertTriangle className="h-7 w-7 sm:h-8 sm:w-8 text-destructive" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                    <CardTitle className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">
                         Authentication Error
-                    </h1>
-                    <p className="text-gray-600 mb-6">{errorMessage}</p>
+                    </CardTitle>
+                    <CardDescription className="text-sm sm:text-base">
+                        {errorMessage}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 px-4 sm:px-6 pb-6">
                     {error && (
-                        <p className="text-sm text-gray-500 mb-6">Error code: {error}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground text-center">
+                            Error code: <code className="bg-muted px-1.5 py-0.5 rounded text-foreground">{error}</code>
+                        </p>
                     )}
-                    <div className="space-y-3">
-                        <Link
-                            href="/login"
-                            className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                            Back to Login
-                        </Link>
-                        <Link
-                            href="/"
-                            className="block w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
-                        >
-                            Go to Home
-                        </Link>
+                    <div className="space-y-3 pt-2">
+                        <Button asChild className="w-full h-10 sm:h-11 font-semibold">
+                            <Link href="/login">Back to Login</Link>
+                        </Button>
+                        <Button asChild variant="outline" className="w-full h-10 sm:h-11">
+                            <Link href="/">Go to Home</Link>
+                        </Button>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
@@ -77,8 +75,8 @@ function AuthErrorContent() {
 export default function AuthError() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
         }>
             <AuthErrorContent />

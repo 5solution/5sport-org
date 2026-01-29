@@ -72,11 +72,11 @@ export default function AdminLayout({
             <div className="flex h-16 items-center border-b px-6">
               <Link href="/admin" className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                  <span className="text-sm font-bold text-primary-foreground">
+                  <span className="font-heading text-sm font-bold text-primary-foreground">
                     5S
                   </span>
                 </div>
-                <span className="text-lg font-semibold text-sidebar-foreground">
+                <span className="font-heading text-lg font-bold text-sidebar-foreground tracking-tight">
                   5Sport Admin
                 </span>
               </Link>

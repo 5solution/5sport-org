@@ -71,16 +71,16 @@ export default function LoginPage() {
             Sign in to your account to continue
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           {error && (
-            <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="mb-4 rounded-lg bg-destructive/10 p-3 sm:p-4 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -95,7 +95,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -109,7 +109,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full h-10 sm:h-11 text-sm sm:text-base font-semibold" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -121,7 +121,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="relative my-6">
+          <div className="relative my-5 sm:my-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -134,7 +134,7 @@ export default function LoginPage() {
 
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full h-10 sm:h-11 text-sm sm:text-base"
             onClick={handleGoogleLogin}
             disabled={isLoading}
           >
@@ -159,12 +159,12 @@ export default function LoginPage() {
             Continue with Google
           </Button>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
+        <CardFooter className="flex justify-center px-4 sm:px-6 pt-2 pb-4 sm:pb-6">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Don&apos;t have an account?{' '}
             <Link
               href="/register"
-              className="font-medium text-primary hover:underline"
+              className="font-semibold text-primary hover:underline"
             >
               Sign up
             </Link>

@@ -102,73 +102,73 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 pt-12 lg:pt-0 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">User Management</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage user accounts, roles, and permissions.
           </p>
         </div>
-        <Button>
+        <Button className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Add User
         </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground hidden sm:block" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+          <CardContent className="px-4 sm:px-6">
+            <div className="font-heading text-xl sm:text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Admins</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Admins</CardTitle>
             <div className="h-2 w-2 rounded-full bg-destructive" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.admins}</div>
+          <CardContent className="px-4 sm:px-6">
+            <div className="font-heading text-xl sm:text-2xl font-bold">{stats.admins}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Organizers</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Organizers</CardTitle>
             <div className="h-2 w-2 rounded-full bg-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.organizers}</div>
+          <CardContent className="px-4 sm:px-6">
+            <div className="font-heading text-xl sm:text-2xl font-bold">{stats.organizers}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Regular Users</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Regular Users</CardTitle>
             <div className="h-2 w-2 rounded-full bg-secondary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.users}</div>
+          <CardContent className="px-4 sm:px-6">
+            <div className="font-heading text-xl sm:text-2xl font-bold">{stats.users}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Users Table */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="px-4 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle>All Users</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-heading text-base sm:text-lg font-bold">All Users</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 A list of all users in your application.
               </CardDescription>
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-full sm:w-[150px]">
                 <SelectValue placeholder="Filter by role" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +180,7 @@ export default function UsersPage() {
             </Select>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           {isLoading ? (
             <div className="flex h-64 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />

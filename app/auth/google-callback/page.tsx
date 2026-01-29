@@ -38,9 +38,10 @@ export default function GoogleCallbackPage() {
                 {
                     onSuccess: (response) => {
                         // Store backend JWT token
-                        const authData = response.data as { token: string; user: unknown };
+                        // defaultMutator returns res.data directly, so response is the auth data
+                        const authData = response as unknown as { token: string; user: unknown };
                         localStorage.setItem('authToken', authData.token);
-                        localStorage.setItem('user', JSON.stringify(authData.user));
+                        localStorage.setItem('authUser', JSON.stringify(authData.user));
 
                         // Redirect to dashboard
                         router.push('/admin/users');
@@ -54,7 +55,8 @@ export default function GoogleCallbackPage() {
         };
 
         exchangeToken();
-    }, [session, status, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session, status]);
 
     if (error) {
         return (

@@ -44,20 +44,11 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     setError('');
     setIsLoading(true);
-
-    try {
-      await signIn('google', {
-        redirect: false,
-        callbackUrl: '/auth/google-callback',
-      });
-      router.push('/auth/google-callback');
-    } catch {
-      setError('Google login failed');
-      setIsLoading(false);
-    }
+    // OAuth providers require a full page redirect, don't use redirect: false
+    signIn('google', { callbackUrl: '/auth/google-callback' });
   };
 
   return (

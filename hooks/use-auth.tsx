@@ -118,13 +118,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [persistAuth]
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // Call backend logout endpoint if we have a token
+    if (token) {
+      try {
+        await fetch(`${API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } catch {
+        // Continue with logout even if API call fails
+      }
+    }
+
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     setToken(null);
     setUser(null);
     router.push('/login');
-  }, [router]);
+  }, [router, token]);
 
   const hasRole = useCallback(
     (roles: Role | Role[]) => {

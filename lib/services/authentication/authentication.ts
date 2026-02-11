@@ -25,7 +25,11 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AuthControllerAdminOnly200,
+  AuthControllerLogout200,
+  AuthControllerOrganizerDashboard200,
   AuthResponseDto,
+  ErrorResponseDto,
   GoogleTokenDto,
   LoginDto,
   RegisterDto,
@@ -35,10 +39,13 @@ import type {
 import { defaultMutator } from '../../api/axiosInstance';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 
 
 /**
- * @summary Register a new user with username and password
+ * Create a new user account with email and password
+ * @summary Register a new user
  */
 export type authControllerRegisterResponse201 = {
   data: AuthResponseDto
@@ -46,14 +53,19 @@ export type authControllerRegisterResponse201 = {
 }
 
 export type authControllerRegisterResponse400 = {
-  data: void
+  data: ErrorResponseDto
   status: 400
+}
+
+export type authControllerRegisterResponse409 = {
+  data: ErrorResponseDto
+  status: 409
 }
     
 export type authControllerRegisterResponseSuccess = (authControllerRegisterResponse201) & {
   headers: Headers;
 };
-export type authControllerRegisterResponseError = (authControllerRegisterResponse400) & {
+export type authControllerRegisterResponseError = (authControllerRegisterResponse400 | authControllerRegisterResponse409) & {
   headers: Headers;
 };
 
@@ -82,16 +94,16 @@ export const authControllerRegister = async (registerDto: RegisterDto, options?:
 
 
 
-export const getAuthControllerRegisterMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterDto}, TContext>, }
+export const getAuthControllerRegisterMutationOptions = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
 ): UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterDto}, TContext> => {
 
 const mutationKey = ['authControllerRegister'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -99,7 +111,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerRegister>>, {data: RegisterDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  authControllerRegister(data,)
+          return  authControllerRegister(data,requestOptions)
         }
 
 
@@ -111,13 +123,13 @@ const {mutation: mutationOptions} = options ?
 
     export type AuthControllerRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerRegister>>>
     export type AuthControllerRegisterMutationBody = RegisterDto
-    export type AuthControllerRegisterMutationError = void
+    export type AuthControllerRegisterMutationError = ErrorResponseDto
 
     /**
- * @summary Register a new user with username and password
+ * @summary Register a new user
  */
-export const useAuthControllerRegister = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterDto}, TContext>, }
+export const useAuthControllerRegister = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRegister>>, TError,{data: RegisterDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authControllerRegister>>,
         TError,
@@ -127,22 +139,28 @@ export const useAuthControllerRegister = <TError = void,
       return useMutation(getAuthControllerRegisterMutationOptions(options), queryClient);
     }
     /**
- * @summary Login with username and password
+ * Authenticate user and return JWT token
+ * @summary Login with email and password
  */
 export type authControllerLoginResponse200 = {
   data: AuthResponseDto
   status: 200
 }
 
+export type authControllerLoginResponse400 = {
+  data: ErrorResponseDto
+  status: 400
+}
+
 export type authControllerLoginResponse401 = {
-  data: void
+  data: ErrorResponseDto
   status: 401
 }
     
 export type authControllerLoginResponseSuccess = (authControllerLoginResponse200) & {
   headers: Headers;
 };
-export type authControllerLoginResponseError = (authControllerLoginResponse401) & {
+export type authControllerLoginResponseError = (authControllerLoginResponse400 | authControllerLoginResponse401) & {
   headers: Headers;
 };
 
@@ -171,16 +189,16 @@ export const authControllerLogin = async (loginDto: LoginDto, options?: RequestI
 
 
 
-export const getAuthControllerLoginMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext>, }
+export const getAuthControllerLoginMutationOptions = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
 ): UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext> => {
 
 const mutationKey = ['authControllerLogin'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -188,7 +206,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerLogin>>, {data: LoginDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  authControllerLogin(data,)
+          return  authControllerLogin(data,requestOptions)
         }
 
 
@@ -200,13 +218,13 @@ const {mutation: mutationOptions} = options ?
 
     export type AuthControllerLoginMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerLogin>>>
     export type AuthControllerLoginMutationBody = LoginDto
-    export type AuthControllerLoginMutationError = void
+    export type AuthControllerLoginMutationError = ErrorResponseDto
 
     /**
- * @summary Login with username and password
+ * @summary Login with email and password
  */
-export const useAuthControllerLogin = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext>, }
+export const useAuthControllerLogin = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authControllerLogin>>,
         TError,
@@ -216,7 +234,8 @@ export const useAuthControllerLogin = <TError = void,
       return useMutation(getAuthControllerLoginMutationOptions(options), queryClient);
     }
     /**
- * @summary Authenticate with Google ID token and get backend JWT
+ * Verify Google ID token and return JWT token
+ * @summary Authenticate with Google
  */
 export type authControllerGoogleAuthenticateResponse200 = {
   data: AuthResponseDto
@@ -224,7 +243,7 @@ export type authControllerGoogleAuthenticateResponse200 = {
 }
 
 export type authControllerGoogleAuthenticateResponse401 = {
-  data: void
+  data: ErrorResponseDto
   status: 401
 }
     
@@ -260,16 +279,16 @@ export const authControllerGoogleAuthenticate = async (googleTokenDto: GoogleTok
 
 
 
-export const getAuthControllerGoogleAuthenticateMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>, TError,{data: GoogleTokenDto}, TContext>, }
+export const getAuthControllerGoogleAuthenticateMutationOptions = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>, TError,{data: GoogleTokenDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
 ): UseMutationOptions<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>, TError,{data: GoogleTokenDto}, TContext> => {
 
 const mutationKey = ['authControllerGoogleAuthenticate'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -277,7 +296,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>, {data: GoogleTokenDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  authControllerGoogleAuthenticate(data,)
+          return  authControllerGoogleAuthenticate(data,requestOptions)
         }
 
 
@@ -289,13 +308,13 @@ const {mutation: mutationOptions} = options ?
 
     export type AuthControllerGoogleAuthenticateMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>>
     export type AuthControllerGoogleAuthenticateMutationBody = GoogleTokenDto
-    export type AuthControllerGoogleAuthenticateMutationError = void
+    export type AuthControllerGoogleAuthenticateMutationError = ErrorResponseDto
 
     /**
- * @summary Authenticate with Google ID token and get backend JWT
+ * @summary Authenticate with Google
  */
-export const useAuthControllerGoogleAuthenticate = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>, TError,{data: GoogleTokenDto}, TContext>, }
+export const useAuthControllerGoogleAuthenticate = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>, TError,{data: GoogleTokenDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authControllerGoogleAuthenticate>>,
         TError,
@@ -305,19 +324,20 @@ export const useAuthControllerGoogleAuthenticate = <TError = void,
       return useMutation(getAuthControllerGoogleAuthenticateMutationOptions(options), queryClient);
     }
     /**
- * @summary Initiate Google OAuth flow (traditional method)
+ * Redirect to Google OAuth consent page (traditional OAuth flow)
+ * @summary Initiate Google OAuth flow
  */
-export type authControllerGoogleAuthResponse302 = {
+export type authControllerGoogleAuthResponse200 = {
   data: void
-  status: 302
+  status: 200
 }
     
-;
-export type authControllerGoogleAuthResponseError = (authControllerGoogleAuthResponse302) & {
+export type authControllerGoogleAuthResponseSuccess = (authControllerGoogleAuthResponse200) & {
   headers: Headers;
 };
+;
 
-export type authControllerGoogleAuthResponse = (authControllerGoogleAuthResponseError)
+export type authControllerGoogleAuthResponse = (authControllerGoogleAuthResponseSuccess)
 
 export const getAuthControllerGoogleAuthUrl = () => {
 
@@ -349,16 +369,16 @@ export const getAuthControllerGoogleAuthQueryKey = () => {
     }
 
     
-export const getAuthControllerGoogleAuthQueryOptions = <TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>>, }
+export const getAuthControllerGoogleAuthQueryOptions = <TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAuthControllerGoogleAuthQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGoogleAuth>>> = ({ signal }) => authControllerGoogleAuth({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGoogleAuth>>> = ({ signal }) => authControllerGoogleAuth({ signal, ...requestOptions });
 
       
 
@@ -368,39 +388,39 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type AuthControllerGoogleAuthQueryResult = NonNullable<Awaited<ReturnType<typeof authControllerGoogleAuth>>>
-export type AuthControllerGoogleAuthQueryError = void
+export type AuthControllerGoogleAuthQueryError = unknown
 
 
-export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = void>(
+export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = unknown>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof authControllerGoogleAuth>>,
           TError,
           Awaited<ReturnType<typeof authControllerGoogleAuth>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = void>(
+export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof authControllerGoogleAuth>>,
           TError,
           Awaited<ReturnType<typeof authControllerGoogleAuth>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>>, }
+export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Initiate Google OAuth flow (traditional method)
+ * @summary Initiate Google OAuth flow
  */
 
-export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>>, }
+export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuth>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -415,19 +435,20 @@ export function useAuthControllerGoogleAuth<TData = Awaited<ReturnType<typeof au
 
 
 /**
- * @summary Google OAuth callback endpoint (traditional method)
+ * Handle Google OAuth callback and redirect with JWT token
+ * @summary Google OAuth callback
  */
-export type authControllerGoogleAuthCallbackResponse302 = {
+export type authControllerGoogleAuthCallbackResponse200 = {
   data: void
-  status: 302
+  status: 200
 }
     
-;
-export type authControllerGoogleAuthCallbackResponseError = (authControllerGoogleAuthCallbackResponse302) & {
+export type authControllerGoogleAuthCallbackResponseSuccess = (authControllerGoogleAuthCallbackResponse200) & {
   headers: Headers;
 };
+;
 
-export type authControllerGoogleAuthCallbackResponse = (authControllerGoogleAuthCallbackResponseError)
+export type authControllerGoogleAuthCallbackResponse = (authControllerGoogleAuthCallbackResponseSuccess)
 
 export const getAuthControllerGoogleAuthCallbackUrl = () => {
 
@@ -459,16 +480,16 @@ export const getAuthControllerGoogleAuthCallbackQueryKey = () => {
     }
 
     
-export const getAuthControllerGoogleAuthCallbackQueryOptions = <TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>>, }
+export const getAuthControllerGoogleAuthCallbackQueryOptions = <TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAuthControllerGoogleAuthCallbackQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>> = ({ signal }) => authControllerGoogleAuthCallback({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>> = ({ signal }) => authControllerGoogleAuthCallback({ signal, ...requestOptions });
 
       
 
@@ -478,39 +499,39 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type AuthControllerGoogleAuthCallbackQueryResult = NonNullable<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>>
-export type AuthControllerGoogleAuthCallbackQueryError = void
+export type AuthControllerGoogleAuthCallbackQueryError = unknown
 
 
-export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = void>(
+export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = unknown>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>,
           TError,
           Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = void>(
+export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>,
           TError,
           Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>>, }
+export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Google OAuth callback endpoint (traditional method)
+ * @summary Google OAuth callback
  */
 
-export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>>, }
+export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGoogleAuthCallback>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -525,7 +546,97 @@ export function useAuthControllerGoogleAuthCallback<TData = Awaited<ReturnType<t
 
 
 /**
- * @summary Get current authenticated user profile
+ * Logout the authenticated user and invalidate the session
+ * @summary Logout user
+ */
+export type authControllerLogoutResponse200 = {
+  data: AuthControllerLogout200
+  status: 200
+}
+
+export type authControllerLogoutResponse401 = {
+  data: ErrorResponseDto
+  status: 401
+}
+    
+export type authControllerLogoutResponseSuccess = (authControllerLogoutResponse200) & {
+  headers: Headers;
+};
+export type authControllerLogoutResponseError = (authControllerLogoutResponse401) & {
+  headers: Headers;
+};
+
+export type authControllerLogoutResponse = (authControllerLogoutResponseSuccess | authControllerLogoutResponseError)
+
+export const getAuthControllerLogoutUrl = () => {
+
+
+  
+
+  return `/auth/logout`
+}
+
+export const authControllerLogout = async ( options?: RequestInit): Promise<authControllerLogoutResponse> => {
+  
+  return defaultMutator<authControllerLogoutResponse>(getAuthControllerLogoutUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getAuthControllerLogoutMutationOptions = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogout>>, TError,void, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof authControllerLogout>>, TError,void, TContext> => {
+
+const mutationKey = ['authControllerLogout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerLogout>>, void> = () => {
+          
+
+          return  authControllerLogout(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthControllerLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerLogout>>>
+    
+    export type AuthControllerLogoutMutationError = ErrorResponseDto
+
+    /**
+ * @summary Logout user
+ */
+export const useAuthControllerLogout = <TError = ErrorResponseDto,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogout>>, TError,void, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authControllerLogout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getAuthControllerLogoutMutationOptions(options), queryClient);
+    }
+    /**
+ * Return the authenticated user profile from JWT token
+ * @summary Get current user profile
  */
 export type authControllerGetProfileResponse200 = {
   data: UserResponseDto
@@ -533,7 +644,7 @@ export type authControllerGetProfileResponse200 = {
 }
 
 export type authControllerGetProfileResponse401 = {
-  data: void
+  data: ErrorResponseDto
   status: 401
 }
     
@@ -576,16 +687,16 @@ export const getAuthControllerGetProfileQueryKey = () => {
     }
 
     
-export const getAuthControllerGetProfileQueryOptions = <TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>>, }
+export const getAuthControllerGetProfileQueryOptions = <TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = ErrorResponseDto>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAuthControllerGetProfileQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetProfile>>> = ({ signal }) => authControllerGetProfile({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerGetProfile>>> = ({ signal }) => authControllerGetProfile({ signal, ...requestOptions });
 
       
 
@@ -595,43 +706,289 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type AuthControllerGetProfileQueryResult = NonNullable<Awaited<ReturnType<typeof authControllerGetProfile>>>
-export type AuthControllerGetProfileQueryError = void
+export type AuthControllerGetProfileQueryError = ErrorResponseDto
 
 
-export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = void>(
+export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = ErrorResponseDto>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof authControllerGetProfile>>,
           TError,
           Awaited<ReturnType<typeof authControllerGetProfile>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = void>(
+export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = ErrorResponseDto>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof authControllerGetProfile>>,
           TError,
           Awaited<ReturnType<typeof authControllerGetProfile>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>>, }
+export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Get current authenticated user profile
+ * @summary Get current user profile
  */
 
-export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>>, }
+export function useAuthControllerGetProfile<TData = Awaited<ReturnType<typeof authControllerGetProfile>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerGetProfile>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAuthControllerGetProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * This endpoint is only accessible by users with admin role
+ * @summary Admin only endpoint example
+ */
+export type authControllerAdminOnlyResponse200 = {
+  data: AuthControllerAdminOnly200
+  status: 200
+}
+
+export type authControllerAdminOnlyResponse401 = {
+  data: ErrorResponseDto
+  status: 401
+}
+
+export type authControllerAdminOnlyResponse403 = {
+  data: ErrorResponseDto
+  status: 403
+}
+    
+export type authControllerAdminOnlyResponseSuccess = (authControllerAdminOnlyResponse200) & {
+  headers: Headers;
+};
+export type authControllerAdminOnlyResponseError = (authControllerAdminOnlyResponse401 | authControllerAdminOnlyResponse403) & {
+  headers: Headers;
+};
+
+export type authControllerAdminOnlyResponse = (authControllerAdminOnlyResponseSuccess | authControllerAdminOnlyResponseError)
+
+export const getAuthControllerAdminOnlyUrl = () => {
+
+
+  
+
+  return `/auth/admin/users`
+}
+
+export const authControllerAdminOnly = async ( options?: RequestInit): Promise<authControllerAdminOnlyResponse> => {
+  
+  return defaultMutator<authControllerAdminOnlyResponse>(getAuthControllerAdminOnlyUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getAuthControllerAdminOnlyQueryKey = () => {
+    return [
+    `/auth/admin/users`
+    ] as const;
+    }
+
+    
+export const getAuthControllerAdminOnlyQueryOptions = <TData = Awaited<ReturnType<typeof authControllerAdminOnly>>, TError = ErrorResponseDto>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerAdminOnly>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAuthControllerAdminOnlyQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerAdminOnly>>> = ({ signal }) => authControllerAdminOnly({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authControllerAdminOnly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AuthControllerAdminOnlyQueryResult = NonNullable<Awaited<ReturnType<typeof authControllerAdminOnly>>>
+export type AuthControllerAdminOnlyQueryError = ErrorResponseDto
+
+
+export function useAuthControllerAdminOnly<TData = Awaited<ReturnType<typeof authControllerAdminOnly>>, TError = ErrorResponseDto>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerAdminOnly>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authControllerAdminOnly>>,
+          TError,
+          Awaited<ReturnType<typeof authControllerAdminOnly>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthControllerAdminOnly<TData = Awaited<ReturnType<typeof authControllerAdminOnly>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerAdminOnly>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authControllerAdminOnly>>,
+          TError,
+          Awaited<ReturnType<typeof authControllerAdminOnly>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthControllerAdminOnly<TData = Awaited<ReturnType<typeof authControllerAdminOnly>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerAdminOnly>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Admin only endpoint example
+ */
+
+export function useAuthControllerAdminOnly<TData = Awaited<ReturnType<typeof authControllerAdminOnly>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerAdminOnly>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAuthControllerAdminOnlyQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * Accessible by organizers and admins
+ * @summary Organizer dashboard endpoint
+ */
+export type authControllerOrganizerDashboardResponse200 = {
+  data: AuthControllerOrganizerDashboard200
+  status: 200
+}
+
+export type authControllerOrganizerDashboardResponse401 = {
+  data: ErrorResponseDto
+  status: 401
+}
+
+export type authControllerOrganizerDashboardResponse403 = {
+  data: ErrorResponseDto
+  status: 403
+}
+    
+export type authControllerOrganizerDashboardResponseSuccess = (authControllerOrganizerDashboardResponse200) & {
+  headers: Headers;
+};
+export type authControllerOrganizerDashboardResponseError = (authControllerOrganizerDashboardResponse401 | authControllerOrganizerDashboardResponse403) & {
+  headers: Headers;
+};
+
+export type authControllerOrganizerDashboardResponse = (authControllerOrganizerDashboardResponseSuccess | authControllerOrganizerDashboardResponseError)
+
+export const getAuthControllerOrganizerDashboardUrl = () => {
+
+
+  
+
+  return `/auth/organizer/dashboard`
+}
+
+export const authControllerOrganizerDashboard = async ( options?: RequestInit): Promise<authControllerOrganizerDashboardResponse> => {
+  
+  return defaultMutator<authControllerOrganizerDashboardResponse>(getAuthControllerOrganizerDashboardUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getAuthControllerOrganizerDashboardQueryKey = () => {
+    return [
+    `/auth/organizer/dashboard`
+    ] as const;
+    }
+
+    
+export const getAuthControllerOrganizerDashboardQueryOptions = <TData = Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError = ErrorResponseDto>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAuthControllerOrganizerDashboardQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>> = ({ signal }) => authControllerOrganizerDashboard({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AuthControllerOrganizerDashboardQueryResult = NonNullable<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>>
+export type AuthControllerOrganizerDashboardQueryError = ErrorResponseDto
+
+
+export function useAuthControllerOrganizerDashboard<TData = Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError = ErrorResponseDto>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authControllerOrganizerDashboard>>,
+          TError,
+          Awaited<ReturnType<typeof authControllerOrganizerDashboard>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthControllerOrganizerDashboard<TData = Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof authControllerOrganizerDashboard>>,
+          TError,
+          Awaited<ReturnType<typeof authControllerOrganizerDashboard>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuthControllerOrganizerDashboard<TData = Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Organizer dashboard endpoint
+ */
+
+export function useAuthControllerOrganizerDashboard<TData = Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError = ErrorResponseDto>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authControllerOrganizerDashboard>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAuthControllerOrganizerDashboardQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

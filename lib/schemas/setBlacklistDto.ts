@@ -6,9 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface LoginDto {
-  /** User email address */
-  email: string;
-  /** User password */
-  password: string;
+export interface SetBlacklistDto {
+  /** Danh sách email/SĐT cần chặn (phân tách bởi dấu cách hoặc Enter) */
+  raw: string;
 }

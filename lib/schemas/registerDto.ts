@@ -7,14 +7,18 @@
  */
 
 export interface RegisterDto {
+  /** User email address (primary identifier) */
+  email: string;
   /**
-   * Username for the new account
-   * @minLength 3
-   */
-  username: string;
-  /**
-   * Password for the new account
+   * Password for the account (min 6 characters)
    * @minLength 6
    */
   password: string;
+  /** Display name for the user */
+  displayName?: string;
+  /**
+   * Tags for user categorization
+   * @maxItems 10
+   */
+  tags?: string[];
 }

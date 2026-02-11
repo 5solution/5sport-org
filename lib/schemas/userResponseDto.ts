@@ -5,14 +5,19 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
+import type { UserResponseDtoRole } from './userResponseDtoRole';
 
 export interface UserResponseDto {
   /** User unique identifier */
   id: string;
-  /** Username */
-  username?: string;
-  /** Email address */
-  email?: string;
-  /** Display name */
+  /** User email address */
+  email: string;
+  /** User display name */
   displayName?: string;
+  /** User role */
+  role: UserResponseDtoRole;
+  /** User tags */
+  tags: string[];
+  /** User avatar URL */
+  avatarUrl?: string;
 }

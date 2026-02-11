@@ -6,9 +6,14 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface LoginDto {
-  /** User email address */
-  email: string;
-  /** User password */
-  password: string;
-}
+export type EventControllerFindAllParams = {
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+};

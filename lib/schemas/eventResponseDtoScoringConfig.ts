@@ -6,9 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface LoginDto {
-  /** User email address */
-  email: string;
-  /** User password */
-  password: string;
-}
+/**
+ * Cấu hình luật thi đấu
+ */
+export type EventResponseDtoScoringConfig = { [key: string]: unknown };

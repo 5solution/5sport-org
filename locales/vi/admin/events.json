@@ -1,0 +1,77 @@
+{
+  "title": "Sự kiện",
+  "createNew": "Tạo Sự Kiện Mới",
+  "editEvent": "Chỉnh Sửa Sự Kiện",
+  "createPage": {
+    "title": "Tạo Sự Kiện Mới",
+    "subtitle": "Thiết lập sự kiện thể thao mới trong vài bước"
+  },
+  "steps": {
+    "basicInfo": {
+      "title": "Thông Tin Cơ Bản",
+      "description": "Chi tiết sự kiện"
+    },
+    "timeline": {
+      "title": "Thời Gian",
+      "description": "Lịch trình & ngày"
+    },
+    "payment": {
+      "title": "Thanh Toán",
+      "description": "Thanh toán & xem lại"
+    }
+  },
+  "fields": {
+    "eventName": "Tên Sự Kiện",
+    "eventNamePlaceholder": "VD: Giải Pickleball 2026",
+    "brand": "Thương Hiệu / Nhà Tài Trợ",
+    "brandPlaceholder": "VD: VinSports",
+    "sportType": "Loại Thể Thao",
+    "sportTypePlaceholder": "Chọn môn thể thao",
+    "hotline": "Hotline",
+    "hotlinePlaceholder": "0901234567",
+    "address": "Địa Chỉ",
+    "addressPlaceholder": "Địa chỉ đầy đủ địa điểm tổ chức",
+    "province": "Tỉnh / Thành Phố",
+    "provincePlaceholder": "Chọn tỉnh/thành phố",
+    "provinceLoading": "Đang tải...",
+    "ward": "Phường / Quận",
+    "wardPlaceholder": "Chọn phường/quận",
+    "wardPlaceholderNoProvince": "Chọn tỉnh/thành phố trước",
+    "wardLoading": "Đang tải...",
+    "prefixCode": "Mã Tiền Tố",
+    "prefixCodePlaceholder": "VD: PKB",
+    "prefixCodeHelp": "Tối đa 6 ký tự, tự động viết hoa",
+    "allowTransfer": "Cho Phép Chuyển Nhượng",
+    "eventStartTime": "Thời Gian Bắt Đầu",
+    "eventEndTime": "Thời Gian Kết Thúc",
+    "editInfoOpenTime": "Mở Chỉnh Sửa Thông Tin",
+    "editInfoCloseTime": "Đóng Chỉnh Sửa Thông Tin",
+    "checkinOpenTime": "Mở Check-in",
+    "checkinCloseTime": "Đóng Check-in",
+    "transferOpenTime": "Mở Chuyển Nhượng",
+    "transferCloseTime": "Đóng Chuyển Nhượng",
+    "paymentMethods": "Phương Thức Thanh Toán"
+  },
+  "validation": {
+    "eventNameRequired": "Tên sự kiện là bắt buộc",
+    "sportTypeRequired": "Loại thể thao là bắt buộc",
+    "hotlineRequired": "Hotline là bắt buộc",
+    "addressRequired": "Địa chỉ là bắt buộc",
+    "provinceRequired": "Tỉnh/thành phố là bắt buộc",
+    "wardRequired": "Phường/quận là bắt buộc",
+    "prefixCodeRequired": "Mã tiền tố là bắt buộc"
+  },
+  "sports": {
+    "pickleball": "Pickleball",
+    "badminton": "Cầu Lông"
+  },
+  "messages": {
+    "createSuccess": "Tạo sự kiện thành công!",
+    "createFailed": "Tạo sự kiện thất bại",
+    "noProvinceFound": "Không tìm thấy tỉnh/thành phố",
+    "noWardFound": "Không tìm thấy phường/quận",
+    "searchProvince": "Tìm tỉnh/thành phố...",
+    "searchWard": "Tìm phường/quận...",
+    "loading": "Đang tải..."
+  }
+}

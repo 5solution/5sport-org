@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,14 +25,19 @@ import {
 import { StepTimeline, validateTimeline } from '@/components/admin/events/create/step-timeline';
 import { StepPayment, validatePayment } from '@/components/admin/events/create/step-payment';
 
-const steps = [
-  { title: 'Basic Info', description: 'Event details' },
-  { title: 'Timeline', description: 'Schedule & dates' },
-  { title: 'Payment', description: 'Payment & review' },
-];
-
 export default function CreateEventPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale as string;
+  const t = useTranslations('admin.events');
+  const tCommon = useTranslations('common.buttons');
+  const tVal = useTranslations('admin.events.validation');
+
+  const steps = [
+    { title: t('steps.basicInfo.title'), description: t('steps.basicInfo.description') },
+    { title: t('steps.timeline.title'), description: t('steps.timeline.description') },
+    { title: t('steps.payment.title'), description: t('steps.payment.description') },
+  ];
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<EventFormData>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -53,7 +59,7 @@ export default function CreateEventPage() {
 
   const validateStep = (): boolean => {
     let stepErrors: Record<string, string> = {};
-    if (currentStep === 0) stepErrors = validateBasicInfo(formData);
+    if (currentStep === 0) stepErrors = validateBasicInfo(formData, tVal);
     else if (currentStep === 1) stepErrors = validateTimeline(formData);
     else if (currentStep === 2) stepErrors = validatePayment(formData);
     setErrors(stepErrors);
@@ -106,16 +112,16 @@ export default function CreateEventPage() {
 
       const result = await createMutation.mutateAsync({ data: payload });
       const eventId = (result as any)?.data?.id ?? (result as any)?.id;
-      toast.success('Event created successfully!');
+      toast.success(t('messages.createSuccess'));
       if (eventId) {
-        router.push(`/admin/events/${eventId}`);
+        router.push(`/${locale}/admin/events/${eventId}`);
       } else {
-        router.push('/admin/events');
+        router.push(`/${locale}/admin/events`);
       }
     } catch (err: any) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to create event';
+      const message = err?.response?.data?.message || err?.message || t('messages.createFailed');
       setSubmitError(message);
-      toast.error('Failed to create event', { description: message });
+      toast.error(t('messages.createFailed'), { description: message });
     }
   };
 
@@ -123,15 +129,15 @@ export default function CreateEventPage() {
     <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
       <div className="flex items-center gap-4 pt-12 lg:pt-0">
-        <Button variant="ghost" size="icon" onClick={() => router.push('/admin/events')}>
+        <Button variant="ghost" size="icon" onClick={() => router.push(`/${locale}/admin/events`)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">
-            Create New Event
+            {t('createPage.title')}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Set up a new sporting event in a few steps.
+            {t('createPage.subtitle')}
           </p>
         </div>
       </div>
@@ -212,16 +218,16 @@ export default function CreateEventPage() {
               disabled={currentStep === 0 || createMutation.isPending}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {tCommon('back')}
             </Button>
             {currentStep < steps.length - 1 ? (
               <Button onClick={handleNext}>
-                Next
+                {tCommon('next')}
               </Button>
             ) : (
               <Button onClick={handleSubmit} disabled={createMutation.isPending}>
                 {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Event
+                {t('createNew')}
               </Button>
             )}
           </div>

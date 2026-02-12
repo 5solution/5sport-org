@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "title": "5Sport Admin",
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "users": "Users",
+    "settings": "Settings",
+    "myAccount": "My Account"
+  }
+}

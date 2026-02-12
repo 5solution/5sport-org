@@ -1,0 +1,77 @@
+{
+  "title": "Events",
+  "createNew": "Create New Event",
+  "editEvent": "Edit Event",
+  "createPage": {
+    "title": "Create New Event",
+    "subtitle": "Set up a new sporting event in a few steps"
+  },
+  "steps": {
+    "basicInfo": {
+      "title": "Basic Info",
+      "description": "Event details"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "description": "Schedule & dates"
+    },
+    "payment": {
+      "title": "Payment",
+      "description": "Payment & review"
+    }
+  },
+  "fields": {
+    "eventName": "Event Name",
+    "eventNamePlaceholder": "e.g. Pickleball Championship 2026",
+    "brand": "Brand / Sponsor",
+    "brandPlaceholder": "e.g. VinSports",
+    "sportType": "Sport Type",
+    "sportTypePlaceholder": "Select sport",
+    "hotline": "Hotline",
+    "hotlinePlaceholder": "0901234567",
+    "address": "Address",
+    "addressPlaceholder": "Full venue address",
+    "province": "Province / City",
+    "provincePlaceholder": "Select province",
+    "provinceLoading": "Loading...",
+    "ward": "Ward / District",
+    "wardPlaceholder": "Select ward",
+    "wardPlaceholderNoProvince": "Select province first",
+    "wardLoading": "Loading...",
+    "prefixCode": "Prefix Code",
+    "prefixCodePlaceholder": "e.g. PKB",
+    "prefixCodeHelp": "Max 6 characters, auto-uppercase",
+    "allowTransfer": "Allow Transfer",
+    "eventStartTime": "Event Start Time",
+    "eventEndTime": "Event End Time",
+    "editInfoOpenTime": "Edit Info Open Time",
+    "editInfoCloseTime": "Edit Info Close Time",
+    "checkinOpenTime": "Check-in Open Time",
+    "checkinCloseTime": "Check-in Close Time",
+    "transferOpenTime": "Transfer Open Time",
+    "transferCloseTime": "Transfer Close Time",
+    "paymentMethods": "Payment Methods"
+  },
+  "validation": {
+    "eventNameRequired": "Event name is required",
+    "sportTypeRequired": "Sport type is required",
+    "hotlineRequired": "Hotline is required",
+    "addressRequired": "Address is required",
+    "provinceRequired": "Province is required",
+    "wardRequired": "Ward is required",
+    "prefixCodeRequired": "Prefix code is required"
+  },
+  "sports": {
+    "pickleball": "Pickleball",
+    "badminton": "Badminton"
+  },
+  "messages": {
+    "createSuccess": "Event created successfully!",
+    "createFailed": "Failed to create event",
+    "noProvinceFound": "No province found",
+    "noWardFound": "No ward found",
+    "searchProvince": "Search province...",
+    "searchWard": "Search ward...",
+    "loading": "Loading..."
+  }
+}

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +22,11 @@ import { useAuth } from '@/hooks/use-auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale as string;
   const { login } = useAuth();
+  const t = useTranslations('auth.login');
+  const tVal = useTranslations('auth.validation');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,9 +41,9 @@ export default function LoginPage() {
 
     try {
       await login(formData);
-      router.push('/admin/users');
+      router.push(`/${locale}/admin/users`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : tVal('loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -56,10 +61,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-2 pb-4 sm:pb-6">
           <CardTitle className="font-heading text-2xl sm:text-3xl font-bold text-center tracking-tight">
-            Welcome back
+            {t('title')}
           </CardTitle>
           <CardDescription className="text-center text-sm sm:text-base">
-            Sign in to your account to continue
+            {t('subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4 sm:px-6">
@@ -71,11 +76,11 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder={t('emailPlaceholder')}
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -86,11 +91,11 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t('passwordPlaceholder')}
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
@@ -104,10 +109,10 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  {t('signingIn')}
                 </>
               ) : (
-                'Sign in'
+                t('signInButton')
               )}
             </Button>
           </form>
@@ -118,7 +123,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
+                {t('orContinueWith')}
               </span>
             </div>
           </div>
@@ -147,17 +152,17 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
+            {t('googleButton')}
           </Button>
         </CardContent>
         <CardFooter className="flex justify-center px-4 sm:px-6 pt-2 pb-4 sm:pb-6">
           <p className="text-sm sm:text-base text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            {t('noAccount')}{' '}
             <Link
-              href="/register"
+              href={`/${locale}/register`}
               className="font-semibold text-primary hover:underline"
             >
-              Sign up
+              {t('signUpLink')}
             </Link>
           </p>
         </CardFooter>

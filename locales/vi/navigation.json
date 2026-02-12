@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "title": "5Sport Quản trị",
+    "dashboard": "Tổng quan",
+    "events": "Sự kiện",
+    "users": "Người dùng",
+    "settings": "Cài đặt",
+    "myAccount": "Tài khoản của tôi"
+  }
+}

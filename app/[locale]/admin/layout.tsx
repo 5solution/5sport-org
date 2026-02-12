@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { LayoutDashboard, Users, LogOut, Settings, Menu, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { AdminGuard } from '@/components/auth';
 import { Button } from '@/components/ui/button';
@@ -18,13 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-
-const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Events', href: '/admin/events', icon: Calendar },
-  { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
-];
+import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 export default function AdminLayout({
   children,
@@ -32,8 +27,20 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const params = useParams();
+  const locale = params?.locale as string;
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const t = useTranslations('navigation.admin');
+  const tCommon = useTranslations('common.buttons');
+
+  const navigation = [
+    { name: t('dashboard'), href: `/${locale}/admin`, icon: LayoutDashboard },
+    { name: t('events'), href: `/${locale}/admin/events`, icon: Calendar },
+    { name: t('users'), href: `/${locale}/admin/users`, icon: Users },
+    { name: t('settings'), href: `/${locale}/admin/settings`, icon: Settings },
+  ];
 
   const getInitials = (name?: string, email?: string) => {
     if (name) {
@@ -71,14 +78,14 @@ export default function AdminLayout({
           <div className="flex h-full flex-col">
             {/* Logo */}
             <div className="flex h-16 items-center border-b px-6">
-              <Link href="/admin" className="flex items-center gap-2">
+              <Link href={`/${locale}/admin`} className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                   <span className="font-heading text-sm font-bold text-primary-foreground">
                     5S
                   </span>
                 </div>
                 <span className="font-heading text-lg font-bold text-sidebar-foreground tracking-tight">
-                  5Sport Admin
+                  {t('title')}
                 </span>
               </Link>
             </div>
@@ -130,18 +137,23 @@ export default function AdminLayout({
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/admin/settings">
+                    <Link href={`/${locale}/admin/settings`}>
                       <Settings className="mr-2 h-4 w-4" />
-                      Settings
+                      {t('settings')}
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <div className="w-full">
+                      <LanguageSwitcher />
+                    </div>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                    {tCommon('signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

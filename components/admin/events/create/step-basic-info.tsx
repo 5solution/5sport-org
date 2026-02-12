@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,6 +69,9 @@ interface StepBasicInfoProps {
 export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps) {
   const [provinceSearch, setProvinceSearch] = useState('');
   const [wardSearch, setWardSearch] = useState('');
+  const t = useTranslations('admin.events.fields');
+  const tSports = useTranslations('admin.events.sports');
+  const tMsg = useTranslations('admin.events.messages');
 
   const { data: provinces = [], isLoading: provincesLoading } = useListProvinces();
   const { data: wards = [], isLoading: wardsLoading } = useListWardsByProvince(
@@ -95,11 +99,11 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Event Name */}
         <div className="space-y-2 sm:col-span-2">
           <Label htmlFor="name">
-            Event Name <span className="text-destructive">*</span>
+            {t('eventName')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="name"
-            placeholder="e.g. Pickleball Championship 2026"
+            placeholder={t('eventNamePlaceholder')}
             value={formData.name}
             onChange={(e) => onChange('name', e.target.value)}
             maxLength={256}
@@ -109,10 +113,10 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
 
         {/* Brand */}
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="brand">Brand / Sponsor</Label>
+          <Label htmlFor="brand">{t('brand')}</Label>
           <Input
             id="brand"
-            placeholder="e.g. VinSports"
+            placeholder={t('brandPlaceholder')}
             value={formData.brand}
             onChange={(e) => onChange('brand', e.target.value)}
             maxLength={256}
@@ -122,15 +126,15 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Sport Type */}
         <div className="space-y-2">
           <Label>
-            Sport Type <span className="text-destructive">*</span>
+            {t('sportType')} <span className="text-destructive">*</span>
           </Label>
           <Select value={formData.sportType} onValueChange={(v) => onChange('sportType', v)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select sport" />
+              <SelectValue placeholder={t('sportTypePlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="PICKLEBALL">Pickleball</SelectItem>
-              <SelectItem value="BADMINTON">Badminton</SelectItem>
+              <SelectItem value="PICKLEBALL">{tSports('pickleball')}</SelectItem>
+              <SelectItem value="BADMINTON">{tSports('badminton')}</SelectItem>
             </SelectContent>
           </Select>
           {errors.sportType && <p className="text-sm text-destructive">{errors.sportType}</p>}
@@ -139,11 +143,11 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Hotline */}
         <div className="space-y-2">
           <Label htmlFor="hotline">
-            Hotline <span className="text-destructive">*</span>
+            {t('hotline')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="hotline"
-            placeholder="0901234567"
+            placeholder={t('hotlinePlaceholder')}
             value={formData.hotline}
             onChange={(e) => onChange('hotline', e.target.value)}
             maxLength={20}
@@ -154,11 +158,11 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Address */}
         <div className="space-y-2 sm:col-span-2">
           <Label htmlFor="address">
-            Address <span className="text-destructive">*</span>
+            {t('address')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="address"
-            placeholder="Full venue address"
+            placeholder={t('addressPlaceholder')}
             value={formData.address}
             onChange={(e) => onChange('address', e.target.value)}
           />
@@ -168,17 +172,17 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Province Select */}
         <div className="space-y-2">
           <Label>
-            Province / City <span className="text-destructive">*</span>
+            {t('province')} <span className="text-destructive">*</span>
           </Label>
           <Select value={formData.provinceCode} onValueChange={handleProvinceChange}>
             <SelectTrigger>
-              <SelectValue placeholder={provincesLoading ? 'Loading...' : 'Select province'} />
+              <SelectValue placeholder={provincesLoading ? t('provinceLoading') : t('provincePlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               <div className="flex items-center gap-2 px-2 pb-2">
                 <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <Input
-                  placeholder="Search province..."
+                  placeholder={tMsg('searchProvince')}
                   value={provinceSearch}
                   onChange={(e) => setProvinceSearch(e.target.value)}
                   className="h-8"
@@ -191,7 +195,7 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
                 </div>
               ) : filteredProvinces.length === 0 ? (
                 <div className="py-4 text-center text-sm text-muted-foreground">
-                  No province found
+                  {tMsg('noProvinceFound')}
                 </div>
               ) : (
                 filteredProvinces.map((province) => (
@@ -208,7 +212,7 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Ward Select */}
         <div className="space-y-2">
           <Label>
-            Ward / District <span className="text-destructive">*</span>
+            {t('ward')} <span className="text-destructive">*</span>
           </Label>
           <Select
             value={formData.wardCode}
@@ -219,10 +223,10 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
               <SelectValue
                 placeholder={
                   !formData.provinceCode
-                    ? 'Select province first'
+                    ? t('wardPlaceholderNoProvince')
                     : wardsLoading
-                      ? 'Loading...'
-                      : 'Select ward'
+                      ? t('wardLoading')
+                      : t('wardPlaceholder')
                 }
               />
             </SelectTrigger>
@@ -230,7 +234,7 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
               <div className="flex items-center gap-2 px-2 pb-2">
                 <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <Input
-                  placeholder="Search ward..."
+                  placeholder={tMsg('searchWard')}
                   value={wardSearch}
                   onChange={(e) => setWardSearch(e.target.value)}
                   className="h-8"
@@ -243,7 +247,7 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
                 </div>
               ) : filteredWards.length === 0 ? (
                 <div className="py-4 text-center text-sm text-muted-foreground">
-                  No ward found
+                  {tMsg('noWardFound')}
                 </div>
               ) : (
                 filteredWards.map((ward) => (
@@ -260,17 +264,17 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
         {/* Prefix Code */}
         <div className="space-y-2">
           <Label htmlFor="prefixCode">
-            Prefix Code <span className="text-destructive">*</span>
+            {t('prefixCode')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="prefixCode"
-            placeholder="e.g. PKB"
+            placeholder={t('prefixCodePlaceholder')}
             value={formData.prefixCode}
             onChange={(e) => onChange('prefixCode', e.target.value.toUpperCase())}
             maxLength={6}
             className="uppercase"
           />
-          <p className="text-xs text-muted-foreground">Max 6 characters, auto-uppercase</p>
+          <p className="text-xs text-muted-foreground">{t('prefixCodeHelp')}</p>
           {errors.prefixCode && <p className="text-sm text-destructive">{errors.prefixCode}</p>}
         </div>
       </div>
@@ -278,14 +282,17 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
   );
 }
 
-export function validateBasicInfo(data: EventFormData): Record<string, string> {
+// Note: Validation function can't use hooks, so validation messages are passed from the parent component
+export function validateBasicInfo(data: EventFormData, t?: any): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!data.name.trim()) errors.name = 'Event name is required';
-  if (!data.sportType) errors.sportType = 'Sport type is required';
-  if (!data.hotline.trim()) errors.hotline = 'Hotline is required';
-  if (!data.address.trim()) errors.address = 'Address is required';
-  if (!data.provinceCode) errors.provinceCode = 'Province is required';
-  if (!data.wardCode) errors.wardCode = 'Ward is required';
-  if (!data.prefixCode.trim()) errors.prefixCode = 'Prefix code is required';
+  const getMsg = (key: string, fallback: string) => t ? t(key) : fallback;
+
+  if (!data.name.trim()) errors.name = getMsg('eventNameRequired', 'Event name is required');
+  if (!data.sportType) errors.sportType = getMsg('sportTypeRequired', 'Sport type is required');
+  if (!data.hotline.trim()) errors.hotline = getMsg('hotlineRequired', 'Hotline is required');
+  if (!data.address.trim()) errors.address = getMsg('addressRequired', 'Address is required');
+  if (!data.provinceCode) errors.provinceCode = getMsg('provinceRequired', 'Province is required');
+  if (!data.wardCode) errors.wardCode = getMsg('wardRequired', 'Ward is required');
+  if (!data.prefixCode.trim()) errors.prefixCode = getMsg('prefixCodeRequired', 'Prefix code is required');
   return errors;
 }

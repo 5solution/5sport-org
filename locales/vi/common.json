@@ -1,0 +1,37 @@
+{
+  "buttons": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo mới",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "submit": "Gửi",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "close": "Đóng",
+    "signIn": "Đăng nhập",
+    "signOut": "Đăng xuất",
+    "signUp": "Đăng ký"
+  },
+  "actions": {
+    "loading": "Đang tải...",
+    "saving": "Đang lưu...",
+    "deleting": "Đang xóa...",
+    "creating": "Đang tạo..."
+  },
+  "status": {
+    "success": "Thành công",
+    "error": "Lỗi",
+    "warning": "Cảnh báo",
+    "info": "Thông tin"
+  },
+  "pagination": {
+    "previous": "Trước",
+    "next": "Sau",
+    "showing": "Hiển thị",
+    "of": "trên",
+    "results": "kết quả"
+  }
+}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, LogOut, Settings, Menu } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Settings, Menu, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
 import { AdminGuard } from '@/components/auth';
@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/use-auth';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Events', href: '/admin/events', icon: Calendar },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];

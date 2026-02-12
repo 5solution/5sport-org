@@ -1,5 +1,8 @@
 'use client';
 
+import { useState } from 'react';
+import { Loader2, Search } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -9,6 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  useListProvinces,
+  useListWardsByProvince,
+} from '@/lib/services/provinces/provinces';
 
 export interface EventFormData {
   name: string;
@@ -59,6 +66,29 @@ interface StepBasicInfoProps {
 }
 
 export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps) {
+  const [provinceSearch, setProvinceSearch] = useState('');
+  const [wardSearch, setWardSearch] = useState('');
+
+  const { data: provinces = [], isLoading: provincesLoading } = useListProvinces();
+  const { data: wards = [], isLoading: wardsLoading } = useListWardsByProvince(
+    Number(formData.provinceCode),
+    { enabled: !!formData.provinceCode },
+  );
+
+  const filteredProvinces = provinceSearch
+    ? provinces.filter((p) => p.name.toLowerCase().includes(provinceSearch.toLowerCase()))
+    : provinces;
+
+  const filteredWards = wardSearch
+    ? (wards ?? []).filter((w) => w.name.toLowerCase().includes(wardSearch.toLowerCase()))
+    : (wards ?? []);
+
+  const handleProvinceChange = (value: string) => {
+    onChange('provinceCode', value);
+    onChange('wardCode', '');
+    setWardSearch('');
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -135,31 +165,95 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
           {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
         </div>
 
-        {/* Province Code */}
+        {/* Province Select */}
         <div className="space-y-2">
-          <Label htmlFor="provinceCode">
-            Province Code <span className="text-destructive">*</span>
+          <Label>
+            Province / City <span className="text-destructive">*</span>
           </Label>
-          <Input
-            id="provinceCode"
-            placeholder="e.g. 01"
-            value={formData.provinceCode}
-            onChange={(e) => onChange('provinceCode', e.target.value)}
-          />
+          <Select value={formData.provinceCode} onValueChange={handleProvinceChange}>
+            <SelectTrigger>
+              <SelectValue placeholder={provincesLoading ? 'Loading...' : 'Select province'} />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="flex items-center gap-2 px-2 pb-2">
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Input
+                  placeholder="Search province..."
+                  value={provinceSearch}
+                  onChange={(e) => setProvinceSearch(e.target.value)}
+                  className="h-8"
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
+              </div>
+              {provincesLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : filteredProvinces.length === 0 ? (
+                <div className="py-4 text-center text-sm text-muted-foreground">
+                  No province found
+                </div>
+              ) : (
+                filteredProvinces.map((province) => (
+                  <SelectItem key={province.code} value={String(province.code)}>
+                    {province.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
           {errors.provinceCode && <p className="text-sm text-destructive">{errors.provinceCode}</p>}
         </div>
 
-        {/* Ward Code */}
+        {/* Ward Select */}
         <div className="space-y-2">
-          <Label htmlFor="wardCode">
-            Ward Code <span className="text-destructive">*</span>
+          <Label>
+            Ward / District <span className="text-destructive">*</span>
           </Label>
-          <Input
-            id="wardCode"
-            placeholder="e.g. 00001"
+          <Select
             value={formData.wardCode}
-            onChange={(e) => onChange('wardCode', e.target.value)}
-          />
+            onValueChange={(v) => onChange('wardCode', v)}
+            disabled={!formData.provinceCode}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  !formData.provinceCode
+                    ? 'Select province first'
+                    : wardsLoading
+                      ? 'Loading...'
+                      : 'Select ward'
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="flex items-center gap-2 px-2 pb-2">
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <Input
+                  placeholder="Search ward..."
+                  value={wardSearch}
+                  onChange={(e) => setWardSearch(e.target.value)}
+                  className="h-8"
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
+              </div>
+              {wardsLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : filteredWards.length === 0 ? (
+                <div className="py-4 text-center text-sm text-muted-foreground">
+                  No ward found
+                </div>
+              ) : (
+                filteredWards.map((ward) => (
+                  <SelectItem key={ward.code} value={String(ward.code)}>
+                    {ward.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
           {errors.wardCode && <p className="text-sm text-destructive">{errors.wardCode}</p>}
         </div>
 
@@ -190,8 +284,8 @@ export function validateBasicInfo(data: EventFormData): Record<string, string> {
   if (!data.sportType) errors.sportType = 'Sport type is required';
   if (!data.hotline.trim()) errors.hotline = 'Hotline is required';
   if (!data.address.trim()) errors.address = 'Address is required';
-  if (!data.provinceCode.trim()) errors.provinceCode = 'Province code is required';
-  if (!data.wardCode.trim()) errors.wardCode = 'Ward code is required';
+  if (!data.provinceCode) errors.provinceCode = 'Province is required';
+  if (!data.wardCode) errors.wardCode = 'Ward is required';
   if (!data.prefixCode.trim()) errors.prefixCode = 'Prefix code is required';
   return errors;
 }

@@ -20,11 +20,11 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="eventStartTime">
-              Start Time <span className="text-destructive">*</span>
+              Start Date <span className="text-destructive">*</span>
             </Label>
             <Input
               id="eventStartTime"
-              type="datetime-local"
+              type="date"
               value={formData.eventStartTime}
               onChange={(e) => onChange('eventStartTime', e.target.value)}
             />
@@ -34,11 +34,11 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="eventEndTime">
-              End Time <span className="text-destructive">*</span>
+              End Date <span className="text-destructive">*</span>
             </Label>
             <Input
               id="eventEndTime"
-              type="datetime-local"
+              type="date"
               value={formData.eventEndTime}
               onChange={(e) => onChange('eventEndTime', e.target.value)}
             />
@@ -53,16 +53,16 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3">Edit Info Period</h3>
         <p className="text-xs text-muted-foreground mb-3">
-          Time window for participants to edit their registration info.
+          Date range for participants to edit their registration info.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="editInfoOpenTime">
-              Open Time <span className="text-destructive">*</span>
+              Open Date <span className="text-destructive">*</span>
             </Label>
             <Input
               id="editInfoOpenTime"
-              type="datetime-local"
+              type="date"
               value={formData.editInfoOpenTime}
               onChange={(e) => onChange('editInfoOpenTime', e.target.value)}
             />
@@ -72,11 +72,11 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="editInfoCloseTime">
-              Close Time <span className="text-destructive">*</span>
+              Close Date <span className="text-destructive">*</span>
             </Label>
             <Input
               id="editInfoCloseTime"
-              type="datetime-local"
+              type="date"
               value={formData.editInfoCloseTime}
               onChange={(e) => onChange('editInfoCloseTime', e.target.value)}
             />
@@ -93,11 +93,11 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="checkinOpenTime">
-              Open Time <span className="text-destructive">*</span>
+              Open Date <span className="text-destructive">*</span>
             </Label>
             <Input
               id="checkinOpenTime"
-              type="datetime-local"
+              type="date"
               value={formData.checkinOpenTime}
               onChange={(e) => onChange('checkinOpenTime', e.target.value)}
             />
@@ -107,11 +107,11 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="checkinCloseTime">
-              Close Time <span className="text-destructive">*</span>
+              Close Date <span className="text-destructive">*</span>
             </Label>
             <Input
               id="checkinCloseTime"
-              type="datetime-local"
+              type="date"
               value={formData.checkinCloseTime}
               onChange={(e) => onChange('checkinCloseTime', e.target.value)}
             />
@@ -137,10 +137,10 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
         {formData.allowTransfer && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="transferOpenTime">Transfer Open Time</Label>
+              <Label htmlFor="transferOpenTime">Transfer Open Date</Label>
               <Input
                 id="transferOpenTime"
-                type="datetime-local"
+                type="date"
                 value={formData.transferOpenTime}
                 onChange={(e) => onChange('transferOpenTime', e.target.value)}
               />
@@ -149,10 +149,10 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transferCloseTime">Transfer Close Time</Label>
+              <Label htmlFor="transferCloseTime">Transfer Close Date</Label>
               <Input
                 id="transferCloseTime"
-                type="datetime-local"
+                type="date"
                 value={formData.transferCloseTime}
                 onChange={(e) => onChange('transferCloseTime', e.target.value)}
               />
@@ -169,28 +169,28 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
 
 export function validateTimeline(data: EventFormData): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!data.eventStartTime) errors.eventStartTime = 'Start time is required';
-  if (!data.eventEndTime) errors.eventEndTime = 'End time is required';
-  if (!data.editInfoOpenTime) errors.editInfoOpenTime = 'Open time is required';
-  if (!data.editInfoCloseTime) errors.editInfoCloseTime = 'Close time is required';
-  if (!data.checkinOpenTime) errors.checkinOpenTime = 'Open time is required';
-  if (!data.checkinCloseTime) errors.checkinCloseTime = 'Close time is required';
+  if (!data.eventStartTime) errors.eventStartTime = 'Start date is required';
+  if (!data.eventEndTime) errors.eventEndTime = 'End date is required';
+  if (!data.editInfoOpenTime) errors.editInfoOpenTime = 'Open date is required';
+  if (!data.editInfoCloseTime) errors.editInfoCloseTime = 'Close date is required';
+  if (!data.checkinOpenTime) errors.checkinOpenTime = 'Open date is required';
+  if (!data.checkinCloseTime) errors.checkinCloseTime = 'Close date is required';
 
-  if (data.eventStartTime && data.eventEndTime && data.eventStartTime >= data.eventEndTime) {
-    errors.eventEndTime = 'End time must be after start time';
+  if (data.eventStartTime && data.eventEndTime && data.eventStartTime > data.eventEndTime) {
+    errors.eventEndTime = 'End date must be after or same as start date';
   }
-  if (data.editInfoOpenTime && data.editInfoCloseTime && data.editInfoOpenTime >= data.editInfoCloseTime) {
-    errors.editInfoCloseTime = 'Close time must be after open time';
+  if (data.editInfoOpenTime && data.editInfoCloseTime && data.editInfoOpenTime > data.editInfoCloseTime) {
+    errors.editInfoCloseTime = 'Close date must be after or same as open date';
   }
-  if (data.checkinOpenTime && data.checkinCloseTime && data.checkinOpenTime >= data.checkinCloseTime) {
-    errors.checkinCloseTime = 'Close time must be after open time';
+  if (data.checkinOpenTime && data.checkinCloseTime && data.checkinOpenTime > data.checkinCloseTime) {
+    errors.checkinCloseTime = 'Close date must be after or same as open date';
   }
 
   if (data.allowTransfer) {
-    if (!data.transferOpenTime) errors.transferOpenTime = 'Transfer open time is required';
-    if (!data.transferCloseTime) errors.transferCloseTime = 'Transfer close time is required';
-    if (data.transferOpenTime && data.transferCloseTime && data.transferOpenTime >= data.transferCloseTime) {
-      errors.transferCloseTime = 'Close time must be after open time';
+    if (!data.transferOpenTime) errors.transferOpenTime = 'Transfer open date is required';
+    if (!data.transferCloseTime) errors.transferCloseTime = 'Transfer close date is required';
+    if (data.transferOpenTime && data.transferCloseTime && data.transferOpenTime > data.transferCloseTime) {
+      errors.transferCloseTime = 'Close date must be after or same as open date';
     }
   }
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -105,13 +106,16 @@ export default function CreateEventPage() {
 
       const result = await createMutation.mutateAsync({ data: payload });
       const eventId = (result as any)?.data?.id ?? (result as any)?.id;
+      toast.success('Event created successfully!');
       if (eventId) {
         router.push(`/admin/events/${eventId}`);
       } else {
         router.push('/admin/events');
       }
     } catch (err: any) {
-      setSubmitError(err?.response?.data?.message || err?.message || 'Failed to create event');
+      const message = err?.response?.data?.message || err?.message || 'Failed to create event';
+      setSubmitError(message);
+      toast.error('Failed to create event', { description: message });
     }
   };
 

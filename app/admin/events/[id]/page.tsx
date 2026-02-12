@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,15 +41,20 @@ export default function EventDetailPage() {
   const queryClient = useQueryClient();
   const eventId = params?.id as string;
 
-  const { data, isLoading, error } = useEventControllerFindOne(eventId);
+  const { data, isLoading, error } = useEventControllerFindOne(eventId, {
+    query: { enabled: !!eventId },
+  });
   const publishMutation = useEventControllerPublish();
   const cancelMutation = useEventControllerCancel();
   const deleteMutation = useEventControllerDelete();
 
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
-  // Access the event from the response - handle both Orval wrapper shapes
-  const event = (data as any)?.data?.data ?? (data as any)?.data ?? null;
+  // Access the event from the response - handle Orval wrapper shape
+  const rawData = data as any;
+  const event = rawData?.data ?? rawData ?? null;
+  // Ensure it's actually an event object (has id and name)
+  const validEvent = event && event.id && event.name ? event : null;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: getEventControllerFindOneQueryKey(eventId) });
@@ -60,14 +66,20 @@ export default function EventDetailPage() {
       if (confirmAction === 'publish') {
         await publishMutation.mutateAsync({ id: eventId });
         invalidate();
+        toast.success('Event published successfully');
       } else if (confirmAction === 'cancel') {
         await cancelMutation.mutateAsync({ id: eventId });
         invalidate();
+        toast.success('Event cancelled');
       } else if (confirmAction === 'delete') {
         await deleteMutation.mutateAsync({ id: eventId });
+        toast.success('Event deleted');
         router.push('/admin/events');
         return;
       }
+    } catch (err: any) {
+      const message = err?.response?.data?.message || err?.message || 'Action failed';
+      toast.error(message);
     } finally {
       setConfirmAction(null);
     }
@@ -101,10 +113,16 @@ export default function EventDetailPage() {
     );
   }
 
-  if (error || !event) {
+  if (error || (!isLoading && !validEvent)) {
     return (
       <div className="flex h-96 flex-col items-center justify-center gap-4 text-muted-foreground">
-        <p>Failed to load event details.</p>
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+          <Loader2 className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-semibold text-foreground">Event not found</p>
+          <p className="text-sm">The event you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+        </div>
         <Button variant="outline" onClick={() => router.push('/admin/events')}>
           Back to Events
         </Button>
@@ -113,14 +131,14 @@ export default function EventDetailPage() {
   }
 
   // Extract nested sub-resources if present
-  const sessions = event.sessions ?? [];
-  const descriptions = event.descriptions ?? [];
-  const customFields = event.customFields ?? event.fields ?? [];
+  const sessions = validEvent.sessions ?? [];
+  const descriptions = validEvent.descriptions ?? [];
+  const customFields = validEvent.customFields ?? validEvent.fields ?? [];
 
   return (
     <div className="space-y-6 pt-12 lg:pt-0">
       <EventHeader
-        event={event}
+        event={validEvent}
         onPublish={() => setConfirmAction('publish')}
         onCancel={() => setConfirmAction('cancel')}
         onDelete={() => setConfirmAction('delete')}
@@ -139,7 +157,7 @@ export default function EventDetailPage() {
         </TabsList>
 
         <TabsContent value="overview">
-          <EventOverviewTab event={event} />
+          <EventOverviewTab event={validEvent} />
         </TabsContent>
 
         <TabsContent value="sessions">
@@ -155,7 +173,7 @@ export default function EventDetailPage() {
         </TabsContent>
 
         <TabsContent value="scoring">
-          <EventScoringTab eventId={eventId} sportType={event.sportType} />
+          <EventScoringTab eventId={eventId} sportType={validEvent.sportType} />
         </TabsContent>
 
         <TabsContent value="blacklist">
@@ -163,7 +181,7 @@ export default function EventDetailPage() {
         </TabsContent>
 
         <TabsContent value="settings">
-          <EventSettingsTab event={event} />
+          <EventSettingsTab event={validEvent} />
         </TabsContent>
       </Tabs>
 

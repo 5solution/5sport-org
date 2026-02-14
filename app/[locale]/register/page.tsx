@@ -10,8 +10,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 export default function RegisterPage() {
     const router = useRouter();
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: '',
+        confirmPassword: '',
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -20,25 +21,43 @@ export default function RegisterPage() {
         e.preventDefault();
         setError('');
 
-        if (formData.username.length < 3) {
-            setError('Username must be at least 3 characters');
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formData.email) {
+            setError('Email is required');
+            return;
+        }
+        if (!emailRegex.test(formData.email)) {
+            setError('Invalid email format');
             return;
         }
 
+        // Password validation
+        if (!formData.password) {
+            setError('Password is required');
+            return;
+        }
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters');
+            return;
+        }
+
+        // Confirm password validation
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
             return;
         }
 
         setLoading(true);
 
         try {
+            const { confirmPassword, ...registerData } = formData;
             const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(registerData),
             });
 
             const data = await response.json();
@@ -95,19 +114,18 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                            Username
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                            Email
                         </label>
                         <input
-                            type="text"
-                            id="username"
-                            value={formData.username}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            type="email"
+                            id="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 text-gray-900"
+                            placeholder="name@example.com"
                             required
-                            minLength={3}
                         />
-                        <p className="text-xs text-gray-500 mt-1">Minimum 3 characters</p>
                     </div>
 
                     <div>
@@ -124,6 +142,20 @@ export default function RegisterPage() {
                             minLength={6}
                         />
                         <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                    </div>
+
+                    <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                            Confirm Password
+                        </label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 text-gray-900"
+                            required
+                        />
                     </div>
 
                     <button

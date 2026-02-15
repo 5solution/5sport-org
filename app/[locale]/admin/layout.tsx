@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
-import { LayoutDashboard, Users, LogOut, Settings, Menu, Calendar } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Settings, Menu, Calendar, Trophy, Medal } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -36,8 +36,10 @@ export default function AdminLayout({
   const tCommon = useTranslations('common.buttons');
 
   const navigation = [
-    { name: t('dashboard'), href: `/${locale}/admin`, icon: LayoutDashboard },
+    { name: t('dashboard'), href: `/${locale}/admin/dashboard`, icon: LayoutDashboard },
     { name: t('events'), href: `/${locale}/admin/events`, icon: Calendar },
+    { name: 'Athletes', href: `/${locale}/admin/athletes`, icon: Trophy },
+    { name: 'Leaderboards', href: `/${locale}/admin/leaderboards`, icon: Medal },
     { name: t('users'), href: `/${locale}/admin/users`, icon: Users },
     { name: t('settings'), href: `/${locale}/admin/settings`, icon: Settings },
   ];

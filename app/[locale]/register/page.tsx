@@ -65,7 +65,7 @@ export default function RegisterPage() {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                router.push('/dashboard');
+                router.push('/admin/dashboard');
             } else {
                 setError(data.message || 'Registration failed');
             }
@@ -83,7 +83,7 @@ export default function RegisterPage() {
         try {
             const result = await signIn('google', {
                 redirect: false,
-                callbackUrl: '/dashboard'
+                callbackUrl: '/admin/dashboard'
             });
 
             if (result?.error) {

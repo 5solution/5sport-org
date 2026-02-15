@@ -14,8 +14,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  useListProvinces,
-  useListWardsByProvince,
+  useProvinceControllerListProvinces,
+  useProvinceControllerListWardsByProvince,
 } from '@/lib/services/provinces/provinces';
 
 export interface EventFormData {
@@ -73,11 +73,15 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
   const tSports = useTranslations('admin.events.sports');
   const tMsg = useTranslations('admin.events.messages');
 
-  const { data: provinces = [], isLoading: provincesLoading } = useListProvinces();
-  const { data: wards = [], isLoading: wardsLoading } = useListWardsByProvince(
+  const { data: provincesData, isLoading: provincesLoading } = useProvinceControllerListProvinces();
+  const provinces = provincesData?.data ?? [];
+  
+  const { data: wardsData, isLoading: wardsLoading } = useProvinceControllerListWardsByProvince(
     Number(formData.provinceCode),
-    { enabled: !!formData.provinceCode },
+    undefined,
+    { query: { enabled: !!formData.provinceCode } },
   );
+  const wards = wardsData?.data ?? [];
 
   const filteredProvinces = provinceSearch
     ? provinces.filter((p) => p.name.toLowerCase().includes(provinceSearch.toLowerCase()))

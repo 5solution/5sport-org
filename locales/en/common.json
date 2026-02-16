@@ -13,13 +13,21 @@
     "close": "Close",
     "signIn": "Sign in",
     "signOut": "Sign out",
-    "signUp": "Sign up"
+    "signUp": "Sign up",
+    "retry": "Retry",
+    "add": "Add",
+    "view": "View",
+    "publish": "Publish",
+    "saveChanges": "Save Changes",
+    "logout": "Logout"
   },
   "actions": {
     "loading": "Loading...",
     "saving": "Saving...",
     "deleting": "Deleting...",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "registering": "Registering...",
+    "signingIn": "Signing in..."
   },
   "status": {
     "success": "Success",
@@ -33,5 +41,45 @@
     "showing": "Showing",
     "of": "of",
     "results": "results"
+  },
+  "dataTable": {
+    "search": "Search...",
+    "noResults": "No results.",
+    "rowsPerPage": "Rows per page",
+    "page": "Page",
+    "goToFirstPage": "Go to first page",
+    "goToPreviousPage": "Go to previous page",
+    "goToNextPage": "Go to next page",
+    "goToLastPage": "Go to last page",
+    "rowsSelected": "{count} of {total} row(s) selected."
+  },
+  "sports": {
+    "pickleball": "Pickleball",
+    "badminton": "Badminton"
+  },
+  "eventStatuses": {
+    "draft": "Draft",
+    "published": "Published",
+    "live": "Live",
+    "closed": "Closed",
+    "cancelled": "Cancelled"
+  },
+  "roles": {
+    "admin": "Admin",
+    "organizer": "Organizer",
+    "user": "User",
+    "allRoles": "All Roles"
+  },
+  "transfer": {
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "or": "OR",
+  "by": "by",
+  "active": "Active",
+  "free": "Free",
+  "columns": {
+    "actions": "Actions",
+    "created": "Created"
   }
 }

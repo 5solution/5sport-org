@@ -1,0 +1,21 @@
+{
+  "title": "Cài đặt",
+  "description": "Quản lý cài đặt tài khoản và tùy chọn của bạn.",
+  "profileUpdateComingSoon": "Cập nhật hồ sơ sắp ra mắt",
+  "profile": {
+    "title": "Hồ sơ",
+    "displayName": "Tên hiển thị",
+    "displayNamePlaceholder": "Tên hiển thị của bạn",
+    "email": "Email",
+    "emailCannotBeChanged": "Email không thể thay đổi"
+  },
+  "security": {
+    "title": "Bảo mật",
+    "role": "Vai trò",
+    "roleDescription": "Cấp quyền truy cập hiện tại",
+    "authentication": "Xác thực",
+    "authenticationDescription": "Cách bạn đăng nhập",
+    "google": "Google",
+    "emailPassword": "Email & Mật khẩu"
+  }
+}

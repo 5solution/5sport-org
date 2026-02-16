@@ -1,0 +1,24 @@
+{
+  "title": "Vận động viên",
+  "description": "Tìm kiếm và duyệt hồ sơ vận động viên",
+  "createProfile": "Tạo Hồ sơ",
+  "form": {
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Nguyễn Văn A",
+    "sport": "Môn thể thao",
+    "dateOfBirth": "Ngày sinh",
+    "gender": "Giới tính",
+    "genderSelect": "Chọn...",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác",
+    "city": "Thành phố",
+    "cityPlaceholder": "Hồ Chí Minh",
+    "phoneNumber": "Số điện thoại",
+    "phonePlaceholder": "+84 901 234 567",
+    "bio": "Tiểu sử",
+    "bioPlaceholder": "Giới thiệu về bản thân...",
+    "createProfileButton": "Tạo Hồ sơ",
+    "failedToCreate": "Không thể tạo hồ sơ vận động viên"
+  }
+}

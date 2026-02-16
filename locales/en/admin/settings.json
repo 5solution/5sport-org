@@ -1,0 +1,21 @@
+{
+  "title": "Settings",
+  "description": "Manage your account settings and preferences.",
+  "profileUpdateComingSoon": "Profile update coming soon",
+  "profile": {
+    "title": "Profile",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your display name",
+    "email": "Email",
+    "emailCannotBeChanged": "Email cannot be changed"
+  },
+  "security": {
+    "title": "Security",
+    "role": "Role",
+    "roleDescription": "Your current access level",
+    "authentication": "Authentication",
+    "authenticationDescription": "How you sign in",
+    "google": "Google",
+    "emailPassword": "Email & Password"
+  }
+}

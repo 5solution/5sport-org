@@ -1,16 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import type { EventFormData } from './step-basic-info';
-
-const paymentOptions = [
-  { value: 'VNPAY_QR', label: 'VNPay QR', description: 'Scan QR code to pay via VNPay' },
-  { value: 'DOMESTIC_CARD', label: 'Domestic Card', description: 'ATM / Debit card (Vietnam)' },
-  { value: 'INTERNATIONAL_CARD', label: 'International Card', description: 'Visa / Mastercard / JCB' },
-  { value: 'PAYX_QR', label: 'PayX QR', description: 'Scan QR code to pay via PayX' },
-  { value: 'PAYX_DOMESTIC', label: 'PayX Domestic', description: 'Domestic card via PayX' },
-];
 
 interface StepPaymentProps {
   formData: EventFormData;
@@ -19,6 +13,17 @@ interface StepPaymentProps {
 }
 
 export function StepPayment({ formData, errors, onChange }: StepPaymentProps) {
+  const t = useTranslations('admin.events.payment');
+  const tTransfer = useTranslations('common.transfer');
+
+  const paymentOptions = [
+    { value: 'VNPAY_QR', label: t('methods.vnpayQr'), description: t('methods.vnpayQrDesc') },
+    { value: 'DOMESTIC_CARD', label: t('methods.domesticCard'), description: t('methods.domesticCardDesc') },
+    { value: 'INTERNATIONAL_CARD', label: t('methods.internationalCard'), description: t('methods.internationalCardDesc') },
+    { value: 'PAYX_QR', label: t('methods.payxQr'), description: t('methods.payxQrDesc') },
+    { value: 'PAYX_DOMESTIC', label: t('methods.payxDomestic'), description: t('methods.payxDomesticDesc') },
+  ];
+
   const togglePayment = (value: string) => {
     const current = formData.paymentMethods;
     const updated = current.includes(value)
@@ -32,10 +37,10 @@ export function StepPayment({ formData, errors, onChange }: StepPaymentProps) {
       {/* Payment Methods */}
       <div>
         <Label className="text-sm font-semibold">
-          Payment Methods <span className="text-destructive">*</span>
+          {t('title')} <span className="text-destructive">*</span>
         </Label>
         <p className="text-xs text-muted-foreground mb-4">
-          Select at least one payment method for ticket purchases.
+          {t('description')}
         </p>
         <div className="grid gap-3">
           {paymentOptions.map((option) => {
@@ -85,22 +90,22 @@ export function StepPayment({ formData, errors, onChange }: StepPaymentProps) {
 
       {/* Summary */}
       <div className="rounded-lg border bg-muted/50 p-4">
-        <h3 className="text-sm font-semibold mb-3">Summary</h3>
+        <h3 className="text-sm font-semibold mb-3">{t('summary')}</h3>
         <div className="grid gap-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Event Name</span>
+            <span className="text-muted-foreground">{t('eventName')}</span>
             <span className="font-medium">{formData.name || '-'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Sport</span>
+            <span className="text-muted-foreground">{t('sport')}</span>
             <Badge variant="secondary">{formData.sportType || '-'}</Badge>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Prefix Code</span>
+            <span className="text-muted-foreground">{t('prefixCode')}</span>
             <span className="font-mono font-medium">{formData.prefixCode || '-'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Event Period</span>
+            <span className="text-muted-foreground">{t('eventPeriod')}</span>
             <span className="font-medium">
               {formData.eventStartTime
                 ? new Date(formData.eventStartTime).toLocaleDateString()
@@ -112,13 +117,13 @@ export function StepPayment({ formData, errors, onChange }: StepPaymentProps) {
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Transfer</span>
+            <span className="text-muted-foreground">{t('transfer')}</span>
             <Badge variant={formData.allowTransfer ? 'success' : 'secondary'}>
-              {formData.allowTransfer ? 'Enabled' : 'Disabled'}
+              {formData.allowTransfer ? tTransfer('enabled') : tTransfer('disabled')}
             </Badge>
           </div>
           <div className="flex justify-between items-start">
-            <span className="text-muted-foreground">Payment</span>
+            <span className="text-muted-foreground">{t('payment')}</span>
             <div className="flex flex-wrap gap-1 justify-end">
               {formData.paymentMethods.length > 0
                 ? formData.paymentMethods.map((m) => (
@@ -126,7 +131,7 @@ export function StepPayment({ formData, errors, onChange }: StepPaymentProps) {
                       {paymentOptions.find((o) => o.value === m)?.label ?? m}
                     </Badge>
                   ))
-                : <span className="text-muted-foreground">None selected</span>
+                : <span className="text-muted-foreground">{t('noneSelected')}</span>
               }
             </div>
           </div>
@@ -136,10 +141,10 @@ export function StepPayment({ formData, errors, onChange }: StepPaymentProps) {
   );
 }
 
-export function validatePayment(data: EventFormData): Record<string, string> {
+export function validatePayment(data: EventFormData, t: (key: string) => string): Record<string, string> {
   const errors: Record<string, string> = {};
   if (data.paymentMethods.length === 0) {
-    errors.paymentMethods = 'At least one payment method is required';
+    errors.paymentMethods = t('atLeastOneRequired');
   }
   return errors;
 }

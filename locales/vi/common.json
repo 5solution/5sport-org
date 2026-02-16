@@ -13,13 +13,21 @@
     "close": "Đóng",
     "signIn": "Đăng nhập",
     "signOut": "Đăng xuất",
-    "signUp": "Đăng ký"
+    "signUp": "Đăng ký",
+    "retry": "Thử lại",
+    "add": "Thêm",
+    "view": "Xem",
+    "publish": "Xuất bản",
+    "saveChanges": "Lưu thay đổi",
+    "logout": "Đăng xuất"
   },
   "actions": {
     "loading": "Đang tải...",
     "saving": "Đang lưu...",
     "deleting": "Đang xóa...",
-    "creating": "Đang tạo..."
+    "creating": "Đang tạo...",
+    "registering": "Đang đăng ký...",
+    "signingIn": "Đang đăng nhập..."
   },
   "status": {
     "success": "Thành công",
@@ -33,5 +41,45 @@
     "showing": "Hiển thị",
     "of": "trên",
     "results": "kết quả"
+  },
+  "dataTable": {
+    "search": "Tìm kiếm...",
+    "noResults": "Không có kết quả.",
+    "rowsPerPage": "Số hàng mỗi trang",
+    "page": "Trang",
+    "goToFirstPage": "Đến trang đầu",
+    "goToPreviousPage": "Đến trang trước",
+    "goToNextPage": "Đến trang sau",
+    "goToLastPage": "Đến trang cuối",
+    "rowsSelected": "{count} trên {total} hàng được chọn."
+  },
+  "sports": {
+    "pickleball": "Pickleball",
+    "badminton": "Cầu Lông"
+  },
+  "eventStatuses": {
+    "draft": "Nháp",
+    "published": "Đã xuất bản",
+    "live": "Đang diễn ra",
+    "closed": "Đã đóng",
+    "cancelled": "Đã hủy"
+  },
+  "roles": {
+    "admin": "Quản trị viên",
+    "organizer": "Tổ chức viên",
+    "user": "Người dùng",
+    "allRoles": "Tất cả vai trò"
+  },
+  "transfer": {
+    "enabled": "Bật",
+    "disabled": "Tắt"
+  },
+  "or": "HOẶC",
+  "by": "bởi",
+  "active": "Đang hoạt động",
+  "free": "Miễn phí",
+  "columns": {
+    "actions": "Thao tác",
+    "created": "Ngày tạo"
   }
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -12,15 +14,17 @@ interface StepTimelineProps {
 }
 
 export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) {
+  const t = useTranslations('admin.events.timeline');
+
   return (
     <div className="space-y-6">
       {/* Event Duration */}
       <div>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Event Duration</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t('eventDuration')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="eventStartTime">
-              Start Date <span className="text-destructive">*</span>
+              {t('startDate')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="eventStartTime"
@@ -34,7 +38,7 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="eventEndTime">
-              End Date <span className="text-destructive">*</span>
+              {t('endDate')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="eventEndTime"
@@ -51,14 +55,14 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
 
       {/* Edit Info Period */}
       <div>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Edit Info Period</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t('editInfoPeriod')}</h3>
         <p className="text-xs text-muted-foreground mb-3">
-          Date range for participants to edit their registration info.
+          {t('editInfoDescription')}
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="editInfoOpenTime">
-              Open Date <span className="text-destructive">*</span>
+              {t('openDate')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="editInfoOpenTime"
@@ -72,7 +76,7 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="editInfoCloseTime">
-              Close Date <span className="text-destructive">*</span>
+              {t('closeDate')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="editInfoCloseTime"
@@ -89,11 +93,11 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
 
       {/* Check-in Period */}
       <div>
-        <h3 className="text-sm font-semibold text-foreground mb-3">Check-in Period</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">{t('checkinPeriod')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="checkinOpenTime">
-              Open Date <span className="text-destructive">*</span>
+              {t('openDate')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="checkinOpenTime"
@@ -107,7 +111,7 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
           </div>
           <div className="space-y-2">
             <Label htmlFor="checkinCloseTime">
-              Close Date <span className="text-destructive">*</span>
+              {t('closeDate')} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="checkinCloseTime"
@@ -126,8 +130,8 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
       <div>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Ticket Transfer</h3>
-            <p className="text-xs text-muted-foreground">Allow participants to transfer tickets</p>
+            <h3 className="text-sm font-semibold text-foreground">{t('ticketTransfer')}</h3>
+            <p className="text-xs text-muted-foreground">{t('ticketTransferDescription')}</p>
           </div>
           <Switch
             checked={formData.allowTransfer}
@@ -137,7 +141,7 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
         {formData.allowTransfer && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="transferOpenTime">Transfer Open Date</Label>
+              <Label htmlFor="transferOpenTime">{t('transferOpenDate')}</Label>
               <Input
                 id="transferOpenTime"
                 type="date"
@@ -149,7 +153,7 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transferCloseTime">Transfer Close Date</Label>
+              <Label htmlFor="transferCloseTime">{t('transferCloseDate')}</Label>
               <Input
                 id="transferCloseTime"
                 type="date"
@@ -167,30 +171,30 @@ export function StepTimeline({ formData, errors, onChange }: StepTimelineProps) 
   );
 }
 
-export function validateTimeline(data: EventFormData): Record<string, string> {
+export function validateTimeline(data: EventFormData, t: (key: string) => string): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!data.eventStartTime) errors.eventStartTime = 'Start date is required';
-  if (!data.eventEndTime) errors.eventEndTime = 'End date is required';
-  if (!data.editInfoOpenTime) errors.editInfoOpenTime = 'Open date is required';
-  if (!data.editInfoCloseTime) errors.editInfoCloseTime = 'Close date is required';
-  if (!data.checkinOpenTime) errors.checkinOpenTime = 'Open date is required';
-  if (!data.checkinCloseTime) errors.checkinCloseTime = 'Close date is required';
+  if (!data.eventStartTime) errors.eventStartTime = t('startDateRequired');
+  if (!data.eventEndTime) errors.eventEndTime = t('endDateRequired');
+  if (!data.editInfoOpenTime) errors.editInfoOpenTime = t('openDateRequired');
+  if (!data.editInfoCloseTime) errors.editInfoCloseTime = t('closeDateRequired');
+  if (!data.checkinOpenTime) errors.checkinOpenTime = t('openDateRequired');
+  if (!data.checkinCloseTime) errors.checkinCloseTime = t('closeDateRequired');
 
   if (data.eventStartTime && data.eventEndTime && data.eventStartTime > data.eventEndTime) {
-    errors.eventEndTime = 'End date must be after or same as start date';
+    errors.eventEndTime = t('endDateAfterStart');
   }
   if (data.editInfoOpenTime && data.editInfoCloseTime && data.editInfoOpenTime > data.editInfoCloseTime) {
-    errors.editInfoCloseTime = 'Close date must be after or same as open date';
+    errors.editInfoCloseTime = t('closeDateAfterOpen');
   }
   if (data.checkinOpenTime && data.checkinCloseTime && data.checkinOpenTime > data.checkinCloseTime) {
-    errors.checkinCloseTime = 'Close date must be after or same as open date';
+    errors.checkinCloseTime = t('closeDateAfterOpen');
   }
 
   if (data.allowTransfer) {
-    if (!data.transferOpenTime) errors.transferOpenTime = 'Transfer open date is required';
-    if (!data.transferCloseTime) errors.transferCloseTime = 'Transfer close date is required';
+    if (!data.transferOpenTime) errors.transferOpenTime = t('transferOpenRequired');
+    if (!data.transferCloseTime) errors.transferCloseTime = t('transferCloseRequired');
     if (data.transferOpenTime && data.transferCloseTime && data.transferOpenTime > data.transferCloseTime) {
-      errors.transferCloseTime = 'Close date must be after or same as open date';
+      errors.transferCloseTime = t('closeDateAfterOpen');
     }
   }
 

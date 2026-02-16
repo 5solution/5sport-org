@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { Trophy, Medal, Calendar, LayoutDashboard, User, LogOut } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from './button';
@@ -12,12 +13,14 @@ export function MainNav() {
   const params = useParams();
   const locale = params?.locale as string || 'en';
   const { user, logout } = useAuth();
+  const t = useTranslations('navigation.admin');
+  const tCommon = useTranslations('common.buttons');
 
   const navigation = [
-    { name: 'Dashboard', href: `/${locale}/dashboard`, icon: LayoutDashboard },
-    { name: 'Athletes', href: `/${locale}/athletes`, icon: Trophy },
-    { name: 'Leaderboards', href: `/${locale}/leaderboards`, icon: Medal },
-    { name: 'Events', href: `/${locale}/admin/events`, icon: Calendar },
+    { name: t('dashboard'), href: `/${locale}/dashboard`, icon: LayoutDashboard },
+    { name: t('athletes'), href: `/${locale}/athletes`, icon: Trophy },
+    { name: t('leaderboards'), href: `/${locale}/leaderboards`, icon: Medal },
+    { name: t('events'), href: `/${locale}/admin/events`, icon: Calendar },
   ];
 
   const isActive = (href: string) => {
@@ -45,7 +48,7 @@ export function MainNav() {
           <nav className="hidden md:flex items-center gap-1">
             {navigation.map((item) => (
               <Link
-                key={item.name}
+                key={item.href}
                 href={item.href}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
@@ -77,7 +80,7 @@ export function MainNav() {
               className="text-gray-600 hover:text-red-600"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">{tCommon('logout')}</span>
             </Button>
           </div>
         </div>
@@ -86,7 +89,7 @@ export function MainNav() {
         <nav className="md:hidden flex items-center gap-1 pb-3 overflow-x-auto">
           {navigation.map((item) => (
             <Link
-              key={item.name}
+              key={item.href}
               href={item.href}
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',

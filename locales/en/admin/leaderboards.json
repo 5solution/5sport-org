@@ -1,0 +1,16 @@
+{
+  "title": "Leaderboards",
+  "description": "View rankings and compete for the top spot",
+  "athletes": "athletes",
+  "overall": "OVERALL",
+  "monthly": "MONTHLY",
+  "columns": {
+    "rank": "Rank",
+    "athlete": "Athlete",
+    "score": "Score",
+    "matches": "Matches",
+    "winLoss": "W-L",
+    "winPercent": "Win %",
+    "change": "Change"
+  }
+}

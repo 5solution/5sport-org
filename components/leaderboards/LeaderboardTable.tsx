@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { TrendingUp, TrendingDown, Medal, Trophy, Target } from 'lucide-react';
 
 interface LeaderboardTableProps {
@@ -9,6 +10,9 @@ interface LeaderboardTableProps {
 }
 
 export function LeaderboardTable({ leaderboardId, locale = 'en' }: LeaderboardTableProps) {
+  const t = useTranslations('admin.leaderboards');
+  const tCommon = useTranslations('common');
+
   // TODO: Replace with actual API call
   // const { data, isLoading } = useGetLeaderboardById(leaderboardId);
 
@@ -97,7 +101,7 @@ export function LeaderboardTable({ leaderboardId, locale = 'en' }: LeaderboardTa
           <span>•</span>
           <span>{leaderboard.type}</span>
           <span>•</span>
-          <span>{leaderboard.entries.length} athletes</span>
+          <span>{leaderboard.entries.length} {t('athletes')}</span>
         </div>
       </div>
 
@@ -107,25 +111,25 @@ export function LeaderboardTable({ leaderboardId, locale = 'en' }: LeaderboardTa
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rank
+                {t('columns.rank')}
               </th>
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Athlete
+                {t('columns.athlete')}
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Score
+                {t('columns.score')}
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Matches
+                {t('columns.matches')}
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                W-L
+                {t('columns.winLoss')}
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Win %
+                {t('columns.winPercent')}
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Change
+                {t('columns.change')}
               </th>
             </tr>
           </thead>

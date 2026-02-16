@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { Loader2, Plus, Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-import { usersColumns } from '@/components/admin/users-columns';
+import { useUsersColumns } from '@/components/admin/users-columns';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -82,8 +83,11 @@ const mockUsers: User[] = [
 ];
 
 export default function UsersPage() {
+  const t = useTranslations('admin.users');
+  const tRoles = useTranslations('common.roles');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const { data, isLoading, error } = useUsers({ page: 1, limit: 100 });
+  const columns = useUsersColumns();
 
   // Use API data if available, otherwise use mock data
   const users = data?.data || mockUsers;
@@ -106,14 +110,14 @@ export default function UsersPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 pt-12 lg:pt-0 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">User Management</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Manage user accounts, roles, and permissions.
+            {t('description')}
           </p>
         </div>
         <Button className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          Add User
+          {t('addUser')}
         </Button>
       </div>
 
@@ -121,7 +125,7 @@ export default function UsersPage() {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.totalUsers')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground hidden sm:block" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -130,7 +134,7 @@ export default function UsersPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Admins</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.admins')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-destructive" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -139,7 +143,7 @@ export default function UsersPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Organizers</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.organizers')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-primary" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -148,7 +152,7 @@ export default function UsersPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Regular Users</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.regularUsers')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-secondary" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -162,20 +166,20 @@ export default function UsersPage() {
         <CardHeader className="px-4 sm:px-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle className="font-heading text-base sm:text-lg font-bold">All Users</CardTitle>
+              <CardTitle className="font-heading text-base sm:text-lg font-bold">{t('table.title')}</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                A list of all users in your application.
+                {t('table.description')}
               </CardDescription>
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Filter by role" />
+                <SelectValue placeholder={t('table.filterByRole')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value={Role.ADMIN}>Admin</SelectItem>
-                <SelectItem value={Role.ORGANIZER}>Organizer</SelectItem>
-                <SelectItem value={Role.USER}>User</SelectItem>
+                <SelectItem value="all">{tRoles('allRoles')}</SelectItem>
+                <SelectItem value={Role.ADMIN}>{tRoles('admin')}</SelectItem>
+                <SelectItem value={Role.ORGANIZER}>{tRoles('organizer')}</SelectItem>
+                <SelectItem value={Role.USER}>{tRoles('user')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -187,14 +191,14 @@ export default function UsersPage() {
             </div>
           ) : error ? (
             <div className="flex h-64 items-center justify-center text-muted-foreground">
-              Failed to load users. Using demo data.
+              {t('table.failedToLoad')}
             </div>
           ) : (
             <DataTable
-              columns={usersColumns}
+              columns={columns}
               data={filteredUsers}
               searchKey="email"
-              searchPlaceholder="Search by email..."
+              searchPlaceholder={t('table.searchByEmail')}
             />
           )}
         </CardContent>

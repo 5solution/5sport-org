@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus, Loader2, Trash2, Pencil } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,10 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState(defaultSession);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const t = useTranslations('admin.events.sessions');
+  const tCommon = useTranslations('common');
+  const tButtons = useTranslations('common.buttons');
 
   const createSession = useEventControllerCreateSession();
   const deleteSession = useEventControllerDeleteSession();
@@ -93,12 +98,12 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold">Competition Sessions</h3>
-          <p className="text-sm text-muted-foreground">Manage match categories and ticket tiers</p>
+          <h3 className="text-base font-semibold">{t('title')}</h3>
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
         <Button size="sm" onClick={() => setShowAdd(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Session
+          {t('addSession')}
         </Button>
       </div>
 
@@ -106,8 +111,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
         <Card>
           <CardContent className="flex h-40 items-center justify-center text-muted-foreground">
             <div className="text-center">
-              <p className="font-medium">No sessions yet</p>
-              <p className="text-sm">Add your first competition session to get started.</p>
+              <p className="font-medium">{t('noSessionsYet')}</p>
+              <p className="text-sm">{t('noSessionsDescription')}</p>
             </div>
           </CardContent>
         </Card>
@@ -143,15 +148,15 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
               <CardContent className="pt-0">
                 <div className="flex gap-4 text-xs text-muted-foreground">
                   <span>
-                    Start: {new Date(session.startTime).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    {t('start')} {new Date(session.startTime).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <span>
-                    End: {new Date(session.endTime).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    {t('end')} {new Date(session.endTime).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
                 {session.ticketTiers && session.ticketTiers.length > 0 && (
                   <div className="mt-3 space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground">Ticket Tiers</p>
+                    <p className="text-xs font-medium text-muted-foreground">{t('ticketTiers')}</p>
                     {session.ticketTiers.map((tier: any) => (
                       <div
                         key={tier.id}
@@ -160,10 +165,10 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                         <span>{tier.name}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-muted-foreground">
-                            {tier.isFree ? 'Free' : `${tier.price?.toLocaleString()} VND`}
+                            {tier.isFree ? tCommon('free') : `${tier.price?.toLocaleString()} VND`}
                           </span>
                           <Badge variant="outline" className="text-xs">
-                            {tier.totalQuantity} tickets
+                            {tier.totalQuantity} {t('tickets')}
                           </Badge>
                         </div>
                       </div>
@@ -180,13 +185,13 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Competition Session</DialogTitle>
+            <DialogTitle>{t('addCompetitionSession')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Name <span className="text-destructive">*</span></Label>
+              <Label>{t('name')} <span className="text-destructive">*</span></Label>
               <Input
-                placeholder="e.g. Men's Singles A"
+                placeholder={t('namePlaceholder')}
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               />
@@ -194,22 +199,22 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Match Type <span className="text-destructive">*</span></Label>
+                <Label>{t('matchType')} <span className="text-destructive">*</span></Label>
                 <Select value={form.matchType} onValueChange={(v) => setForm((f) => ({ ...f, matchType: v }))}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select" />
+                    <SelectValue placeholder={t('select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="SINGLES">Singles</SelectItem>
-                    <SelectItem value="DOUBLES">Doubles</SelectItem>
+                    <SelectItem value="SINGLES">{t('singles')}</SelectItem>
+                    <SelectItem value="DOUBLES">{t('doubles')}</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.matchType && <p className="text-sm text-destructive">{errors.matchType}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Ticket Code <span className="text-destructive">*</span></Label>
+                <Label>{t('ticketCode')} <span className="text-destructive">*</span></Label>
                 <Input
-                  placeholder="e.g. MSA"
+                  placeholder={t('ticketCodePlaceholder')}
                   value={form.ticketCode}
                   onChange={(e) => setForm((f) => ({ ...f, ticketCode: e.target.value.toUpperCase() }))}
                   maxLength={3}
@@ -220,7 +225,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Start Time <span className="text-destructive">*</span></Label>
+                <Label>{t('startTime')} <span className="text-destructive">*</span></Label>
                 <Input
                   type="datetime-local"
                   value={form.startTime}
@@ -229,7 +234,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                 {errors.startTime && <p className="text-sm text-destructive">{errors.startTime}</p>}
               </div>
               <div className="space-y-2">
-                <Label>End Time <span className="text-destructive">*</span></Label>
+                <Label>{t('endTime')} <span className="text-destructive">*</span></Label>
                 <Input
                   type="datetime-local"
                   value={form.endTime}
@@ -240,10 +245,10 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAdd(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowAdd(false)}>{tButtons('cancel')}</Button>
             <Button onClick={handleCreate} disabled={createSession.isPending}>
               {createSession.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Session
+              {t('createSession')}
             </Button>
           </DialogFooter>
         </DialogContent>

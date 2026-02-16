@@ -1,19 +1,31 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { EventResponseDtoStatus } from '@/lib/schemas/eventResponseDtoStatus';
 
 type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning';
 
-const statusConfig: Record<string, { variant: BadgeVariant; label: string }> = {
-  [EventResponseDtoStatus.DRAFT]: { variant: 'secondary', label: 'Draft' },
-  [EventResponseDtoStatus.PUBLISHED]: { variant: 'default', label: 'Published' },
-  [EventResponseDtoStatus.LIVE]: { variant: 'success', label: 'Live' },
-  [EventResponseDtoStatus.CLOSED]: { variant: 'outline', label: 'Closed' },
-  [EventResponseDtoStatus.CANCELLED]: { variant: 'destructive', label: 'Cancelled' },
+const statusVariants: Record<string, BadgeVariant> = {
+  [EventResponseDtoStatus.DRAFT]: 'secondary',
+  [EventResponseDtoStatus.PUBLISHED]: 'default',
+  [EventResponseDtoStatus.LIVE]: 'success',
+  [EventResponseDtoStatus.CLOSED]: 'outline',
+  [EventResponseDtoStatus.CANCELLED]: 'destructive',
+};
+
+const statusKeys: Record<string, string> = {
+  [EventResponseDtoStatus.DRAFT]: 'draft',
+  [EventResponseDtoStatus.PUBLISHED]: 'published',
+  [EventResponseDtoStatus.LIVE]: 'live',
+  [EventResponseDtoStatus.CLOSED]: 'closed',
+  [EventResponseDtoStatus.CANCELLED]: 'cancelled',
 };
 
 export function EventStatusBadge({ status }: { status: string }) {
-  const config = statusConfig[status] ?? { variant: 'outline' as BadgeVariant, label: status };
-  return <Badge variant={config.variant}>{config.label}</Badge>;
+  const t = useTranslations('common.eventStatuses');
+  const variant = statusVariants[status] ?? 'outline';
+  const key = statusKeys[status];
+  const label = key ? t(key) : status;
+  return <Badge variant={variant}>{label}</Badge>;
 }

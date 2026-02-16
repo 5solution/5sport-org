@@ -1,0 +1,24 @@
+{
+  "title": "Athletes",
+  "description": "Browse and search athlete profiles",
+  "createProfile": "Create Profile",
+  "form": {
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "sport": "Sport",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "genderSelect": "Select...",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "city": "City",
+    "cityPlaceholder": "Ho Chi Minh City",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "+84 901 234 567",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself...",
+    "createProfileButton": "Create Profile",
+    "failedToCreate": "Failed to create athlete profile"
+  }
+}

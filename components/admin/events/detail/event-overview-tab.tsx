@@ -1,16 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { EventResponseDto } from '@/lib/schemas/eventResponseDto';
-
-const paymentLabels: Record<string, string> = {
-  VNPAY_QR: 'VNPay QR',
-  DOMESTIC_CARD: 'Domestic Card',
-  INTERNATIONAL_CARD: 'International Card',
-  PAYX_QR: 'PayX QR',
-  PAYX_DOMESTIC: 'PayX Domestic',
-};
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -37,57 +31,71 @@ function DateValue({ date }: { date?: string }) {
 }
 
 export function EventOverviewTab({ event }: { event: EventResponseDto }) {
+  const t = useTranslations('admin.events');
+  const tFields = useTranslations('admin.events.fields');
+  const tPayment = useTranslations('admin.events.payment.methods');
+  const tSports = useTranslations('common.sports');
+  const tTransfer = useTranslations('common.transfer');
+
+  const paymentLabels: Record<string, string> = {
+    VNPAY_QR: tPayment('vnpayQr'),
+    DOMESTIC_CARD: tPayment('domesticCard'),
+    INTERNATIONAL_CARD: tPayment('internationalCard'),
+    PAYX_QR: tPayment('payxQr'),
+    PAYX_DOMESTIC: tPayment('payxDomestic'),
+  };
+
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {/* Basic Info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Basic Information</CardTitle>
+          <CardTitle className="text-base font-semibold">{t('detail.basicInformation')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-0">
-          <InfoRow label="Event Name" value={event.name} />
-          <InfoRow label="Brand" value={event.brand} />
+          <InfoRow label={tFields('eventName')} value={event.name} />
+          <InfoRow label={tFields('brand')} value={event.brand} />
           <InfoRow
-            label="Sport Type"
+            label={tFields('sportType')}
             value={
               <Badge variant="outline">
-                {event.sportType === 'PICKLEBALL' ? 'Pickleball' : 'Badminton'}
+                {event.sportType === 'PICKLEBALL' ? tSports('pickleball') : tSports('badminton')}
               </Badge>
             }
           />
-          <InfoRow label="Hotline" value={event.hotline} />
-          <InfoRow label="Address" value={event.address} />
-          <InfoRow label="Province Code" value={event.provinceCode} />
-          <InfoRow label="Ward Code" value={event.wardCode} />
-          <InfoRow label="Prefix Code" value={<code className="font-mono">{event.prefixCode}</code>} />
-          <InfoRow label="Slug" value={<code className="font-mono text-xs">{event.slug}</code>} />
+          <InfoRow label={tFields('hotline')} value={event.hotline} />
+          <InfoRow label={tFields('address')} value={event.address} />
+          <InfoRow label={t('detail.provinceCode')} value={event.provinceCode} />
+          <InfoRow label={t('detail.wardCode')} value={event.wardCode} />
+          <InfoRow label={tFields('prefixCode')} value={<code className="font-mono">{event.prefixCode}</code>} />
+          <InfoRow label={t('detail.slug')} value={<code className="font-mono text-xs">{event.slug}</code>} />
         </CardContent>
       </Card>
 
       {/* Timeline */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Timeline</CardTitle>
+          <CardTitle className="text-base font-semibold">{t('detail.timeline')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-0">
-          <InfoRow label="Event Start" value={<DateValue date={event.eventStartTime} />} />
-          <InfoRow label="Event End" value={<DateValue date={event.eventEndTime} />} />
-          <InfoRow label="Edit Info Open" value={<DateValue date={event.editInfoOpenTime} />} />
-          <InfoRow label="Edit Info Close" value={<DateValue date={event.editInfoCloseTime} />} />
-          <InfoRow label="Check-in Open" value={<DateValue date={event.checkinOpenTime} />} />
-          <InfoRow label="Check-in Close" value={<DateValue date={event.checkinCloseTime} />} />
+          <InfoRow label={t('detail.eventStart')} value={<DateValue date={event.eventStartTime} />} />
+          <InfoRow label={t('detail.eventEnd')} value={<DateValue date={event.eventEndTime} />} />
+          <InfoRow label={t('detail.editInfoOpen')} value={<DateValue date={event.editInfoOpenTime} />} />
+          <InfoRow label={t('detail.editInfoClose')} value={<DateValue date={event.editInfoCloseTime} />} />
+          <InfoRow label={t('detail.checkinOpen')} value={<DateValue date={event.checkinOpenTime} />} />
+          <InfoRow label={t('detail.checkinClose')} value={<DateValue date={event.checkinCloseTime} />} />
           <InfoRow
-            label="Transfer"
+            label={t('detail.transfer')}
             value={
               <Badge variant={event.allowTransfer ? 'success' : 'secondary'}>
-                {event.allowTransfer ? 'Enabled' : 'Disabled'}
+                {event.allowTransfer ? tTransfer('enabled') : tTransfer('disabled')}
               </Badge>
             }
           />
           {event.allowTransfer && (
             <>
-              <InfoRow label="Transfer Open" value={<DateValue date={event.transferOpenTime} />} />
-              <InfoRow label="Transfer Close" value={<DateValue date={event.transferCloseTime} />} />
+              <InfoRow label={t('detail.transferOpen')} value={<DateValue date={event.transferOpenTime} />} />
+              <InfoRow label={t('detail.transferClose')} value={<DateValue date={event.transferCloseTime} />} />
             </>
           )}
         </CardContent>
@@ -96,7 +104,7 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
       {/* Payment Methods */}
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Payment Methods</CardTitle>
+          <CardTitle className="text-base font-semibold">{t('detail.paymentMethods')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
@@ -106,7 +114,7 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
               </Badge>
             ))}
             {event.paymentMethods.length === 0 && (
-              <span className="text-sm text-muted-foreground">No payment methods configured</span>
+              <span className="text-sm text-muted-foreground">{t('detail.noPaymentMethods')}</span>
             )}
           </div>
         </CardContent>

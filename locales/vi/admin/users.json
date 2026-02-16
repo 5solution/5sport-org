@@ -1,0 +1,30 @@
+{
+  "title": "Quản lý Người dùng",
+  "description": "Quản lý tài khoản, vai trò và quyền hạn người dùng.",
+  "addUser": "Thêm Người dùng",
+  "stats": {
+    "totalUsers": "Tổng Người dùng",
+    "admins": "Quản trị viên",
+    "organizers": "Tổ chức viên",
+    "regularUsers": "Người dùng thường"
+  },
+  "table": {
+    "title": "Tất cả Người dùng",
+    "description": "Danh sách tất cả người dùng trong ứng dụng.",
+    "filterByRole": "Lọc theo vai trò",
+    "searchByEmail": "Tìm kiếm theo email...",
+    "failedToLoad": "Không thể tải người dùng. Sử dụng dữ liệu mẫu."
+  },
+  "columns": {
+    "user": "Người dùng",
+    "role": "Vai trò",
+    "tags": "Nhãn",
+    "noTags": "Không có nhãn"
+  },
+  "actions": {
+    "copyUserId": "Sao chép ID người dùng",
+    "viewDetails": "Xem chi tiết",
+    "editUser": "Chỉnh sửa người dùng",
+    "deleteUser": "Xóa người dùng"
+  }
+}

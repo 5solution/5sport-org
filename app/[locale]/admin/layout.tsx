@@ -38,8 +38,8 @@ export default function AdminLayout({
   const navigation = [
     { name: t('dashboard'), href: `/${locale}/admin/dashboard`, icon: LayoutDashboard },
     { name: t('events'), href: `/${locale}/admin/events`, icon: Calendar },
-    { name: 'Athletes', href: `/${locale}/admin/athletes`, icon: Trophy },
-    { name: 'Leaderboards', href: `/${locale}/admin/leaderboards`, icon: Medal },
+    { name: t('athletes'), href: `/${locale}/admin/athletes`, icon: Trophy },
+    { name: t('leaderboards'), href: `/${locale}/admin/leaderboards`, icon: Medal },
     { name: t('users'), href: `/${locale}/admin/users`, icon: Users },
     { name: t('settings'), href: `/${locale}/admin/settings`, icon: Settings },
   ];

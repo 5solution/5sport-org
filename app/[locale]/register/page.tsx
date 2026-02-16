@@ -4,10 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export default function RegisterPage() {
+    const t = useTranslations('auth.register');
+    const tVal = useTranslations('auth.validation');
+    const tCommon = useTranslations('common');
     const router = useRouter();
     const [formData, setFormData] = useState({
         email: '',
@@ -24,27 +28,27 @@ export default function RegisterPage() {
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!formData.email) {
-            setError('Email is required');
+            setError(tVal('emailRequired'));
             return;
         }
         if (!emailRegex.test(formData.email)) {
-            setError('Invalid email format');
+            setError(tVal('invalidEmailFormat'));
             return;
         }
 
         // Password validation
         if (!formData.password) {
-            setError('Password is required');
+            setError(tVal('passwordRequired'));
             return;
         }
         if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setError(tVal('passwordMinLength'));
             return;
         }
 
         // Confirm password validation
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
+            setError(tVal('passwordsDoNotMatch'));
             return;
         }
 
@@ -67,10 +71,10 @@ export default function RegisterPage() {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 router.push('/admin/dashboard');
             } else {
-                setError(data.message || 'Registration failed');
+                setError(data.message || tVal('registrationFailed'));
             }
         } catch (err) {
-            setError('An error occurred. Please try again.');
+            setError(tVal('genericError'));
         } finally {
             setLoading(false);
         }
@@ -87,14 +91,14 @@ export default function RegisterPage() {
             });
 
             if (result?.error) {
-                setError('Google registration failed');
+                setError(tVal('googleRegistrationFailed'));
                 setLoading(false);
                 return;
             }
 
             router.push('/auth/google-callback');
         } catch (err) {
-            setError('An error occurred during Google registration');
+            setError(tVal('googleRegistrationError'));
             setLoading(false);
         }
     };
@@ -103,7 +107,7 @@ export default function RegisterPage() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-purple-900 p-4">
             <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
                 <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-                    Register
+                    {t('title')}
                 </h1>
 
                 {error && (
@@ -115,7 +119,7 @@ export default function RegisterPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                            Email
+                            {t('email')}
                         </label>
                         <input
                             type="email"
@@ -123,14 +127,14 @@ export default function RegisterPage() {
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 text-gray-900"
-                            placeholder="name@example.com"
+                            placeholder={t('emailPlaceholder')}
                             required
                         />
                     </div>
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                            Password
+                            {t('password')}
                         </label>
                         <input
                             type="password"
@@ -141,12 +145,12 @@ export default function RegisterPage() {
                             required
                             minLength={6}
                         />
-                        <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                        <p className="text-xs text-gray-500 mt-1">{t('minCharacters')}</p>
                     </div>
 
                     <div>
                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                            Confirm Password
+                            {t('confirmPassword')}
                         </label>
                         <input
                             type="password"
@@ -163,7 +167,7 @@ export default function RegisterPage() {
                         disabled={loading}
                         className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                        {loading ? 'Registering...' : 'Register'}
+                        {loading ? t('registering') : t('registerButton')}
                     </button>
                 </form>
 
@@ -172,7 +176,7 @@ export default function RegisterPage() {
                         <div className="w-full border-t border-gray-300"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">OR</span>
+                        <span className="px-2 bg-white text-gray-500">{tCommon('or')}</span>
                     </div>
                 </div>
 
@@ -186,13 +190,13 @@ export default function RegisterPage() {
                         <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
                         <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
                     </svg>
-                    Register with Google
+                    {t('googleButton')}
                 </button>
 
                 <p className="mt-6 text-center text-gray-600">
-                    Already have an account?{' '}
+                    {t('hasAccount')}{' '}
                     <Link href="/login" className="text-purple-600 font-semibold hover:underline">
-                        Login here
+                        {t('loginLink')}
                     </Link>
                 </p>
             </div>

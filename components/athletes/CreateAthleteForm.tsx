@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { User, MapPin, Phone, Calendar, Trophy } from 'lucide-react';
 
 export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
@@ -17,6 +18,11 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
     bio: '',
   });
 
+  const t = useTranslations('admin.athletes.form');
+  const tSports = useTranslations('common.sports');
+  const tButtons = useTranslations('common.buttons');
+  const tActions = useTranslations('common.actions');
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -25,14 +31,14 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
       // TODO: Replace with actual API call after generation
       // await createAthlete.mutateAsync(formData);
       console.log('Creating athlete:', formData);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       router.push(`/${locale}/athletes`);
     } catch (error) {
       console.error('Error creating athlete:', error);
-      alert('Failed to create athlete profile');
+      alert(t('failedToCreate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -45,7 +51,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <div className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            Full Name *
+            {t('fullName')} *
           </div>
         </label>
         <input
@@ -54,7 +60,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="John Doe"
+          placeholder={t('fullNamePlaceholder')}
         />
       </div>
 
@@ -63,7 +69,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4" />
-            Sport *
+            {t('sport')} *
           </div>
         </label>
         <select
@@ -72,8 +78,8 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
           onChange={(e) => setFormData({ ...formData, sportType: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          <option value="PICKLEBALL">Pickleball</option>
-          <option value="BADMINTON">Badminton</option>
+          <option value="PICKLEBALL">{tSports('pickleball')}</option>
+          <option value="BADMINTON">{tSports('badminton')}</option>
         </select>
       </div>
 
@@ -82,7 +88,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            Date of Birth
+            {t('dateOfBirth')}
           </div>
         </label>
         <input
@@ -96,17 +102,17 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
       {/* Gender */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Gender
+          {t('gender')}
         </label>
         <select
           value={formData.gender}
           onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          <option value="">Select...</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
+          <option value="">{t('genderSelect')}</option>
+          <option value="male">{t('male')}</option>
+          <option value="female">{t('female')}</option>
+          <option value="other">{t('other')}</option>
         </select>
       </div>
 
@@ -115,7 +121,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4" />
-            City
+            {t('city')}
           </div>
         </label>
         <input
@@ -123,7 +129,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
           value={formData.city}
           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Ho Chi Minh City"
+          placeholder={t('cityPlaceholder')}
         />
       </div>
 
@@ -132,7 +138,7 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4" />
-            Phone Number
+            {t('phoneNumber')}
           </div>
         </label>
         <input
@@ -140,21 +146,21 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
           value={formData.phoneNumber}
           onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="+84 901 234 567"
+          placeholder={t('phonePlaceholder')}
         />
       </div>
 
       {/* Bio */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Bio
+          {t('bio')}
         </label>
         <textarea
           value={formData.bio}
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
           rows={4}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Tell us about yourself..."
+          placeholder={t('bioPlaceholder')}
         />
       </div>
 
@@ -165,14 +171,14 @@ export function CreateAthleteForm({ locale = 'en' }: { locale?: string }) {
           disabled={isSubmitting}
           className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {isSubmitting ? 'Creating...' : 'Create Profile'}
+          {isSubmitting ? tActions('creating') : t('createProfileButton')}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
           className="px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
         >
-          Cancel
+          {tButtons('cancel')}
         </button>
       </div>
     </form>

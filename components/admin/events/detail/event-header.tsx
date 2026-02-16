@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, Send, XCircle, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,13 +18,18 @@ interface EventHeaderProps {
   isLoading?: boolean;
 }
 
-const sportLabels: Record<string, string> = {
-  PICKLEBALL: 'Pickleball',
-  BADMINTON: 'Badminton',
-};
-
 export function EventHeader({ event, onPublish, onCancel, onDelete, isLoading }: EventHeaderProps) {
   const router = useRouter();
+  const t = useTranslations('admin.events');
+  const tSports = useTranslations('common.sports');
+  const tCommon = useTranslations('common');
+  const tButtons = useTranslations('common.buttons');
+
+  const sportLabels: Record<string, string> = {
+    PICKLEBALL: tSports('pickleball'),
+    BADMINTON: tSports('badminton'),
+  };
+
   const isDraft = event.status === EventResponseDtoStatus.DRAFT;
   const isPublishedOrLive =
     event.status === EventResponseDtoStatus.PUBLISHED ||
@@ -34,7 +40,7 @@ export function EventHeader({ event, onPublish, onCancel, onDelete, isLoading }:
       {/* Back Button */}
       <Button variant="ghost" size="sm" onClick={() => router.push('/admin/events')}>
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Events
+        {t('detail.backToEvents')}
       </Button>
 
       {/* Header Content */}
@@ -48,9 +54,9 @@ export function EventHeader({ event, onPublish, onCancel, onDelete, isLoading }:
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Badge variant="outline">{sportLabels[event.sportType] ?? event.sportType}</Badge>
-            {event.brand && <span>by {event.brand}</span>}
+            {event.brand && <span>{tCommon('by')} {event.brand}</span>}
             <span>
-              Created{' '}
+              {tCommon('columns.created')}{' '}
               {new Date(event.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
@@ -65,13 +71,13 @@ export function EventHeader({ event, onPublish, onCancel, onDelete, isLoading }:
           {isDraft && (
             <Button onClick={onPublish} disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-              Publish
+              {tButtons('publish')}
             </Button>
           )}
           {isPublishedOrLive && (
             <Button variant="outline" onClick={onCancel} disabled={isLoading}>
               <XCircle className="mr-2 h-4 w-4" />
-              Cancel Event
+              {t('dialogs.cancelAction')}
             </Button>
           )}
           {isDraft && (

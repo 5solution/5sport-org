@@ -1,12 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { Trophy, Calendar, Users } from 'lucide-react';
 
-export default async function LeaderboardsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
+export default function LeaderboardsPage() {
+  const locale = useLocale();
+  const t = useTranslations('admin.leaderboards');
+  const tCommon = useTranslations('common');
+
   // TODO: Replace with actual API call
   // const { data } = useGetLeaderboards();
 
@@ -41,8 +43,8 @@ export default async function LeaderboardsPage({
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Leaderboards</h1>
-        <p className="text-gray-600 mt-1">View rankings and compete for the top spot</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600 mt-1">{t('description')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -57,7 +59,7 @@ export default async function LeaderboardsPage({
                 <Trophy className="w-10 h-10 text-yellow-500" />
                 {leaderboard.isActive && (
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                    Active
+                    {tCommon('active')}
                   </span>
                 )}
               </div>
@@ -73,7 +75,7 @@ export default async function LeaderboardsPage({
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4" />
-                  <span>{leaderboard.entriesCount} athletes</span>
+                  <span>{leaderboard.entriesCount} {t('athletes')}</span>
                 </div>
               </div>
 

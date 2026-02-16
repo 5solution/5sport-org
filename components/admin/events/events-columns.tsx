@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreHorizontal, Eye, Pencil, Trash2, Send, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,14 +19,14 @@ import { EventResponseDto } from '@/lib/schemas/eventResponseDto';
 import { EventResponseDtoStatus } from '@/lib/schemas/eventResponseDtoStatus';
 import { EventStatusBadge } from './event-status-badge';
 
-const sportTypeLabels: Record<string, string> = {
-  PICKLEBALL: 'Pickleball',
-  BADMINTON: 'Badminton',
-};
-
 const sportTypeBadgeVariant: Record<string, 'default' | 'secondary'> = {
   PICKLEBALL: 'default',
   BADMINTON: 'secondary',
+};
+
+const sportTypeKeys: Record<string, string> = {
+  PICKLEBALL: 'pickleball',
+  BADMINTON: 'badminton',
 };
 
 export function useEventsColumns({
@@ -38,6 +39,10 @@ export function useEventsColumns({
   onDelete: (id: string) => void;
 }): ColumnDef<EventResponseDto>[] {
   const router = useRouter();
+  const t = useTranslations('admin.events.columns');
+  const tActions = useTranslations('admin.events.actions');
+  const tCommon = useTranslations('common');
+  const tSports = useTranslations('common.sports');
 
   return [
     {
@@ -47,7 +52,7 @@ export function useEventsColumns({
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Event Name
+          {t('eventName')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -65,19 +70,20 @@ export function useEventsColumns({
     },
     {
       accessorKey: 'sportType',
-      header: 'Sport',
+      header: t('sport'),
       cell: ({ row }) => {
         const sport = row.getValue('sportType') as string;
+        const key = sportTypeKeys[sport];
         return (
           <Badge variant={sportTypeBadgeVariant[sport] ?? 'outline'}>
-            {sportTypeLabels[sport] ?? sport}
+            {key ? tSports(key) : sport}
           </Badge>
         );
       },
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: t('status'),
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
         return <EventStatusBadge status={status} />;
@@ -93,7 +99,7 @@ export function useEventsColumns({
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Start Date
+          {t('startDate')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -118,7 +124,7 @@ export function useEventsColumns({
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Created
+          {tCommon('columns.created')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -155,32 +161,32 @@ export function useEventsColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>{tCommon('columns.actions')}</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => router.push(`/admin/events/${event.id}`)}
               >
                 <Eye className="mr-2 h-4 w-4" />
-                View details
+                {tActions('viewDetails')}
               </DropdownMenuItem>
               {isDraft && (
                 <DropdownMenuItem
                   onClick={() => router.push(`/admin/events/${event.id}?edit=true`)}
                 >
                   <Pencil className="mr-2 h-4 w-4" />
-                  Edit
+                  {tActions('edit')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
               {isDraft && (
                 <DropdownMenuItem onClick={() => onPublish(event.id)}>
                   <Send className="mr-2 h-4 w-4" />
-                  Publish
+                  {tActions('publish')}
                 </DropdownMenuItem>
               )}
               {isPublishedOrLive && (
                 <DropdownMenuItem onClick={() => onCancel(event.id)}>
                   <XCircle className="mr-2 h-4 w-4" />
-                  Cancel event
+                  {tActions('cancelEvent')}
                 </DropdownMenuItem>
               )}
               {isDraft && (
@@ -191,7 +197,7 @@ export function useEventsColumns({
                     onClick={() => onDelete(event.id)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    {tActions('delete')}
                   </DropdownMenuItem>
                 </>
               )}

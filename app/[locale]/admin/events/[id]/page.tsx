@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,6 +41,9 @@ export default function EventDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const eventId = params?.id as string;
+
+  const t = useTranslations('admin.events');
+  const tButtons = useTranslations('common.buttons');
 
   const { data, isLoading, error } = useEventControllerFindOne(eventId, {
     query: { enabled: !!eventId },
@@ -89,19 +93,19 @@ export default function EventDetailPage() {
 
   const confirmLabels: Record<string, { title: string; description: string; action: string }> = {
     publish: {
-      title: 'Publish Event',
-      description: 'This will make the event visible to participants. Make sure all details are configured correctly.',
-      action: 'Publish',
+      title: t('dialogs.publishTitle'),
+      description: t('dialogs.publishDetailDescription'),
+      action: t('dialogs.publishAction'),
     },
     cancel: {
-      title: 'Cancel Event',
-      description: 'This will cancel the event. Participants will be notified. This cannot be undone.',
-      action: 'Cancel Event',
+      title: t('dialogs.cancelTitle'),
+      description: t('dialogs.cancelDetailDescription'),
+      action: t('dialogs.cancelAction'),
     },
     delete: {
-      title: 'Delete Event',
-      description: 'This will permanently delete the event and all its data. This cannot be undone.',
-      action: 'Delete',
+      title: t('dialogs.deleteTitle'),
+      description: t('dialogs.deleteDetailDescription'),
+      action: t('dialogs.deleteAction'),
     },
   };
 
@@ -120,11 +124,11 @@ export default function EventDetailPage() {
           <Loader2 className="h-8 w-8 text-muted-foreground" />
         </div>
         <div className="text-center">
-          <p className="text-lg font-semibold text-foreground">Event not found</p>
-          <p className="text-sm">The event you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          <p className="text-lg font-semibold text-foreground">{t('detail.eventNotFound')}</p>
+          <p className="text-sm">{t('detail.eventNotFoundDescription')}</p>
         </div>
         <Button variant="outline" onClick={() => router.push('/admin/events')}>
-          Back to Events
+          {t('detail.backToEvents')}
         </Button>
       </div>
     );
@@ -147,13 +151,13 @@ export default function EventDetailPage() {
 
       <Tabs defaultValue="overview">
         <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-          <TabsTrigger value="fields">Fields</TabsTrigger>
-          <TabsTrigger value="descriptions">Descriptions</TabsTrigger>
-          <TabsTrigger value="scoring">Scoring</TabsTrigger>
-          <TabsTrigger value="blacklist">Blacklist</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="overview">{t('detail.tabs.overview')}</TabsTrigger>
+          <TabsTrigger value="sessions">{t('detail.tabs.sessions')}</TabsTrigger>
+          <TabsTrigger value="fields">{t('detail.tabs.fields')}</TabsTrigger>
+          <TabsTrigger value="descriptions">{t('detail.tabs.descriptions')}</TabsTrigger>
+          <TabsTrigger value="scoring">{t('detail.tabs.scoring')}</TabsTrigger>
+          <TabsTrigger value="blacklist">{t('detail.tabs.blacklist')}</TabsTrigger>
+          <TabsTrigger value="settings">{t('detail.tabs.settings')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -198,7 +202,7 @@ export default function EventDetailPage() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmAction(null)} disabled={isMutating}>
-              Cancel
+              {tButtons('cancel')}
             </Button>
             <Button
               variant={confirmAction === 'delete' || confirmAction === 'cancel' ? 'destructive' : 'default'}

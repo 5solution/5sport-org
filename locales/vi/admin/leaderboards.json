@@ -1,0 +1,16 @@
+{
+  "title": "Bảng xếp hạng",
+  "description": "Xem xếp hạng và cạnh tranh vị trí hàng đầu",
+  "athletes": "vận động viên",
+  "overall": "TỔNG",
+  "monthly": "THÁNG",
+  "columns": {
+    "rank": "Hạng",
+    "athlete": "Vận động viên",
+    "score": "Điểm",
+    "matches": "Trận",
+    "winLoss": "T-B",
+    "winPercent": "Tỉ lệ thắng",
+    "change": "Thay đổi"
+  }
+}

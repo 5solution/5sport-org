@@ -60,8 +60,8 @@ export default function CreateEventPage() {
   const validateStep = (): boolean => {
     let stepErrors: Record<string, string> = {};
     if (currentStep === 0) stepErrors = validateBasicInfo(formData, tVal);
-    else if (currentStep === 1) stepErrors = validateTimeline(formData);
-    else if (currentStep === 2) stepErrors = validatePayment(formData);
+    else if (currentStep === 1) stepErrors = validateTimeline(formData, tVal);
+    else if (currentStep === 2) stepErrors = validatePayment(formData, tVal);
     setErrors(stepErrors);
     return Object.keys(stepErrors).length === 0;
   };

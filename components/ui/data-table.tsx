@@ -14,6 +14,7 @@ import {
 } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,8 +45,9 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  searchPlaceholder = 'Search...',
+  searchPlaceholder,
 }: DataTableProps<TData, TValue>) {
+  const t = useTranslations('common.dataTable');
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -79,7 +81,7 @@ export function DataTable<TData, TValue>({
       {searchKey && (
         <div className="flex items-center gap-4">
           <Input
-            placeholder={searchPlaceholder}
+            placeholder={searchPlaceholder || t('search')}
             value={
               (table.getColumn(searchKey)?.getFilterValue() as string) ?? ''
             }
@@ -135,7 +137,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {t('noResults')}
                 </TableCell>
               </TableRow>
             )}
@@ -146,12 +148,11 @@ export function DataTable<TData, TValue>({
       {/* Pagination */}
       <div className="flex items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {t('rowsSelected', { count: table.getFilteredSelectedRowModel().rows.length, total: table.getFilteredRowModel().rows.length })}
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
+            <p className="text-sm font-medium">{t('rowsPerPage')}</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -173,8 +174,7 @@ export function DataTable<TData, TValue>({
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
+            {t('page')} {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -183,7 +183,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <span className="sr-only">Go to first page</span>
+              <span className="sr-only">{t('goToFirstPage')}</span>
               <ChevronsLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -192,7 +192,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <span className="sr-only">Go to previous page</span>
+              <span className="sr-only">{t('goToPreviousPage')}</span>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -201,7 +201,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <span className="sr-only">Go to next page</span>
+              <span className="sr-only">{t('goToNextPage')}</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button
@@ -210,7 +210,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <span className="sr-only">Go to last page</span>
+              <span className="sr-only">{t('goToLastPage')}</span>
               <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>

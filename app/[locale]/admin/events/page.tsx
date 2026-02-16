@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Calendar, Loader2, Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { useEventsColumns } from '@/components/admin/events/events-columns';
 import { EventStatusBadge } from '@/components/admin/events/event-status-badge';
@@ -51,6 +52,12 @@ export default function EventsPage() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+
+  const t = useTranslations('admin.events');
+  const tList = useTranslations('admin.events.listPage');
+  const tDialogs = useTranslations('admin.events.dialogs');
+  const tStatuses = useTranslations('common.eventStatuses');
+  const tButtons = useTranslations('common.buttons');
 
   const { data, isLoading, error } = useEventControllerFindAll({ page: 1, limit: 100 });
 
@@ -104,19 +111,19 @@ export default function EventsPage() {
 
   const confirmLabels = {
     publish: {
-      title: 'Publish Event',
-      description: 'Are you sure you want to publish this event? It will become visible to users.',
-      action: 'Publish',
+      title: tDialogs('publishTitle'),
+      description: tDialogs('publishDescription'),
+      action: tDialogs('publishAction'),
     },
     cancel: {
-      title: 'Cancel Event',
-      description: 'Are you sure you want to cancel this event? This action cannot be undone.',
-      action: 'Cancel Event',
+      title: tDialogs('cancelTitle'),
+      description: tDialogs('cancelDescription'),
+      action: tDialogs('cancelAction'),
     },
     delete: {
-      title: 'Delete Event',
-      description: 'Are you sure you want to delete this event? This action cannot be undone.',
-      action: 'Delete',
+      title: tDialogs('deleteTitle'),
+      description: tDialogs('deleteDescription'),
+      action: tDialogs('deleteAction'),
     },
   };
 
@@ -126,15 +133,15 @@ export default function EventsPage() {
       <div className="flex flex-col gap-4 pt-12 lg:pt-0 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
-            Events
+            {t('title')}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Manage your sporting events and competitions.
+            {tList('description')}
           </p>
         </div>
         <Button className="w-full sm:w-auto" onClick={() => router.push('/admin/events/create')}>
           <Plus className="mr-2 h-4 w-4" />
-          Create Event
+          {t('createEvent')}
         </Button>
       </div>
 
@@ -142,7 +149,7 @@ export default function EventsPage() {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{tList('total')}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground hidden sm:block" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -151,7 +158,7 @@ export default function EventsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Draft</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{tStatuses('draft')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-secondary" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -160,7 +167,7 @@ export default function EventsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Published</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{tStatuses('published')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-primary" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -169,7 +176,7 @@ export default function EventsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Live</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{tStatuses('live')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-green-500" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -178,7 +185,7 @@ export default function EventsPage() {
         </Card>
         <Card className="col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Cancelled</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">{tStatuses('cancelled')}</CardTitle>
             <div className="h-2 w-2 rounded-full bg-destructive" />
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
@@ -193,23 +200,23 @@ export default function EventsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="font-heading text-base sm:text-lg font-bold">
-                All Events
+                {tList('allEvents')}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                View and manage all events in your organization.
+                {tList('allEventsDescription')}
               </CardDescription>
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-[160px]">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={tList('filterByStatus')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value={EventResponseDtoStatus.DRAFT}>Draft</SelectItem>
-                <SelectItem value={EventResponseDtoStatus.PUBLISHED}>Published</SelectItem>
-                <SelectItem value={EventResponseDtoStatus.LIVE}>Live</SelectItem>
-                <SelectItem value={EventResponseDtoStatus.CLOSED}>Closed</SelectItem>
-                <SelectItem value={EventResponseDtoStatus.CANCELLED}>Cancelled</SelectItem>
+                <SelectItem value="all">{tList('allStatuses')}</SelectItem>
+                <SelectItem value={EventResponseDtoStatus.DRAFT}>{tStatuses('draft')}</SelectItem>
+                <SelectItem value={EventResponseDtoStatus.PUBLISHED}>{tStatuses('published')}</SelectItem>
+                <SelectItem value={EventResponseDtoStatus.LIVE}>{tStatuses('live')}</SelectItem>
+                <SelectItem value={EventResponseDtoStatus.CLOSED}>{tStatuses('closed')}</SelectItem>
+                <SelectItem value={EventResponseDtoStatus.CANCELLED}>{tStatuses('cancelled')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -221,21 +228,21 @@ export default function EventsPage() {
             </div>
           ) : error ? (
             <div className="flex h-64 flex-col items-center justify-center gap-2 text-muted-foreground">
-              <p>Failed to load events.</p>
+              <p>{tList('failedToLoad')}</p>
               <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-                Retry
+                {tButtons('retry')}
               </Button>
             </div>
           ) : events.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center gap-4 text-muted-foreground">
               <Calendar className="h-12 w-12" />
               <div className="text-center">
-                <p className="font-medium text-foreground">No events yet</p>
-                <p className="text-sm">Create your first event to get started.</p>
+                <p className="font-medium text-foreground">{tList('noEventsYet')}</p>
+                <p className="text-sm">{tList('noEventsDescription')}</p>
               </div>
               <Button onClick={() => router.push('/admin/events/create')}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Event
+                {t('createEvent')}
               </Button>
             </div>
           ) : (
@@ -243,7 +250,6 @@ export default function EventsPage() {
               columns={columns}
               data={filteredEvents}
               searchKey="name"
-              searchPlaceholder="Search events..."
             />
           )}
         </CardContent>
@@ -262,7 +268,7 @@ export default function EventsPage() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmAction(null)} disabled={isMutating}>
-              Cancel
+              {tButtons('cancel')}
             </Button>
             <Button
               variant={confirmAction?.type === 'delete' ? 'destructive' : 'default'}

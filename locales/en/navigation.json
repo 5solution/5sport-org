@@ -5,6 +5,8 @@
     "events": "Events",
     "users": "Users",
     "settings": "Settings",
-    "myAccount": "My Account"
+    "myAccount": "My Account",
+    "athletes": "Athletes",
+    "leaderboards": "Leaderboards"
   }
 }

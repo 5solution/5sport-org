@@ -2,9 +2,101 @@
   "title": "Sự kiện",
   "createNew": "Tạo Sự Kiện Mới",
   "editEvent": "Chỉnh Sửa Sự Kiện",
+  "createEvent": "Tạo Sự Kiện",
   "createPage": {
     "title": "Tạo Sự Kiện Mới",
     "subtitle": "Thiết lập sự kiện thể thao mới trong vài bước"
+  },
+  "listPage": {
+    "description": "Quản lý sự kiện thể thao và giải đấu của bạn.",
+    "allEvents": "Tất cả Sự kiện",
+    "allEventsDescription": "Xem và quản lý tất cả sự kiện trong tổ chức của bạn.",
+    "filterByStatus": "Lọc theo trạng thái",
+    "allStatuses": "Tất cả trạng thái",
+    "total": "Tổng cộng",
+    "failedToLoad": "Không thể tải sự kiện.",
+    "noEventsYet": "Chưa có sự kiện",
+    "noEventsDescription": "Tạo sự kiện đầu tiên để bắt đầu."
+  },
+  "detail": {
+    "eventNotFound": "Không tìm thấy sự kiện",
+    "eventNotFoundDescription": "Sự kiện bạn đang tìm không tồn tại hoặc đã bị xóa.",
+    "backToEvents": "Quay lại Sự kiện",
+    "tabs": {
+      "overview": "Tổng quan",
+      "sessions": "Phiên thi đấu",
+      "fields": "Trường dữ liệu",
+      "descriptions": "Mô tả",
+      "scoring": "Chấm điểm",
+      "blacklist": "Danh sách đen",
+      "settings": "Cài đặt"
+    },
+    "basicInformation": "Thông tin cơ bản",
+    "timeline": "Thời gian",
+    "eventStart": "Bắt đầu sự kiện",
+    "eventEnd": "Kết thúc sự kiện",
+    "editInfoOpen": "Mở chỉnh sửa thông tin",
+    "editInfoClose": "Đóng chỉnh sửa thông tin",
+    "checkinOpen": "Mở check-in",
+    "checkinClose": "Đóng check-in",
+    "transfer": "Chuyển nhượng",
+    "transferOpen": "Mở chuyển nhượng",
+    "transferClose": "Đóng chuyển nhượng",
+    "paymentMethods": "Phương thức thanh toán",
+    "noPaymentMethods": "Chưa cấu hình phương thức thanh toán",
+    "slug": "Slug",
+    "provinceCode": "Mã tỉnh/thành",
+    "wardCode": "Mã phường/quận"
+  },
+  "sessions": {
+    "title": "Phiên Thi Đấu",
+    "description": "Quản lý hạng mục thi đấu và loại vé",
+    "addSession": "Thêm phiên",
+    "noSessionsYet": "Chưa có phiên thi đấu",
+    "noSessionsDescription": "Thêm phiên thi đấu đầu tiên để bắt đầu.",
+    "ticketTiers": "Loại vé",
+    "tickets": "vé",
+    "start": "Bắt đầu:",
+    "end": "Kết thúc:",
+    "addCompetitionSession": "Thêm Phiên Thi Đấu",
+    "name": "Tên",
+    "namePlaceholder": "VD: Đơn nam hạng A",
+    "matchType": "Loại trận",
+    "select": "Chọn",
+    "singles": "Đơn",
+    "doubles": "Đôi",
+    "ticketCode": "Mã vé",
+    "ticketCodePlaceholder": "VD: DNA",
+    "startTime": "Thời gian bắt đầu",
+    "endTime": "Thời gian kết thúc",
+    "createSession": "Tạo phiên"
+  },
+  "dialogs": {
+    "publishTitle": "Xuất bản Sự kiện",
+    "publishDescription": "Bạn có chắc muốn xuất bản sự kiện này? Sự kiện sẽ hiển thị cho người dùng.",
+    "publishDetailDescription": "Sự kiện sẽ hiển thị cho người tham gia. Hãy đảm bảo tất cả thông tin đã được cấu hình đúng.",
+    "publishAction": "Xuất bản",
+    "cancelTitle": "Hủy Sự kiện",
+    "cancelDescription": "Bạn có chắc muốn hủy sự kiện này? Hành động này không thể hoàn tác.",
+    "cancelDetailDescription": "Sự kiện sẽ bị hủy. Người tham gia sẽ được thông báo. Hành động này không thể hoàn tác.",
+    "cancelAction": "Hủy Sự kiện",
+    "deleteTitle": "Xóa Sự kiện",
+    "deleteDescription": "Bạn có chắc muốn xóa sự kiện này? Hành động này không thể hoàn tác.",
+    "deleteDetailDescription": "Sự kiện và tất cả dữ liệu sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.",
+    "deleteAction": "Xóa"
+  },
+  "columns": {
+    "eventName": "Tên Sự kiện",
+    "sport": "Môn thể thao",
+    "status": "Trạng thái",
+    "startDate": "Ngày bắt đầu"
+  },
+  "actions": {
+    "viewDetails": "Xem chi tiết",
+    "edit": "Chỉnh sửa",
+    "publish": "Xuất bản",
+    "cancelEvent": "Hủy sự kiện",
+    "delete": "Xóa"
   },
   "steps": {
     "basicInfo": {
@@ -18,6 +110,55 @@
     "payment": {
       "title": "Thanh Toán",
       "description": "Thanh toán & xem lại"
+    }
+  },
+  "timeline": {
+    "eventDuration": "Thời gian sự kiện",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "editInfoPeriod": "Thời gian chỉnh sửa thông tin",
+    "editInfoDescription": "Khoảng thời gian người tham gia có thể chỉnh sửa thông tin đăng ký.",
+    "openDate": "Ngày mở",
+    "closeDate": "Ngày đóng",
+    "checkinPeriod": "Thời gian check-in",
+    "ticketTransfer": "Chuyển nhượng vé",
+    "ticketTransferDescription": "Cho phép người tham gia chuyển nhượng vé",
+    "transferOpenDate": "Ngày mở chuyển nhượng",
+    "transferCloseDate": "Ngày đóng chuyển nhượng",
+    "validation": {
+      "startDateRequired": "Ngày bắt đầu là bắt buộc",
+      "endDateRequired": "Ngày kết thúc là bắt buộc",
+      "openDateRequired": "Ngày mở là bắt buộc",
+      "closeDateRequired": "Ngày đóng là bắt buộc",
+      "endDateAfterStart": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu",
+      "closeDateAfterOpen": "Ngày đóng phải sau hoặc bằng ngày mở",
+      "transferOpenRequired": "Ngày mở chuyển nhượng là bắt buộc",
+      "transferCloseRequired": "Ngày đóng chuyển nhượng là bắt buộc"
+    }
+  },
+  "payment": {
+    "title": "Phương Thức Thanh Toán",
+    "description": "Chọn ít nhất một phương thức thanh toán cho việc mua vé.",
+    "summary": "Tóm tắt",
+    "eventName": "Tên Sự kiện",
+    "sport": "Môn thể thao",
+    "prefixCode": "Mã tiền tố",
+    "eventPeriod": "Thời gian sự kiện",
+    "transfer": "Chuyển nhượng",
+    "payment": "Thanh toán",
+    "noneSelected": "Chưa chọn",
+    "atLeastOneRequired": "Cần chọn ít nhất một phương thức thanh toán",
+    "methods": {
+      "vnpayQr": "VNPay QR",
+      "vnpayQrDesc": "Quét mã QR để thanh toán qua VNPay",
+      "domesticCard": "Thẻ nội địa",
+      "domesticCardDesc": "Thẻ ATM / Ghi nợ (Việt Nam)",
+      "internationalCard": "Thẻ quốc tế",
+      "internationalCardDesc": "Visa / Mastercard / JCB",
+      "payxQr": "PayX QR",
+      "payxQrDesc": "Quét mã QR để thanh toán qua PayX",
+      "payxDomestic": "PayX Nội địa",
+      "payxDomesticDesc": "Thẻ nội địa qua PayX"
     }
   },
   "fields": {

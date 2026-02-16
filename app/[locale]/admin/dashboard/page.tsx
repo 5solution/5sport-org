@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const API_URL = 'http://localhost:3000';
 
@@ -19,6 +20,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [showToken, setShowToken] = useState(false);
     const [token, setToken] = useState('');
+
+    const tActions = useTranslations('common.actions');
+    const tButtons = useTranslations('common.buttons');
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -73,7 +77,7 @@ export default function DashboardPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-purple-900">
-                <div className="text-white text-xl">Loading...</div>
+                <div className="text-white text-xl">{tActions('loading')}</div>
             </div>
         );
     }
@@ -150,7 +154,7 @@ export default function DashboardPage() {
                             onClick={handleLogout}
                             className="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
                         >
-                            Logout
+                            {tButtons('logout')}
                         </button>
                     </div>
                 </div>

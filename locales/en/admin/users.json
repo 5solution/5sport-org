@@ -1,0 +1,30 @@
+{
+  "title": "User Management",
+  "description": "Manage user accounts, roles, and permissions.",
+  "addUser": "Add User",
+  "stats": {
+    "totalUsers": "Total Users",
+    "admins": "Admins",
+    "organizers": "Organizers",
+    "regularUsers": "Regular Users"
+  },
+  "table": {
+    "title": "All Users",
+    "description": "A list of all users in your application.",
+    "filterByRole": "Filter by role",
+    "searchByEmail": "Search by email...",
+    "failedToLoad": "Failed to load users. Using demo data."
+  },
+  "columns": {
+    "user": "User",
+    "role": "Role",
+    "tags": "Tags",
+    "noTags": "No tags"
+  },
+  "actions": {
+    "copyUserId": "Copy user ID",
+    "viewDetails": "View details",
+    "editUser": "Edit user",
+    "deleteUser": "Delete user"
+  }
+}

@@ -74,14 +74,14 @@ export function StepBasicInfo({ formData, errors, onChange }: StepBasicInfoProps
   const tMsg = useTranslations('admin.events.messages');
 
   const { data: provincesData, isLoading: provincesLoading } = useProvinceControllerListProvinces();
-  const provinces = provincesData?.data ?? [];
-  
+  const provinces = provincesData as unknown as any[] ?? [];
+
   const { data: wardsData, isLoading: wardsLoading } = useProvinceControllerListWardsByProvince(
     Number(formData.provinceCode),
     undefined,
     { query: { enabled: !!formData.provinceCode } },
   );
-  const wards = wardsData?.data ?? [];
+  const wards = wardsData as unknown as any[] ?? [];
 
   const filteredProvinces = provinceSearch
     ? provinces.filter((p) => p.name.toLowerCase().includes(provinceSearch.toLowerCase()))

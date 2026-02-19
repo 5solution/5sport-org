@@ -75,9 +75,8 @@ export function EventFieldsTab({ eventId }: EventFieldsTabProps) {
   const [optionInput, setOptionInput] = useState('');
   const [fileTypeInput, setFileTypeInput] = useState('');
 
-  const { data: rawData, isLoading } = useEventControllerGetCustomFields(eventId);
-  // Handle both { data: [...] } and [...] response shapes (same as other tabs)
-  const fields: any[] = (rawData as any)?.data ?? (Array.isArray(rawData) ? rawData : []);
+  const { data: rawFields, isLoading } = useEventControllerGetCustomFields(eventId);
+  const fields: any[] = Array.isArray(rawFields) ? rawFields : [];
 
   const addMutation = useEventControllerAddCustomField();
   const deleteMutation = useEventControllerDeleteCustomField();

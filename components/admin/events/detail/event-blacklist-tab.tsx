@@ -27,7 +27,7 @@ export function EventBlacklistTab({ eventId }: EventBlacklistTabProps) {
   const [raw, setRaw] = useState('');
   const [saved, setSaved] = useState(false);
 
-  const entries: any[] = (blacklistData as any)?.data ?? [];
+  const entries: any[] = Array.isArray(blacklistData) ? (blacklistData as any[]) : [];
 
   useEffect(() => {
     if (entries.length > 0) {

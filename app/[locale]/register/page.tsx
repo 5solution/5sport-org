@@ -64,7 +64,8 @@ export default function RegisterPage() {
                 body: JSON.stringify(registerData),
             });
 
-            const data = await response.json();
+            const raw = await response.json();
+            const data = raw.data ?? raw;
 
             if (response.ok) {
                 localStorage.setItem('token', data.token);

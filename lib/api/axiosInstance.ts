@@ -1,4 +1,5 @@
 import Axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { toast } from 'sonner';
 
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
@@ -37,15 +38,21 @@ AXIOS_INSTANCE.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    // Handle 401 Unauthorized errors
-    if (error.response?.status === 401) {
-      // Clear token and redirect to login
+    const status = error.response?.status;
+    const data = error.response?.data as any;
+    const message = data?.message || data?.error || error.message;
+
+    if (status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('authToken');
-        // Optionally redirect to login page
-        // window.location.href = '/login';
       }
+      toast.error('Session expired. Please log in again.');
+    } else if (status === 400) {
+      toast.error(message || 'Invalid request.');
+    } else if (status && status >= 500) {
+      toast.error('Server error. Please try again later.');
     }
+
     return Promise.reject(error);
   }
 );

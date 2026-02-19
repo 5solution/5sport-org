@@ -27,8 +27,12 @@ export interface EventResponseDto {
   address: string;
   /** Mã tỉnh/thành */
   provinceCode: string;
+  /** Tên tỉnh/thành */
+  provinceName?: string;
   /** Mã phường/xã */
   wardCode: string;
+  /** Tên phường/xã */
+  wardName?: string;
   /** Mã tiền tố */
   prefixCode: string;
   /** Slug URL */

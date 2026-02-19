@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,7 +45,6 @@ export function EventScoringTab({ eventId, sportType }: EventScoringTabProps) {
   const saveMutation = useEventControllerSaveScoringConfig();
 
   const [form, setForm] = useState(defaultConfig);
-  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const config = scoringData as any;
@@ -79,9 +79,8 @@ export function EventScoringTab({ eventId, sportType }: EventScoringTabProps) {
       });
       queryClient.invalidateQueries({ queryKey: getEventControllerGetScoringConfigQueryKey(eventId) });
       queryClient.invalidateQueries({ queryKey: getEventControllerFindOneQueryKey(eventId) });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch {}
+      toast.success('Scoring configuration saved!');
+    } catch { }
   };
 
   return (
@@ -97,7 +96,7 @@ export function EventScoringTab({ eventId, sportType }: EventScoringTabProps) {
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          {saved ? 'Saved!' : 'Save Config'}
+          Save Config
         </Button>
       </div>
 

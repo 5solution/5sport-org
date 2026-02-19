@@ -24,7 +24,18 @@ AXIOS_INSTANCE.interceptors.request.use(
 
 // Add response interceptor for error handling
 AXIOS_INSTANCE.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Unwrap standard API envelope: { status: 'success', code, data }
+    if (
+      response.data &&
+      typeof response.data === 'object' &&
+      'status' in response.data &&
+      'data' in response.data
+    ) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error: AxiosError) => {
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {

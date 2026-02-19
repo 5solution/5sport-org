@@ -54,10 +54,7 @@ export default function EventDetailPage() {
 
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
-  // Access the event from the response - handle Orval wrapper shape
-  const rawData = data as any;
-  const event = rawData?.data ?? rawData ?? null;
-  // Ensure it's actually an event object (has id and name)
+  const event = data as any;
   const validEvent = event && event.id && event.name ? event : null;
 
   const invalidate = () => {

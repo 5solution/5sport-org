@@ -47,7 +47,7 @@ export function EventScoringTab({ eventId, sportType }: EventScoringTabProps) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const config = (scoringData as any)?.data;
+    const config = scoringData as any;
     if (config) {
       setForm({
         sportType: config.sportType || sportType,

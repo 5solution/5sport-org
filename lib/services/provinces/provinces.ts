@@ -21,11 +21,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ProvinceControllerGetProvince200,
   ProvinceControllerGetProvinceParams,
+  ProvinceControllerGetWard200,
+  ProvinceControllerListProvinces200,
   ProvinceControllerListProvincesParams,
-  ProvinceControllerListWardsByProvinceParams,
-  ProvinceDto,
-  WardDto
+  ProvinceControllerListWardsByProvince200,
+  ProvinceControllerListWardsByProvinceParams
 } from '../../schemas';
 
 import { defaultMutator } from '../../api/axiosInstance';
@@ -39,7 +41,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Danh sách tỉnh/thành phố
  */
 export type provinceControllerListProvincesResponse200 = {
-  data: ProvinceDto[]
+  data: ProvinceControllerListProvinces200
   status: 200
 }
     
@@ -156,7 +158,7 @@ export function useProvinceControllerListProvinces<TData = Awaited<ReturnType<ty
  * @summary Chi tiết tỉnh/thành phố (kèm phường/xã)
  */
 export type provinceControllerGetProvinceResponse200 = {
-  data: ProvinceDto
+  data: ProvinceControllerGetProvince200
   status: 200
 }
     
@@ -281,7 +283,7 @@ export function useProvinceControllerGetProvince<TData = Awaited<ReturnType<type
  * @summary Danh sách phường/xã theo tỉnh/thành phố
  */
 export type provinceControllerListWardsByProvinceResponse200 = {
-  data: WardDto[]
+  data: ProvinceControllerListWardsByProvince200
   status: 200
 }
     
@@ -406,7 +408,7 @@ export function useProvinceControllerListWardsByProvince<TData = Awaited<ReturnT
  * @summary Chi tiết phường/xã
  */
 export type provinceControllerGetWardResponse200 = {
-  data: WardDto
+  data: ProvinceControllerGetWard200
   status: 200
 }
     

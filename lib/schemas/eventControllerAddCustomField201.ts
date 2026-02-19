@@ -5,10 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import type { EventControllerFindAll200Data } from './eventControllerFindAll200Data';
+import type { CustomFieldResponseDto } from './customFieldResponseDto';
 
-export type EventControllerFindAll200 = {
+export type EventControllerAddCustomField201 = {
   status?: string;
   code?: number;
-  data?: EventControllerFindAll200Data;
+  data?: CustomFieldResponseDto;
 };

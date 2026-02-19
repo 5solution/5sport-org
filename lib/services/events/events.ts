@@ -25,23 +25,34 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  BlacklistResponseDto,
   CreateCustomFieldDto,
   CreateDescriptionDto,
   CreateEventDto,
   CreateEventSessionDto,
   CreateTicketTierDto,
-  CustomFieldResponseDto,
-  DescriptionResponseDto,
+  EventControllerAddCustomField201,
+  EventControllerAddDescription201,
+  EventControllerCancel200,
+  EventControllerCreate201,
+  EventControllerCreateSession201,
+  EventControllerCreateTicketTier201,
   EventControllerFindAll200,
   EventControllerFindAllParams,
+  EventControllerFindOne200,
+  EventControllerGetBlacklist200,
+  EventControllerGetCustomFields200,
   EventControllerGetScoringConfig200,
-  EventResponseDto,
+  EventControllerPublish200,
+  EventControllerSaveScoringConfig200,
+  EventControllerSetBlacklist200,
+  EventControllerUpdate200,
+  EventControllerUpdateCustomField200,
+  EventControllerUpdateDescription200,
+  EventControllerUpdateSession200,
+  EventControllerUpdateTicketTier200,
   ReorderDto,
   ScoringConfigDto,
-  SessionResponseDto,
   SetBlacklistDto,
-  TicketTierResponseDto,
   UpdateCustomFieldDto,
   UpdateDescriptionDto,
   UpdateEventDto,
@@ -61,7 +72,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Tạo mới sự kiện
  */
 export type eventControllerCreateResponse201 = {
-  data: EventResponseDto
+  data: EventControllerCreate201
   status: 201
 }
     
@@ -262,7 +273,7 @@ export function useEventControllerFindAll<TData = Awaited<ReturnType<typeof even
  * @summary Chi tiết sự kiện
  */
 export type eventControllerFindOneResponse200 = {
-  data: EventResponseDto
+  data: EventControllerFindOne200
   status: 200
 }
     
@@ -373,7 +384,7 @@ export function useEventControllerFindOne<TData = Awaited<ReturnType<typeof even
  * @summary Cập nhật sự kiện
  */
 export type eventControllerUpdateResponse200 = {
-  data: EventResponseDto
+  data: EventControllerUpdate200
   status: 200
 }
     
@@ -539,7 +550,7 @@ export const useEventControllerDelete = <TError = unknown,
  * @summary Xuất bản sự kiện
  */
 export type eventControllerPublishResponse200 = {
-  data: EventResponseDto
+  data: EventControllerPublish200
   status: 200
 }
     
@@ -621,7 +632,7 @@ export const useEventControllerPublish = <TError = unknown,
  * @summary Hủy sự kiện
  */
 export type eventControllerCancelResponse200 = {
-  data: EventResponseDto
+  data: EventControllerCancel200
   status: 200
 }
     
@@ -703,7 +714,7 @@ export const useEventControllerCancel = <TError = unknown,
  * @summary Thêm mô tả sự kiện
  */
 export type eventControllerAddDescriptionResponse201 = {
-  data: DescriptionResponseDto
+  data: EventControllerAddDescription201
   status: 201
 }
     
@@ -787,7 +798,7 @@ export const useEventControllerAddDescription = <TError = unknown,
  * @summary Cập nhật mô tả
  */
 export type eventControllerUpdateDescriptionResponse200 = {
-  data: DescriptionResponseDto
+  data: EventControllerUpdateDescription200
   status: 200
 }
     
@@ -1041,7 +1052,7 @@ export const useEventControllerReorderDescriptions = <TError = unknown,
  * @summary Tạo hạng mục thi đấu
  */
 export type eventControllerCreateSessionResponse201 = {
-  data: SessionResponseDto
+  data: EventControllerCreateSession201
   status: 201
 }
     
@@ -1125,7 +1136,7 @@ export const useEventControllerCreateSession = <TError = unknown,
  * @summary Cập nhật hạng mục thi đấu
  */
 export type eventControllerUpdateSessionResponse200 = {
-  data: SessionResponseDto
+  data: EventControllerUpdateSession200
   status: 200
 }
     
@@ -1295,7 +1306,7 @@ export const useEventControllerDeleteSession = <TError = unknown,
  * @summary Tạo loại vé
  */
 export type eventControllerCreateTicketTierResponse201 = {
-  data: TicketTierResponseDto
+  data: EventControllerCreateTicketTier201
   status: 201
 }
     
@@ -1381,7 +1392,7 @@ export const useEventControllerCreateTicketTier = <TError = unknown,
  * @summary Cập nhật loại vé
  */
 export type eventControllerUpdateTicketTierResponse200 = {
-  data: TicketTierResponseDto
+  data: EventControllerUpdateTicketTier200
   status: 200
 }
     
@@ -1555,7 +1566,7 @@ export const useEventControllerDeleteTicketTier = <TError = unknown,
  * @summary Danh sách trường dữ liệu tùy chỉnh
  */
 export type eventControllerGetCustomFieldsResponse200 = {
-  data: CustomFieldResponseDto[]
+  data: EventControllerGetCustomFields200
   status: 200
 }
     
@@ -1666,7 +1677,7 @@ export function useEventControllerGetCustomFields<TData = Awaited<ReturnType<typ
  * @summary Thêm trường dữ liệu tùy chỉnh
  */
 export type eventControllerAddCustomFieldResponse201 = {
-  data: CustomFieldResponseDto
+  data: EventControllerAddCustomField201
   status: 201
 }
     
@@ -1750,7 +1761,7 @@ export const useEventControllerAddCustomField = <TError = unknown,
  * @summary Cập nhật trường dữ liệu
  */
 export type eventControllerUpdateCustomFieldResponse200 = {
-  data: CustomFieldResponseDto
+  data: EventControllerUpdateCustomField200
   status: 200
 }
     
@@ -2004,7 +2015,7 @@ export const useEventControllerReorderCustomFields = <TError = unknown,
  * @summary Cấu hình luật thi đấu
  */
 export type eventControllerSaveScoringConfigResponse200 = {
-  data: EventResponseDto
+  data: EventControllerSaveScoringConfig200
   status: 200
 }
     
@@ -2199,7 +2210,7 @@ export function useEventControllerGetScoringConfig<TData = Awaited<ReturnType<ty
  * @summary Cập nhật danh sách chặn
  */
 export type eventControllerSetBlacklistResponse200 = {
-  data: BlacklistResponseDto[]
+  data: EventControllerSetBlacklist200
   status: 200
 }
     
@@ -2283,7 +2294,7 @@ export const useEventControllerSetBlacklist = <TError = unknown,
  * @summary Lấy danh sách chặn
  */
 export type eventControllerGetBlacklistResponse200 = {
-  data: BlacklistResponseDto[]
+  data: EventControllerGetBlacklist200
   status: 200
 }
     

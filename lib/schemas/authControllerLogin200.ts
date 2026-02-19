@@ -5,10 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import type { EventControllerFindAll200Data } from './eventControllerFindAll200Data';
+import type { AuthResponseDto } from './authResponseDto';
 
-export type EventControllerFindAll200 = {
+export type AuthControllerLogin200 = {
   status?: string;
   code?: number;
-  data?: EventControllerFindAll200Data;
+  data?: AuthResponseDto;
 };

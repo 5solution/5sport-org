@@ -74,7 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(error.message || 'Login failed');
       }
 
-      const data: AuthResponse = await response.json();
+      const raw = await response.json();
+      const data: AuthResponse = raw.data ?? raw;
       persistAuth(data);
     },
     [persistAuth]
@@ -93,7 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(error.message || 'Registration failed');
       }
 
-      const data: AuthResponse = await response.json();
+      const raw = await response.json();
+      const data: AuthResponse = raw.data ?? raw;
       persistAuth(data);
     },
     [persistAuth]
@@ -112,7 +114,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(error.message || 'Google login failed');
       }
 
-      const data: AuthResponse = await response.json();
+      const raw = await response.json();
+      const data: AuthResponse = raw.data ?? raw;
       persistAuth(data);
     },
     [persistAuth]

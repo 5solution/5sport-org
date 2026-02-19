@@ -5,7 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
+import type { AuthControllerOrganizerDashboard200Data } from './authControllerOrganizerDashboard200Data';
 
 export type AuthControllerOrganizerDashboard200 = {
-  message?: string;
+  status?: string;
+  code?: number;
+  data?: AuthControllerOrganizerDashboard200Data;
 };

@@ -5,7 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
+import type { AuthControllerAdminOnly200Data } from './authControllerAdminOnly200Data';
 
 export type AuthControllerAdminOnly200 = {
-  message?: string;
+  status?: string;
+  code?: number;
+  data?: AuthControllerAdminOnly200Data;
 };

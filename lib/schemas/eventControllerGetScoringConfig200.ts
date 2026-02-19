@@ -5,11 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
+import type { EventControllerGetScoringConfig200Data } from './eventControllerGetScoringConfig200Data';
 
 export type EventControllerGetScoringConfig200 = {
-  sportType?: string;
-  scoringMode?: string;
-  matchFormat?: string;
-  pointsToWin?: number;
-  winByTwo?: boolean;
+  status?: string;
+  code?: number;
+  data?: EventControllerGetScoringConfig200Data;
 };

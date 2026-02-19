@@ -5,7 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
+import type { AuthControllerLogout200Data } from './authControllerLogout200Data';
 
 export type AuthControllerLogout200 = {
-  message?: string;
+  status?: string;
+  code?: number;
+  data?: AuthControllerLogout200Data;
 };

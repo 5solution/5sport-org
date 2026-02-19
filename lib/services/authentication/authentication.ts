@@ -26,14 +26,16 @@ import type {
 
 import type {
   AuthControllerAdminOnly200,
+  AuthControllerGetProfile200,
+  AuthControllerGoogleAuthenticate200,
+  AuthControllerLogin200,
   AuthControllerLogout200,
   AuthControllerOrganizerDashboard200,
-  AuthResponseDto,
+  AuthControllerRegister201,
   ErrorResponseDto,
   GoogleTokenDto,
   LoginDto,
-  RegisterDto,
-  UserResponseDto
+  RegisterDto
 } from '../../schemas';
 
 import { defaultMutator } from '../../api/axiosInstance';
@@ -48,7 +50,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Register a new user
  */
 export type authControllerRegisterResponse201 = {
-  data: AuthResponseDto
+  data: AuthControllerRegister201
   status: 201
 }
 
@@ -143,7 +145,7 @@ export const useAuthControllerRegister = <TError = ErrorResponseDto,
  * @summary Login with email and password
  */
 export type authControllerLoginResponse200 = {
-  data: AuthResponseDto
+  data: AuthControllerLogin200
   status: 200
 }
 
@@ -238,7 +240,7 @@ export const useAuthControllerLogin = <TError = ErrorResponseDto,
  * @summary Authenticate with Google
  */
 export type authControllerGoogleAuthenticateResponse200 = {
-  data: AuthResponseDto
+  data: AuthControllerGoogleAuthenticate200
   status: 200
 }
 
@@ -639,7 +641,7 @@ export const useAuthControllerLogout = <TError = ErrorResponseDto,
  * @summary Get current user profile
  */
 export type authControllerGetProfileResponse200 = {
-  data: UserResponseDto
+  data: AuthControllerGetProfile200
   status: 200
 }
 

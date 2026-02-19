@@ -137,7 +137,6 @@ export default function EventDetailPage() {
   // Extract nested sub-resources if present
   const sessions = validEvent.sessions ?? [];
   const descriptions = validEvent.descriptions ?? [];
-  const customFields = validEvent.customFields ?? validEvent.fields ?? [];
 
   return (
     <div className="space-y-6 pt-12 lg:pt-0">
@@ -169,7 +168,7 @@ export default function EventDetailPage() {
         </TabsContent>
 
         <TabsContent value="fields">
-          <EventFieldsTab eventId={eventId} fields={customFields} />
+          <EventFieldsTab eventId={eventId} />
         </TabsContent>
 
         <TabsContent value="descriptions">

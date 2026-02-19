@@ -1551,6 +1551,117 @@ export const useEventControllerDeleteTicketTier = <TError = unknown,
       return useMutation(getEventControllerDeleteTicketTierMutationOptions(options), queryClient);
     }
     /**
+ * Lấy tất cả câu hỏi trong form đăng ký của sự kiện
+ * @summary Danh sách trường dữ liệu tùy chỉnh
+ */
+export type eventControllerGetCustomFieldsResponse200 = {
+  data: CustomFieldResponseDto[]
+  status: 200
+}
+    
+export type eventControllerGetCustomFieldsResponseSuccess = (eventControllerGetCustomFieldsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type eventControllerGetCustomFieldsResponse = (eventControllerGetCustomFieldsResponseSuccess)
+
+export const getEventControllerGetCustomFieldsUrl = (id: string,) => {
+
+
+  
+
+  return `/events/${id}/fields`
+}
+
+export const eventControllerGetCustomFields = async (id: string, options?: RequestInit): Promise<eventControllerGetCustomFieldsResponse> => {
+  
+  return defaultMutator<eventControllerGetCustomFieldsResponse>(getEventControllerGetCustomFieldsUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getEventControllerGetCustomFieldsQueryKey = (id: string,) => {
+    return [
+    `/events/${id}/fields`
+    ] as const;
+    }
+
+    
+export const getEventControllerGetCustomFieldsQueryOptions = <TData = Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEventControllerGetCustomFieldsQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventControllerGetCustomFields>>> = ({ signal }) => eventControllerGetCustomFields(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventControllerGetCustomFieldsQueryResult = NonNullable<Awaited<ReturnType<typeof eventControllerGetCustomFields>>>
+export type EventControllerGetCustomFieldsQueryError = unknown
+
+
+export function useEventControllerGetCustomFields<TData = Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventControllerGetCustomFields>>,
+          TError,
+          Awaited<ReturnType<typeof eventControllerGetCustomFields>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventControllerGetCustomFields<TData = Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventControllerGetCustomFields>>,
+          TError,
+          Awaited<ReturnType<typeof eventControllerGetCustomFields>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventControllerGetCustomFields<TData = Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Danh sách trường dữ liệu tùy chỉnh
+ */
+
+export function useEventControllerGetCustomFields<TData = Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventControllerGetCustomFields>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getEventControllerGetCustomFieldsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
  * Thêm một câu hỏi mới trong form đăng ký
  * @summary Thêm trường dữ liệu tùy chỉnh
  */

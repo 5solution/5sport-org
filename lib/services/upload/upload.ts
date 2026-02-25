@@ -43,7 +43,7 @@ export const getUploadControllerUploadFileUrl = () => {
 
   
 
-  return `/upload/upload`
+  return `/upload`
 }
 
 export const uploadControllerUploadFile = async (uploadControllerUploadFileBody: UploadControllerUploadFileBody, options?: RequestInit): Promise<uploadControllerUploadFileResponse> => {

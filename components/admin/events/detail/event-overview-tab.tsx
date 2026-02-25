@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import { Pencil, X, Save, Loader2 } from 'lucide-react';
+import { Pencil, X, Save, Loader2, Upload, ImageIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AXIOS_INSTANCE } from '@/lib/api/axiosInstance';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -104,6 +105,10 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState(() => buildFormFromEvent(event));
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const paymentLabels: Record<string, string> = {
     VNPAY_QR: tPayment('vnpayQr'),
@@ -155,6 +160,66 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
   const setStr = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
+  const handleUploadImage = async (
+    file: File,
+    field: 'bannerImageUrl',
+    setLoading: (v: boolean) => void,
+  ) => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await AXIOS_INSTANCE.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const url = typeof res.data === 'string' ? res.data : res.data?.url || res.data;
+      if (!url) throw new Error('Upload failed');
+
+      await updateMutation.mutateAsync({
+        id: event.id,
+        data: { [field]: url } as any,
+      });
+      queryClient.invalidateQueries({ queryKey: getEventControllerFindOneQueryKey(event.id) });
+      toast.success('Image uploaded and saved');
+    } catch {
+      // Error handled by interceptor
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUploadLogo = async (file: File) => {
+    setIsUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await AXIOS_INSTANCE.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const url = typeof res.data === 'string' ? res.data : res.data?.url || res.data;
+      if (!url) throw new Error('Upload failed');
+
+      // Save as event media (logo type) via the event update endpoint
+      // For now we store as bannerCtaUrl or use the media relation
+      // Using AXIOS directly to create media entry
+      await AXIOS_INSTANCE.post(`/events/${event.id}/media`, {
+        type: 'LOGO',
+        url,
+        fileSize: file.size,
+        mimeType: file.type,
+      });
+      queryClient.invalidateQueries({ queryKey: getEventControllerFindOneQueryKey(event.id) });
+      toast.success('Logo uploaded');
+    } catch {
+      // Error handled by interceptor
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
+
+  const logoMedia = (event as any).media?.find((m: any) => m.type === 'LOGO');
+  const wallpaperMedia = (event as any).media?.find((m: any) => m.type === 'WALLPAPER');
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
@@ -186,6 +251,127 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
           </Button>
         )}
       </div>
+
+      {/* Event Media */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Event Media
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Logo */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Logo</p>
+              <div className="relative rounded-lg border-2 border-dashed border-gray-200 hover:border-primary/50 transition-colors overflow-hidden bg-muted/30 aspect-square max-w-[200px]">
+                {logoMedia?.url ? (
+                  <>
+                    <img
+                      src={logoMedia.url}
+                      alt="Event Logo"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={isUploadingLogo}
+                      >
+                        {isUploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+                        Replace
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer p-4"
+                    onClick={() => logoInputRef.current?.click()}
+                    disabled={isUploadingLogo}
+                  >
+                    {isUploadingLogo ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Upload Logo</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleUploadLogo(file);
+                  e.target.value = '';
+                }}
+              />
+            </div>
+
+            {/* Banner */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Banner</p>
+              <div className="relative rounded-lg border-2 border-dashed border-gray-200 hover:border-primary/50 transition-colors overflow-hidden bg-muted/30 aspect-[3/1] max-w-[400px]">
+                {(event as any).bannerImageUrl ? (
+                  <>
+                    <img
+                      src={(event as any).bannerImageUrl}
+                      alt="Event Banner"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => bannerInputRef.current?.click()}
+                        disabled={isUploadingBanner}
+                      >
+                        {isUploadingBanner ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+                        Replace
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer p-4"
+                    onClick={() => bannerInputRef.current?.click()}
+                    disabled={isUploadingBanner}
+                  >
+                    {isUploadingBanner ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Upload Banner</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+              <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleUploadImage(file, 'bannerImageUrl', setIsUploadingBanner);
+                  e.target.value = '';
+                }}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Basic Info */}

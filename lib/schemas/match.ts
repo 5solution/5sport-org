@@ -10,6 +10,7 @@ import type { MatchScore } from './matchScore';
 import type { MatchStatus } from './matchStatus';
 import type { MatchTeam1Score } from './matchTeam1Score';
 import type { MatchTeam2Score } from './matchTeam2Score';
+import type { Stage } from './stage';
 
 export interface Match {
   /** Match unique identifier */
@@ -18,6 +19,14 @@ export interface Match {
   sessionId: string;
   /** Event session relationship */
   session: EventSession;
+  /** Stage ID */
+  stageId?: string;
+  /** Stage relationship */
+  stage?: Stage;
+  /** Bracket type (for Double Elimination) */
+  bracketType?: string;
+  /** Group name (for Round Robin) */
+  groupName?: string;
   /** Match name */
   name: string;
   /** Match number */

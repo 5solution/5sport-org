@@ -20,8 +20,10 @@ import {
   useStageControllerFindOne,
   useStageControllerGenerateMatches,
   useStageControllerAdvanceWinners,
+  useStageControllerGetMatchesByStage,
   getStageControllerFindOneQueryKey,
   getStageControllerFindAllBySessionQueryKey,
+  getStageControllerGetMatchesByStageQueryKey,
 } from '@/lib/services/stages/stages';
 import { useParticipantControllerFindAll } from '@/lib/services/participants/participants';
 
@@ -70,12 +72,19 @@ export default function StageDetailPage() {
   });
   const allParticipants = (participantsData as any) || [];
 
+  const { data: matchesData } = useStageControllerGetMatchesByStage(eventId, stageId, {
+    query: { enabled: !!eventId && !!stageId },
+  });
+
   const generateMatches = useStageControllerGenerateMatches();
   const advanceWinners = useStageControllerAdvanceWinners();
 
   const invalidate = () => {
     queryClient.invalidateQueries({
       queryKey: getStageControllerFindOneQueryKey(eventId, stageId),
+    });
+    queryClient.invalidateQueries({
+      queryKey: getStageControllerGetMatchesByStageQueryKey(eventId, stageId),
     });
     if (stage?.sessionId) {
       queryClient.invalidateQueries({
@@ -119,7 +128,7 @@ export default function StageDetailPage() {
     );
   }
 
-  const matches = stage.matches || [];
+  const matches = (matchesData as any) || [];
   const sessionParticipants = allParticipants.filter(
     (p: any) => p.sessionId === stage.sessionId,
   );
@@ -290,11 +299,15 @@ export default function StageDetailPage() {
                               ) : (
                                 <>
                                   <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                                    {match.team1Name || match.team1Player1Id?.slice(0, 8) || 'TBD'}
+                                    {match.team1Name ||
+                                      [match.team1Player1?.name, match.team1Player2?.name].filter(Boolean).join(' / ') ||
+                                      'TBD'}
                                   </span>
                                   <span>vs</span>
                                   <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                                    {match.team2Name || match.team2Player1Id?.slice(0, 8) || 'TBD'}
+                                    {match.team2Name ||
+                                      [match.team2Player1?.name, match.team2Player2?.name].filter(Boolean).join(' / ') ||
+                                      'TBD'}
                                   </span>
                                 </>
                               )}

@@ -2,7 +2,7 @@ import { defineConfig } from "orval";
 
 export default defineConfig({
   api: {
-    input: "http://localhost:3000/swagger/json",
+    input: "http://localhost:8080/swagger/json",
     output: {
       mode: "tags-split",
       target: "./lib/services",

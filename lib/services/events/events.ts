@@ -2400,3 +2400,168 @@ export function useEventControllerGetBlacklist<TData = Awaited<ReturnType<typeof
 
 
 
+/**
+ * @summary Add media to event
+ */
+export type eventControllerAddMediaResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type eventControllerAddMediaResponseSuccess = (eventControllerAddMediaResponse201) & {
+  headers: Headers;
+};
+;
+
+export type eventControllerAddMediaResponse = (eventControllerAddMediaResponseSuccess)
+
+export const getEventControllerAddMediaUrl = (id: string,) => {
+
+
+  
+
+  return `/events/${id}/media`
+}
+
+export const eventControllerAddMedia = async (id: string, options?: RequestInit): Promise<eventControllerAddMediaResponse> => {
+  
+  return defaultMutator<eventControllerAddMediaResponse>(getEventControllerAddMediaUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getEventControllerAddMediaMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['eventControllerAddMedia'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventControllerAddMedia>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  eventControllerAddMedia(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventControllerAddMediaMutationResult = NonNullable<Awaited<ReturnType<typeof eventControllerAddMedia>>>
+    
+    export type EventControllerAddMediaMutationError = unknown
+
+    /**
+ * @summary Add media to event
+ */
+export const useEventControllerAddMedia = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventControllerAddMedia>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getEventControllerAddMediaMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Delete media from event
+ */
+export type eventControllerDeleteMediaResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type eventControllerDeleteMediaResponseSuccess = (eventControllerDeleteMediaResponse200) & {
+  headers: Headers;
+};
+;
+
+export type eventControllerDeleteMediaResponse = (eventControllerDeleteMediaResponseSuccess)
+
+export const getEventControllerDeleteMediaUrl = (id: string,
+    mediaId: string,) => {
+
+
+  
+
+  return `/events/${id}/media/${mediaId}`
+}
+
+export const eventControllerDeleteMedia = async (id: string,
+    mediaId: string, options?: RequestInit): Promise<eventControllerDeleteMediaResponse> => {
+  
+  return defaultMutator<eventControllerDeleteMediaResponse>(getEventControllerDeleteMediaUrl(id,mediaId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getEventControllerDeleteMediaMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerDeleteMedia>>, TError,{id: string;mediaId: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventControllerDeleteMedia>>, TError,{id: string;mediaId: string}, TContext> => {
+
+const mutationKey = ['eventControllerDeleteMedia'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventControllerDeleteMedia>>, {id: string;mediaId: string}> = (props) => {
+          const {id,mediaId} = props ?? {};
+
+          return  eventControllerDeleteMedia(id,mediaId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventControllerDeleteMediaMutationResult = NonNullable<Awaited<ReturnType<typeof eventControllerDeleteMedia>>>
+    
+    export type EventControllerDeleteMediaMutationError = unknown
+
+    /**
+ * @summary Delete media from event
+ */
+export const useEventControllerDeleteMedia = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerDeleteMedia>>, TError,{id: string;mediaId: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventControllerDeleteMedia>>,
+        TError,
+        {id: string;mediaId: string},
+        TContext
+      > => {
+      return useMutation(getEventControllerDeleteMediaMutationOptions(options), queryClient);
+    }
+    

@@ -693,4 +693,121 @@ export const useStageControllerAdvanceWinners = <TError = unknown,
       > => {
       return useMutation(getStageControllerAdvanceWinnersMutationOptions(options), queryClient);
     }
+    /**
+ * @summary Get all matches for a stage
+ */
+export type stageControllerGetMatchesByStageResponse200 = {
+  data: Match[]
+  status: 200
+}
     
+export type stageControllerGetMatchesByStageResponseSuccess = (stageControllerGetMatchesByStageResponse200) & {
+  headers: Headers;
+};
+;
+
+export type stageControllerGetMatchesByStageResponse = (stageControllerGetMatchesByStageResponseSuccess)
+
+export const getStageControllerGetMatchesByStageUrl = (eventId: unknown,
+    stageId: string,) => {
+
+
+  
+
+  return `/events/${eventId}/stages/${stageId}/matches`
+}
+
+export const stageControllerGetMatchesByStage = async (eventId: unknown,
+    stageId: string, options?: RequestInit): Promise<stageControllerGetMatchesByStageResponse> => {
+  
+  return defaultMutator<stageControllerGetMatchesByStageResponse>(getStageControllerGetMatchesByStageUrl(eventId,stageId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getStageControllerGetMatchesByStageQueryKey = (eventId: unknown,
+    stageId: string,) => {
+    return [
+    `/events/${eventId}/stages/${stageId}/matches`
+    ] as const;
+    }
+
+    
+export const getStageControllerGetMatchesByStageQueryOptions = <TData = Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError = unknown>(eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStageControllerGetMatchesByStageQueryKey(eventId,stageId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>> = ({ signal }) => stageControllerGetMatchesByStage(eventId,stageId, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(eventId && stageId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StageControllerGetMatchesByStageQueryResult = NonNullable<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>>
+export type StageControllerGetMatchesByStageQueryError = unknown
+
+
+export function useStageControllerGetMatchesByStage<TData = Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>,
+          TError,
+          Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStageControllerGetMatchesByStage<TData = Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>,
+          TError,
+          Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStageControllerGetMatchesByStage<TData = Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get all matches for a stage
+ */
+
+export function useStageControllerGetMatchesByStage<TData = Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof stageControllerGetMatchesByStage>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStageControllerGetMatchesByStageQueryOptions(eventId,stageId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

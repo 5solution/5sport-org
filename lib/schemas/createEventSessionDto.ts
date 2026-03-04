@@ -5,7 +5,7 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import type { CreateEventSessionDtoMatchType } from './createEventSessionDtoMatchType';
+import type { CreateEventSessionDtoCompetitionFormat } from './createEventSessionDtoCompetitionFormat';
 import type { CreateEventSessionDtoRatingSourcesItem } from './createEventSessionDtoRatingSourcesItem';
 
 export interface CreateEventSessionDto {
@@ -14,9 +14,9 @@ export interface CreateEventSessionDto {
    * @maxLength 256
    */
   name: string;
-  /** Thể thức thi đấu */
-  matchType: CreateEventSessionDtoMatchType;
-  /** Yêu cầu có đối thủ/đồng đội (chỉ với Doubles) */
+  /** Thể thức thi đấu: Đơn (SINGLES) hoặc Đôi (DOUBLES) */
+  competitionFormat: CreateEventSessionDtoCompetitionFormat;
+  /** Yêu cầu đăng ký theo cặp (partner) — chỉ áp dụng khi DOUBLES */
   requirePartner?: boolean;
   /** Thời gian bắt đầu nội dung thi đấu (ISO 8601) */
   startTime: string;

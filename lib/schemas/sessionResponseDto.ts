@@ -13,8 +13,8 @@ export interface SessionResponseDto {
   eventId: string;
   /** Tên hạng mục */
   name: string;
-  /** Thể thức (SINGLES/DOUBLES) */
-  matchType: string;
+  /** Thể thức thi đấu (SINGLES/DOUBLES) */
+  competitionFormat: string;
   /** Yêu cầu partner */
   requirePartner: boolean;
   /** Thời gian bắt đầu */

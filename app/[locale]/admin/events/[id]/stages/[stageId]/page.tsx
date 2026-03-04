@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -10,22 +11,24 @@ import {
   CheckCircle2,
   Zap,
   Play,
+  Trophy,
+  UserCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useStageControllerFindOne,
   useStageControllerGenerateMatches,
   useStageControllerAdvanceWinners,
-  useStageControllerFindAllBySession,
+  useStageControllerFindMatchesByStage,
   getStageControllerFindOneQueryKey,
-  getStageControllerFindAllBySessionQueryKey,
   getStageControllerFindMatchesByStageQueryKey,
 } from '@/lib/services/stages/stages';
-import { useParticipantControllerFindAll } from '@/lib/services/participants/participants';
+import { useParticipantControllerFindByStage } from '@/lib/services/participants/participants';
 
 const STAGE_TYPE_LABELS: Record<string, string> = {
   ROUND_ROBIN_PLAYOFF: 'Round Robin + Playoff',
@@ -62,19 +65,23 @@ export default function StageDetailPage() {
   const eventId = params?.id as string;
   const stageId = params?.stageId as string;
 
+  const [activeTab, setActiveTab] = useState('matches');
+
   const { data: stageData, isLoading } = useStageControllerFindOne(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
   });
   const stage = stageData as any;
 
-  const { data: participantsData } = useParticipantControllerFindAll(eventId, {
-    query: { enabled: !!eventId },
-  });
-  const allParticipants = (participantsData as any) || [];
-
-  const { data: matchesData } = useStageControllerFindAllBySession(eventId, stageId, {
+  // Correct: use stageId directly for matches
+  const { data: matchesData } = useStageControllerFindMatchesByStage(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
   });
+
+  // Correct: use stageId to get participants assigned to this stage
+  const { data: stageParticipantsData, isLoading: participantsLoading } =
+    useParticipantControllerFindByStage(eventId, stageId, {
+      query: { enabled: !!eventId && !!stageId },
+    });
 
   const generateMatches = useStageControllerGenerateMatches();
   const advanceWinners = useStageControllerAdvanceWinners();
@@ -86,11 +93,6 @@ export default function StageDetailPage() {
     queryClient.invalidateQueries({
       queryKey: getStageControllerFindMatchesByStageQueryKey(eventId, stageId),
     });
-    if (stage?.sessionId) {
-      queryClient.invalidateQueries({
-        queryKey: getStageControllerFindAllBySessionQueryKey(eventId, stage.sessionId),
-      });
-    }
   };
 
   const handleGenerateMatches = async () => {
@@ -129,10 +131,7 @@ export default function StageDetailPage() {
   }
 
   const matches = (matchesData as any) || [];
-  console.log('Stage Data:', matchesData);
-  const sessionParticipants = allParticipants.filter(
-    (p: any) => p.sessionId === stage.sessionId,
-  );
+  const stageParticipants = (stageParticipantsData as any) || [];
   const completedMatches = matches.filter((m: any) => m.status === 'COMPLETED');
 
   // Group matches by round
@@ -186,8 +185,8 @@ export default function StageDetailPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{sessionParticipants.length}</div>
-            <p className="text-xs text-muted-foreground">in this session</p>
+            <div className="text-2xl font-bold">{stageParticipants.length}</div>
+            <p className="text-xs text-muted-foreground">in this stage</p>
           </CardContent>
         </Card>
         <Card>
@@ -252,94 +251,207 @@ export default function StageDetailPage() {
         )}
       </div>
 
-      {/* Matches List */}
-      {matches.length === 0 ? (
-        <Card>
-          <CardContent className="flex h-40 items-center justify-center text-muted-foreground">
-            <div className="text-center">
-              <Swords className="mx-auto h-8 w-8 mb-2 opacity-50" />
-              <p className="font-medium">No matches yet</p>
-              <p className="text-sm">
-                {stage.status === 'DRAFT'
-                  ? 'Generate matches to get started'
-                  : 'Matches will appear here'}
-              </p>
+      {/* Tabs: Matches / Participants */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="matches" className="flex items-center gap-1.5">
+            <Swords className="h-4 w-4" />
+            Matches
+            {matches.length > 0 && (
+              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                {matches.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="participants" className="flex items-center gap-1.5">
+            <UserCheck className="h-4 w-4" />
+            Participants
+            {stageParticipants.length > 0 && (
+              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                {stageParticipants.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Matches Tab */}
+        <TabsContent value="matches" className="mt-4">
+          {matches.length === 0 ? (
+            <Card>
+              <CardContent className="flex h-40 items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Swords className="mx-auto h-8 w-8 mb-2 opacity-50" />
+                  <p className="font-medium">No matches yet</p>
+                  <p className="text-sm">
+                    {stage.status === 'DRAFT'
+                      ? 'Generate matches to get started'
+                      : 'Matches will appear here'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {[...matchesByRound.entries()].map(([round, roundMatches]) => (
+                <Card key={round}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      {round}
+                      <Badge variant="outline" className="text-xs font-normal">
+                        {roundMatches.length} matches
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {roundMatches
+                        .sort((a: any, b: any) => (a.matchNumber || 0) - (b.matchNumber || 0))
+                        .map((match: any) => (
+                          <div
+                            key={match.id}
+                            className="flex items-center justify-between rounded-md border p-3 text-sm"
+                          >
+                            <div className="flex items-center gap-4">
+                              <span className="text-xs text-muted-foreground w-6 text-right font-mono">
+                                #{match.matchNumber || '-'}
+                              </span>
+                              <div className="min-w-0">
+                                <p className="font-medium truncate">{match.name}</p>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                                  {match.isBye ? (
+                                    <span className="italic">BYE</span>
+                                  ) : (
+                                    <>
+                                      <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                                        {match.team1Name ||
+                                          [match.team1Player1?.name, match.team1Player2?.name].filter(Boolean).join(' / ') ||
+                                          'TBD'}
+                                      </span>
+                                      <span>vs</span>
+                                      <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                                        {match.team2Name ||
+                                          [match.team2Player1?.name, match.team2Player2?.name].filter(Boolean).join(' / ') ||
+                                          'TBD'}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              {match.team1Score && match.team2Score && (
+                                <span className="font-mono text-sm">
+                                  {match.team1Score.total ?? '-'} : {match.team2Score.total ?? '-'}
+                                </span>
+                              )}
+                              {match.bracketType && (
+                                <Badge variant="outline" className="text-xs">
+                                  {match.bracketType}
+                                </Badge>
+                              )}
+                              <span
+                                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${MATCH_STATUS_CONFIG[match.status]?.className || 'bg-gray-100 text-gray-600'}`}
+                              >
+                                {MATCH_STATUS_CONFIG[match.status]?.label || match.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {[...matchesByRound.entries()].map(([round, roundMatches]) => (
-            <Card key={round}>
+          )}
+        </TabsContent>
+
+        {/* Participants Tab */}
+        <TabsContent value="participants" className="mt-4">
+          {participantsLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : stageParticipants.length === 0 ? (
+            <Card>
+              <CardContent className="flex h-40 items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Users className="mx-auto h-8 w-8 mb-2 opacity-50" />
+                  <p className="font-medium">No participants in this stage</p>
+                  <p className="text-sm">Participants assigned to this stage will appear here</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  {round}
+                  <Trophy className="h-4 w-4" />
+                  Stage Participants
                   <Badge variant="outline" className="text-xs font-normal">
-                    {roundMatches.length} matches
+                    {stageParticipants.length} total
                   </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-2">
-                  {roundMatches
-                    .sort((a: any, b: any) => (a.matchNumber || 0) - (b.matchNumber || 0))
-                    .map((match: any) => (
+                  {stageParticipants.map((participant: any, index: number) => {
+                    const name =
+                      participant.athlete?.name ||
+                      participant.team?.name ||
+                      participant.name ||
+                      `Participant #${index + 1}`;
+                    const sub =
+                      participant.seedNumber != null
+                        ? `Seed #${participant.seedNumber}`
+                        : `No rank`;
+                    return (
                       <div
-                        key={match.id}
+                        key={participant.id}
                         className="flex items-center justify-between rounded-md border p-3 text-sm"
                       >
-                        <div className="flex items-center gap-4">
-                          <span className="text-xs text-muted-foreground w-6 text-right font-mono">
-                            #{match.matchNumber || '-'}
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                            {index + 1}
                           </span>
-                          <div className="min-w-0">
-                            <p className="font-medium truncate">{match.name}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                              {match.isBye ? (
-                                <span className="italic">BYE</span>
-                              ) : (
-                                <>
-                                  <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                                    {match.team1Name ||
-                                      [match.team1Player1?.name, match.team1Player2?.name].filter(Boolean).join(' / ') ||
-                                      'TBD'}
-                                  </span>
-                                  <span>vs</span>
-                                  <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                                    {match.team2Name ||
-                                      [match.team2Player1?.name, match.team2Player2?.name].filter(Boolean).join(' / ') ||
-                                      'TBD'}
-                                  </span>
-                                </>
-                              )}
-                            </div>
+                          <div>
+                            <p className="font-medium">{name}</p>
+                            {sub && (
+                              <p className="text-xs text-muted-foreground">{sub}</p>
+                            )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          {match.team1Score && match.team2Score && (
-                            <span className="font-mono text-sm">
-                              {match.team1Score.total ?? '-'} : {match.team2Score.total ?? '-'}
-                            </span>
-                          )}
-                          {match.bracketType && (
+                        <div className="flex items-center gap-2">
+                          {participant.seedNumber != null && (
                             <Badge variant="outline" className="text-xs">
-                              {match.bracketType}
+                              Seed #{participant.seedNumber}
                             </Badge>
                           )}
-                          <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${MATCH_STATUS_CONFIG[match.status]?.className || 'bg-gray-100 text-gray-600'}`}
-                          >
-                            {MATCH_STATUS_CONFIG[match.status]?.label || match.status}
-                          </span>
+                          {participant.status && (
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${participant.status === 'CHECKED_IN'
+                                ? 'bg-green-100 text-green-700'
+                                : participant.status === 'REGISTERED'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : 'bg-gray-100 text-gray-600'
+                                }`}
+                            >
+                              {participant.status === 'CHECKED_IN'
+                                ? 'Checked In'
+                                : participant.status === 'REGISTERED'
+                                  ? 'Registered'
+                                  : participant.status}
+                            </span>
+                          )}
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

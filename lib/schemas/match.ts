@@ -5,6 +5,7 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
+import type { Athlete } from './athlete';
 import type { EventSession } from './eventSession';
 import type { MatchScore } from './matchScore';
 import type { MatchStatus } from './matchStatus';
@@ -45,12 +46,16 @@ export interface Match {
   status: MatchStatus;
   /** Team 1 Player 1 ID */
   team1Player1Id?: string;
+  team1Player1?: Athlete;
   /** Team 1 Player 2 ID */
   team1Player2Id?: string;
+  team1Player2?: Athlete;
   /** Team 2 Player 1 ID */
   team2Player1Id?: string;
+  team2Player1?: Athlete;
   /** Team 2 Player 2 ID */
   team2Player2Id?: string;
+  team2Player2?: Athlete;
   /** Team 1 name */
   team1Name?: string;
   /** Team 2 name */

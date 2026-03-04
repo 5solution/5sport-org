@@ -45,6 +45,8 @@ export interface EventParticipant {
   status: EventParticipantStatus;
   /** Bib number */
   bibNumber?: string;
+  /** Seed number (set by admin) */
+  seed?: number;
   /** Custom data from event custom fields */
   customData?: EventParticipantCustomData;
 }

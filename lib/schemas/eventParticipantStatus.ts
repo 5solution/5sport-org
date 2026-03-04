@@ -14,7 +14,14 @@ export type EventParticipantStatus = typeof EventParticipantStatus[keyof typeof 
 
 export const EventParticipantStatus = {
   REGISTERED: 'REGISTERED',
+  FINDING_PARTNER: 'FINDING_PARTNER',
+  WAITING_PARTNER: 'WAITING_PARTNER',
+  PAIRED: 'PAIRED',
   CHECKED_IN: 'CHECKED_IN',
+  READY: 'READY',
+  PLAYING: 'PLAYING',
+  ELIMINATED: 'ELIMINATED',
+  WINNER: 'WINNER',
   WITHDRAWN: 'WITHDRAWN',
   DISQUALIFIED: 'DISQUALIFIED',
 } as const;

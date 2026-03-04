@@ -20,10 +20,10 @@ import {
   useStageControllerFindOne,
   useStageControllerGenerateMatches,
   useStageControllerAdvanceWinners,
-  useStageControllerGetMatchesByStage,
+  useStageControllerFindAllBySession,
   getStageControllerFindOneQueryKey,
   getStageControllerFindAllBySessionQueryKey,
-  getStageControllerGetMatchesByStageQueryKey,
+  getStageControllerFindMatchesByStageQueryKey,
 } from '@/lib/services/stages/stages';
 import { useParticipantControllerFindAll } from '@/lib/services/participants/participants';
 
@@ -72,7 +72,7 @@ export default function StageDetailPage() {
   });
   const allParticipants = (participantsData as any) || [];
 
-  const { data: matchesData } = useStageControllerGetMatchesByStage(eventId, stageId, {
+  const { data: matchesData } = useStageControllerFindAllBySession(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
   });
 
@@ -84,7 +84,7 @@ export default function StageDetailPage() {
       queryKey: getStageControllerFindOneQueryKey(eventId, stageId),
     });
     queryClient.invalidateQueries({
-      queryKey: getStageControllerGetMatchesByStageQueryKey(eventId, stageId),
+      queryKey: getStageControllerFindMatchesByStageQueryKey(eventId, stageId),
     });
     if (stage?.sessionId) {
       queryClient.invalidateQueries({
@@ -98,7 +98,7 @@ export default function StageDetailPage() {
       await generateMatches.mutateAsync({ eventId, stageId });
       invalidate();
       toast.success('Matches generated successfully');
-    } catch {}
+    } catch { }
   };
 
   const handleAdvanceWinners = async () => {
@@ -106,7 +106,7 @@ export default function StageDetailPage() {
       await advanceWinners.mutateAsync({ eventId, stageId });
       invalidate();
       toast.success('Winners advanced');
-    } catch {}
+    } catch { }
   };
 
   if (isLoading) {
@@ -129,6 +129,7 @@ export default function StageDetailPage() {
   }
 
   const matches = (matchesData as any) || [];
+  console.log('Stage Data:', matchesData);
   const sessionParticipants = allParticipants.filter(
     (p: any) => p.sessionId === stage.sessionId,
   );

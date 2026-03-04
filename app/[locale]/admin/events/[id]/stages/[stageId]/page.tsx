@@ -51,8 +51,9 @@ import {
   useStageControllerFindOne,
   useStageControllerGenerateMatches,
   useStageControllerAdvanceWinners,
-  useStageControllerFindMatchesByStage,
+  useStageControllerFindAllBySession,
   getStageControllerFindOneQueryKey,
+  getStageControllerFindAllBySessionQueryKey,
   getStageControllerFindMatchesByStageQueryKey,
 } from '@/lib/services/stages/stages';
 import {
@@ -227,356 +228,355 @@ function MatchRow({ match, statusConfig, eventId, stageId, onMatchUpdated }: { m
 
   return (
     <>
-    <div
-      className={`flex items-center justify-between rounded-md border p-3 text-sm ${match.status === 'IN_PROGRESS' ? 'bg-red-50 border-red-300' : match.status === 'COMPLETED' ? 'bg-green-50 border-green-300' : match.status === 'CANCELLED' ? 'bg-gray-100 border-gray-300' : ''}`}
-    >
-      <div className="flex items-center gap-4">
-        <span className="text-xs text-muted-foreground w-6 text-right font-mono">
-          #{match.matchNumber || '-'}
-        </span>
-        <div className="min-w-0">
-          <p className="font-medium truncate">{match.name}</p>
-          {(match.startTime || match.endTime) && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {match.startTime && (
-                <span>Start: {new Date(match.startTime).toLocaleString()}</span>
-              )}
-              {match.startTime && match.endTime && <span className="mx-1">·</span>}
-              {match.endTime && (
-                <span>End: {new Date(match.endTime).toLocaleString()}</span>
-              )}
-            </p>
-          )}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-            {match.isBye ? (
-              <span className="italic">BYE</span>
-            ) : (() => {
-              const playerCount = [match.team1Player1, match.team1Player2, match.team2Player1, match.team2Player2].filter(Boolean).length;
-              if (playerCount === 2) {
-                return (
-                  <>
-                    <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                      {match.team1Player1?.name || 'TBD'}
-                    </span>
-                    <span>vs</span>
-                    <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                      {match.team2Player1?.name || 'TBD'}
-                    </span>
-                  </>
-                );
-              }
-              if (playerCount === 4) {
-                return (
-                  <>
-                    <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                      {match.team1Player1?.name} / {match.team1Player2?.name}
-                    </span>
-                    <span>vs</span>
-                    <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                      {match.team2Player1?.name} / {match.team2Player2?.name}
-                    </span>
-                  </>
-                );
-              }
-              return (
-                <>
-                  <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                    {match.team1Name || 'TBD'}
-                  </span>
-                  <span>vs</span>
-                  <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                    {match.team2Name || 'TBD'}
-                  </span>
-                </>
-              );
-            })()}
-          </div>
-          {showScore && (
-            <div className="mt-1.5">
-              {isFetchingScores ? (
-                <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-              ) : scores.length > 0 ? (
-                <div className="flex flex-col gap-1 font-mono text-xs">
-                  {scores
-                    .sort((a: any, b: any) => a.setNumber - b.setNumber)
-                    .map((score: any) => (
-                      <span
-                        key={score.id}
-                        className={`px-1.5 py-0.5 rounded ${
-                          score.winnerTeam === 1
-                            ? 'bg-green-100 text-green-800'
-                            : score.winnerTeam === 2
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        Set {score.setNumber}: {score.team1Points}-{score.team2Points}
+      <div
+        className={`flex items-center justify-between rounded-md border p-3 text-sm ${match.status === 'IN_PROGRESS' ? 'bg-red-50 border-red-300' : match.status === 'COMPLETED' ? 'bg-green-50 border-green-300' : match.status === 'CANCELLED' ? 'bg-gray-100 border-gray-300' : ''}`}
+      >
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-muted-foreground w-6 text-right font-mono">
+            #{match.matchNumber || '-'}
+          </span>
+          <div className="min-w-0">
+            <p className="font-medium truncate">{match.name}</p>
+            {(match.startTime || match.endTime) && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {match.startTime && (
+                  <span>Start: {new Date(match.startTime).toLocaleString()}</span>
+                )}
+                {match.startTime && match.endTime && <span className="mx-1">·</span>}
+                {match.endTime && (
+                  <span>End: {new Date(match.endTime).toLocaleString()}</span>
+                )}
+              </p>
+            )}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+              {match.isBye ? (
+                <span className="italic">BYE</span>
+              ) : (() => {
+                const playerCount = [match.team1Player1, match.team1Player2, match.team2Player1, match.team2Player2].filter(Boolean).length;
+                if (playerCount === 2) {
+                  return (
+                    <>
+                      <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                        {match.team1Player1?.name || 'TBD'}
                       </span>
-                    ))}
-                </div>
-              ) : (
-                <span className="text-xs text-muted-foreground italic">No scores yet</span>
-              )}
+                      <span>vs</span>
+                      <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                        {match.team2Player1?.name || 'TBD'}
+                      </span>
+                    </>
+                  );
+                }
+                if (playerCount === 4) {
+                  return (
+                    <>
+                      <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                        {match.team1Player1?.name} / {match.team1Player2?.name}
+                      </span>
+                      <span>vs</span>
+                      <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                        {match.team2Player1?.name} / {match.team2Player2?.name}
+                      </span>
+                    </>
+                  );
+                }
+                return (
+                  <>
+                    <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                      {match.team1Name || 'TBD'}
+                    </span>
+                    <span>vs</span>
+                    <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                      {match.team2Name || 'TBD'}
+                    </span>
+                  </>
+                );
+              })()}
             </div>
+            {showScore && (
+              <div className="mt-1.5">
+                {isFetchingScores ? (
+                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                ) : scores.length > 0 ? (
+                  <div className="flex flex-col gap-1 font-mono text-xs">
+                    {scores
+                      .sort((a: any, b: any) => a.setNumber - b.setNumber)
+                      .map((score: any) => (
+                        <span
+                          key={score.id}
+                          className={`px-1.5 py-0.5 rounded ${score.winnerTeam === 1
+                              ? 'bg-green-100 text-green-800'
+                              : score.winnerTeam === 2
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-600'
+                            }`}
+                        >
+                          Set {score.setNumber}: {score.team1Points}-{score.team2Points}
+                        </span>
+                      ))}
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground italic">No scores yet</span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={handleOpenEdit}
+          >
+            <Pencil className="h-3 w-3 mr-1" />
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={showScore ? handleHideScore : handleShowScore}
+            disabled={isFetchingScores}
+          >
+            {isFetchingScores ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : showScore ? (
+              <>
+                <EyeOff className="h-3 w-3 mr-1" />
+                Hide Score
+              </>
+            ) : (
+              <>
+                <Eye className="h-3 w-3 mr-1" />
+                Show Score
+              </>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={() => setShowQrDialog(true)}
+            title="QR Code"
+          >
+            <QrCode className="h-3 w-3" />
+          </Button>
+          {match.bracketType && (
+            <Badge variant="outline" className="text-xs">
+              {match.bracketType}
+            </Badge>
           )}
+          <span
+            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig[match.status]?.className || 'bg-gray-100 text-gray-600'}`}
+          >
+            {statusConfig[match.status]?.label || match.status}
+          </span>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={handleOpenEdit}
-        >
-          <Pencil className="h-3 w-3 mr-1" />
-          Edit
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={showScore ? handleHideScore : handleShowScore}
-          disabled={isFetchingScores}
-        >
-          {isFetchingScores ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : showScore ? (
-            <>
-              <EyeOff className="h-3 w-3 mr-1" />
-              Hide Score
-            </>
-          ) : (
-            <>
-              <Eye className="h-3 w-3 mr-1" />
-              Show Score
-            </>
-          )}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-7 w-7 p-0"
-          onClick={() => setShowQrDialog(true)}
-          title="QR Code"
-        >
-          <QrCode className="h-3 w-3" />
-        </Button>
-        {match.bracketType && (
-          <Badge variant="outline" className="text-xs">
-            {match.bracketType}
-          </Badge>
-        )}
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig[match.status]?.className || 'bg-gray-100 text-gray-600'}`}
-        >
-          {statusConfig[match.status]?.label || match.status}
-        </span>
-      </div>
-    </div>
 
-    <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Referee QR Code</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col items-center gap-4 py-2">
-          <p className="text-sm text-muted-foreground text-center">
-            {match.name}
-          </p>
-          {qrImage ? (
-            <img src={qrImage} alt="Referee QR Code" className="rounded-lg border" />
-          ) : (
-            <div className="w-64 h-64 flex items-center justify-center bg-muted rounded-lg">
+      <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Referee QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-2">
+            <p className="text-sm text-muted-foreground text-center">
+              {match.name}
+            </p>
+            {qrImage ? (
+              <img src={qrImage} alt="Referee QR Code" className="rounded-lg border" />
+            ) : (
+              <div className="w-64 h-64 flex items-center justify-center bg-muted rounded-lg">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 w-full">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(refereeUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                title="Copy URL"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+              </button>
+              <p className="text-xs text-muted-foreground break-all">{refereeUrl}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showEditDialog} onOpenChange={(open) => { if (!open) setShowEditDialog(false); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4" />
+              Edit Match
+            </DialogTitle>
+          </DialogHeader>
+          {isFetchingDetail ? (
+            <div className="flex h-32 items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
+          ) : (
+            <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto pr-1">
+              <div className="space-y-1.5">
+                <Label>Name</Label>
+                <Input
+                  value={editForm.name}
+                  onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Round</Label>
+                <Input
+                  value={editForm.round}
+                  onChange={(e) => setEditForm(f => ({ ...f, round: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Scheduled Time</Label>
+                <Input
+                  type="datetime-local"
+                  value={editForm.scheduledTime}
+                  onChange={(e) => setEditForm(f => ({ ...f, scheduledTime: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-3">
+                <Label>Team 1</Label>
+                <div className="space-y-2 pl-1">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Player 1</Label>
+                    <Select
+                      value={editForm.team1Player1Id}
+                      onValueChange={(v) => setEditForm(f => ({ ...f, team1Player1Id: v === '__none__' ? '' : v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select player..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">— None —</SelectItem>
+                        {participants.map((p: any) => (
+                          <SelectItem key={p.id} value={p.athleteId}>
+                            {p.athlete?.name || p.athleteId}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Player 2</Label>
+                    <Select
+                      value={editForm.team1Player2Id}
+                      onValueChange={(v) => setEditForm(f => ({ ...f, team1Player2Id: v === '__none__' ? '' : v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select player..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">— None —</SelectItem>
+                        {participants.map((p: any) => (
+                          <SelectItem key={p.id} value={p.athleteId}>
+                            {p.athlete?.name || p.athleteId}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Label>Team 2</Label>
+                <div className="space-y-2 pl-1">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Player 1</Label>
+                    <Select
+                      value={editForm.team2Player1Id}
+                      onValueChange={(v) => setEditForm(f => ({ ...f, team2Player1Id: v === '__none__' ? '' : v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select player..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">— None —</SelectItem>
+                        {participants.map((p: any) => (
+                          <SelectItem key={p.id} value={p.athleteId}>
+                            {p.athlete?.name || p.athleteId}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Player 2</Label>
+                    <Select
+                      value={editForm.team2Player2Id}
+                      onValueChange={(v) => setEditForm(f => ({ ...f, team2Player2Id: v === '__none__' ? '' : v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select player..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">— None —</SelectItem>
+                        {participants.map((p: any) => (
+                          <SelectItem key={p.id} value={p.athleteId}>
+                            {p.athlete?.name || p.athleteId}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
-          <div className="flex items-center gap-1.5 w-full">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(refereeUrl);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }}
-              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
-              title="Copy URL"
+          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+            <Button
+              variant="destructive"
+              onClick={() => setShowCloseConfirm(true)}
+              disabled={isFetchingDetail || updateMatch.isPending || closeMatch.isPending}
             >
-              {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
-            </button>
-            <p className="text-xs text-muted-foreground break-all">{refereeUrl}</p>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+              Close Match
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveEdit}
+                disabled={isFetchingDetail || updateMatch.isPending || closeMatch.isPending}
+              >
+                {updateMatch.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-    <Dialog open={showEditDialog} onOpenChange={(open) => { if (!open) setShowEditDialog(false); }}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Pencil className="h-4 w-4" />
-            Edit Match
-          </DialogTitle>
-        </DialogHeader>
-        {isFetchingDetail ? (
-          <div className="flex h-32 items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto pr-1">
-            <div className="space-y-1.5">
-              <Label>Name</Label>
-              <Input
-                value={editForm.name}
-                onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Round</Label>
-              <Input
-                value={editForm.round}
-                onChange={(e) => setEditForm(f => ({ ...f, round: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Scheduled Time</Label>
-              <Input
-                type="datetime-local"
-                value={editForm.scheduledTime}
-                onChange={(e) => setEditForm(f => ({ ...f, scheduledTime: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-3">
-              <Label>Team 1</Label>
-              <div className="space-y-2 pl-1">
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Player 1</Label>
-                  <Select
-                    value={editForm.team1Player1Id}
-                    onValueChange={(v) => setEditForm(f => ({ ...f, team1Player1Id: v === '__none__' ? '' : v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select player..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— None —</SelectItem>
-                      {participants.map((p: any) => (
-                        <SelectItem key={p.id} value={p.athleteId}>
-                          {p.athlete?.name || p.athleteId}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Player 2</Label>
-                  <Select
-                    value={editForm.team1Player2Id}
-                    onValueChange={(v) => setEditForm(f => ({ ...f, team1Player2Id: v === '__none__' ? '' : v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select player..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— None —</SelectItem>
-                      {participants.map((p: any) => (
-                        <SelectItem key={p.id} value={p.athleteId}>
-                          {p.athlete?.name || p.athleteId}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <Label>Team 2</Label>
-              <div className="space-y-2 pl-1">
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Player 1</Label>
-                  <Select
-                    value={editForm.team2Player1Id}
-                    onValueChange={(v) => setEditForm(f => ({ ...f, team2Player1Id: v === '__none__' ? '' : v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select player..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— None —</SelectItem>
-                      {participants.map((p: any) => (
-                        <SelectItem key={p.id} value={p.athleteId}>
-                          {p.athlete?.name || p.athleteId}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Player 2</Label>
-                  <Select
-                    value={editForm.team2Player2Id}
-                    onValueChange={(v) => setEditForm(f => ({ ...f, team2Player2Id: v === '__none__' ? '' : v }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select player..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— None —</SelectItem>
-                      {participants.map((p: any) => (
-                        <SelectItem key={p.id} value={p.athleteId}>
-                          {p.athlete?.name || p.athleteId}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
-          <Button
-            variant="destructive"
-            onClick={() => setShowCloseConfirm(true)}
-            disabled={isFetchingDetail || updateMatch.isPending || closeMatch.isPending}
-          >
-            Close Match
-          </Button>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+      <Dialog open={showCloseConfirm} onOpenChange={(open) => { if (!open) setShowCloseConfirm(false); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Close Match</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">
+            Are you sure you want to close <span className="font-medium text-foreground">{match.name}</span>? This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCloseConfirm(false)}>
               Cancel
             </Button>
             <Button
-              onClick={handleSaveEdit}
-              disabled={isFetchingDetail || updateMatch.isPending || closeMatch.isPending}
+              variant="destructive"
+              onClick={handleConfirmClose}
+              disabled={closeMatch.isPending}
             >
-              {updateMatch.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save
+              {closeMatch.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Close Match
             </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog open={showCloseConfirm} onOpenChange={(open) => { if (!open) setShowCloseConfirm(false); }}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Close Match</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-muted-foreground py-2">
-          Are you sure you want to close <span className="font-medium text-foreground">{match.name}</span>? This action cannot be undone.
-        </p>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setShowCloseConfirm(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleConfirmClose}
-            disabled={closeMatch.isPending}
-          >
-            {closeMatch.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Close Match
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -598,8 +598,12 @@ export default function StageDetailPage() {
   });
   const stage = stageData as any;
 
-  // Correct: use stageId directly for matches
-  const { data: matchesData, refetch: refetchMatches, isFetching: isFetchingMatches } = useStageControllerFindMatchesByStage(eventId, stageId, {
+  const { data: participantsData } = useParticipantControllerFindAll(eventId, {
+    query: { enabled: !!eventId },
+  });
+  const allParticipants = (participantsData as any) || [];
+
+  const { data: matchesData } = useStageControllerFindAllBySession(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
   });
 
@@ -693,7 +697,9 @@ export default function StageDetailPage() {
   }
 
   const matches = (matchesData as any) || [];
-  const stageParticipants = (stageParticipantsData as any) || [];
+  const sessionParticipants = allParticipants.filter(
+    (p: any) => p.sessionId === stage.sessionId,
+  );
   const completedMatches = matches.filter((m: any) => m.status === 'COMPLETED');
 
   // Group matches by round
@@ -816,35 +822,35 @@ export default function StageDetailPage() {
       {/* Tabs: Matches / Participants */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center justify-between">
-        <TabsList>
-          <TabsTrigger value="matches" className="flex items-center gap-1.5">
-            <Swords className="h-4 w-4" />
-            Matches
-            {matches.length > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
-                {matches.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="participants" className="flex items-center gap-1.5">
-            <UserCheck className="h-4 w-4" />
-            Participants
-            {stageParticipants.length > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
-                {stageParticipants.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => { refetchMatches(); setReloadCount(c => c + 1); }}
-          disabled={isFetchingMatches}
-        >
-          <RefreshCw className={`h-4 w-4 mr-1.5 ${isFetchingMatches ? 'animate-spin' : ''}`} />
-          Reload
-        </Button>
+          <TabsList>
+            <TabsTrigger value="matches" className="flex items-center gap-1.5">
+              <Swords className="h-4 w-4" />
+              Matches
+              {matches.length > 0 && (
+                <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                  {matches.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="participants" className="flex items-center gap-1.5">
+              <UserCheck className="h-4 w-4" />
+              Participants
+              {stageParticipants.length > 0 && (
+                <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+                  {stageParticipants.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { refetchMatches(); setReloadCount(c => c + 1); }}
+            disabled={isFetchingMatches}
+          >
+            <RefreshCw className={`h-4 w-4 mr-1.5 ${isFetchingMatches ? 'animate-spin' : ''}`} />
+            Reload
+          </Button>
         </div>
 
         {/* Matches Tab */}

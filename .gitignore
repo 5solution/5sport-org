@@ -14,3 +14,5 @@ create-fake-orders.sh
 
 # Other
 create-fake-orders.sh
+.idea
+.DS_Store

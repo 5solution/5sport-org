@@ -5,7 +5,10 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,1337 +21,1059 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
-import type { CreateParticipantDto, EventParticipant } from "../../schemas";
+import type {
+  CreateParticipantDto,
+  EventParticipant,
+  ParticipantControllerAssignPartnerBody
+} from '../../schemas';
 
-import { defaultMutator } from "../../api/axiosInstance";
+import { defaultMutator } from '../../api/axiosInstance';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * @summary Register participant for event
  */
 export type participantControllerCreateResponse201 = {
-  data: EventParticipant;
-  status: 201;
+  data: EventParticipant
+  status: 201
+}
+    
+export type participantControllerCreateResponseSuccess = (participantControllerCreateResponse201) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerCreateResponseSuccess =
-  participantControllerCreateResponse201 & {
-    headers: Headers;
-  };
-export type participantControllerCreateResponse =
-  participantControllerCreateResponseSuccess;
+export type participantControllerCreateResponse = (participantControllerCreateResponseSuccess)
 
-export const getParticipantControllerCreateUrl = (eventId: string) => {
-  return `/events/${eventId}/participants`;
-};
+export const getParticipantControllerCreateUrl = (eventId: string,) => {
 
-export const participantControllerCreate = async (
-  eventId: string,
-  createParticipantDto: CreateParticipantDto,
-  options?: RequestInit,
-): Promise<participantControllerCreateResponse> => {
-  return defaultMutator<participantControllerCreateResponse>(
-    getParticipantControllerCreateUrl(eventId),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(createParticipantDto),
-    },
-  );
-};
 
-export const getParticipantControllerCreateMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof participantControllerCreate>>,
-    TError,
-    { eventId: string; data: CreateParticipantDto },
-    TContext
-  >;
-  request?: SecondParameter<typeof defaultMutator>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof participantControllerCreate>>,
-  TError,
-  { eventId: string; data: CreateParticipantDto },
-  TContext
-> => {
-  const mutationKey = ["participantControllerCreate"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof participantControllerCreate>>,
-    { eventId: string; data: CreateParticipantDto }
-  > = (props) => {
-    const { eventId, data } = props ?? {};
+  return `/events/${eventId}/participants`
+}
 
-    return participantControllerCreate(eventId, data, requestOptions);
-  };
+export const participantControllerCreate = async (eventId: string,
+    createParticipantDto: CreateParticipantDto, options?: RequestInit): Promise<participantControllerCreateResponse> => {
+  
+  return defaultMutator<participantControllerCreateResponse>(getParticipantControllerCreateUrl(eventId),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createParticipantDto,)
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type ParticipantControllerCreateMutationResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerCreate>>
->;
-export type ParticipantControllerCreateMutationBody = CreateParticipantDto;
-export type ParticipantControllerCreateMutationError = unknown;
 
-/**
+
+export const getParticipantControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerCreate>>, TError,{eventId: string;data: CreateParticipantDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerCreate>>, TError,{eventId: string;data: CreateParticipantDto}, TContext> => {
+
+const mutationKey = ['participantControllerCreate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerCreate>>, {eventId: string;data: CreateParticipantDto}> = (props) => {
+          const {eventId,data} = props ?? {};
+
+          return  participantControllerCreate(eventId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerCreate>>>
+    export type ParticipantControllerCreateMutationBody = CreateParticipantDto
+    export type ParticipantControllerCreateMutationError = unknown
+
+    /**
  * @summary Register participant for event
  */
-export const useParticipantControllerCreate = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof participantControllerCreate>>,
-      TError,
-      { eventId: string; data: CreateParticipantDto },
-      TContext
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof participantControllerCreate>>,
-  TError,
-  { eventId: string; data: CreateParticipantDto },
-  TContext
-> => {
-  return useMutation(
-    getParticipantControllerCreateMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useParticipantControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerCreate>>, TError,{eventId: string;data: CreateParticipantDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerCreate>>,
+        TError,
+        {eventId: string;data: CreateParticipantDto},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerCreateMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Get all participants for event
  */
 export type participantControllerFindAllResponse200 = {
-  data: EventParticipant[];
-  status: 200;
+  data: EventParticipant[]
+  status: 200
+}
+    
+export type participantControllerFindAllResponseSuccess = (participantControllerFindAllResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerFindAllResponseSuccess =
-  participantControllerFindAllResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerFindAllResponse =
-  participantControllerFindAllResponseSuccess;
+export type participantControllerFindAllResponse = (participantControllerFindAllResponseSuccess)
 
-export const getParticipantControllerFindAllUrl = (eventId: string) => {
-  return `/events/${eventId}/participants`;
-};
+export const getParticipantControllerFindAllUrl = (eventId: string,) => {
 
-export const participantControllerFindAll = async (
-  eventId: string,
-  options?: RequestInit,
-): Promise<participantControllerFindAllResponse> => {
-  return defaultMutator<participantControllerFindAllResponse>(
-    getParticipantControllerFindAllUrl(eventId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
 
-export const getParticipantControllerFindAllQueryKey = (eventId: string) => {
-  return [`/events/${eventId}/participants`] as const;
-};
+  
 
-export const getParticipantControllerFindAllQueryOptions = <
-  TData = Awaited<ReturnType<typeof participantControllerFindAll>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindAll>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
+  return `/events/${eventId}/participants`
+}
+
+export const participantControllerFindAll = async (eventId: string, options?: RequestInit): Promise<participantControllerFindAllResponse> => {
+  
+  return defaultMutator<participantControllerFindAllResponse>(getParticipantControllerFindAllUrl(eventId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getParticipantControllerFindAllQueryKey = (eventId: string,) => {
+    return [
+    `/events/${eventId}/participants`
+    ] as const;
+    }
+
+    
+export const getParticipantControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof participantControllerFindAll>>, TError = unknown>(eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ?? getParticipantControllerFindAllQueryKey(eventId);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof participantControllerFindAll>>
-  > = ({ signal }) =>
-    participantControllerFindAll(eventId, { signal, ...requestOptions });
+  const queryKey =  queryOptions?.queryKey ?? getParticipantControllerFindAllQueryKey(eventId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!eventId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof participantControllerFindAll>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type ParticipantControllerFindAllQueryResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerFindAll>>
->;
-export type ParticipantControllerFindAllQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof participantControllerFindAll>>> = ({ signal }) => participantControllerFindAll(eventId, { signal, ...requestOptions });
 
-export function useParticipantControllerFindAll<
-  TData = Awaited<ReturnType<typeof participantControllerFindAll>>,
-  TError = unknown,
->(
-  eventId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindAll>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(eventId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindAll>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ParticipantControllerFindAllQueryResult = NonNullable<Awaited<ReturnType<typeof participantControllerFindAll>>>
+export type ParticipantControllerFindAllQueryError = unknown
+
+
+export function useParticipantControllerFindAll<TData = Awaited<ReturnType<typeof participantControllerFindAll>>, TError = unknown>(
+ eventId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindAll>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerFindAll>>,
           TError,
           Awaited<ReturnType<typeof participantControllerFindAll>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerFindAll<
-  TData = Awaited<ReturnType<typeof participantControllerFindAll>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindAll>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerFindAll<TData = Awaited<ReturnType<typeof participantControllerFindAll>>, TError = unknown>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindAll>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerFindAll>>,
           TError,
           Awaited<ReturnType<typeof participantControllerFindAll>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerFindAll<
-  TData = Awaited<ReturnType<typeof participantControllerFindAll>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindAll>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerFindAll<TData = Awaited<ReturnType<typeof participantControllerFindAll>>, TError = unknown>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get all participants for event
  */
 
-export function useParticipantControllerFindAll<
-  TData = Awaited<ReturnType<typeof participantControllerFindAll>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindAll>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getParticipantControllerFindAllQueryOptions(
-    eventId,
-    options,
-  );
+export function useParticipantControllerFindAll<TData = Awaited<ReturnType<typeof participantControllerFindAll>>, TError = unknown>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getParticipantControllerFindAllQueryOptions(eventId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * @summary Get checked-in participants
  */
 export type participantControllerGetCheckedInResponse200 = {
-  data: EventParticipant[];
-  status: 200;
+  data: EventParticipant[]
+  status: 200
+}
+    
+export type participantControllerGetCheckedInResponseSuccess = (participantControllerGetCheckedInResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerGetCheckedInResponseSuccess =
-  participantControllerGetCheckedInResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerGetCheckedInResponse =
-  participantControllerGetCheckedInResponseSuccess;
+export type participantControllerGetCheckedInResponse = (participantControllerGetCheckedInResponseSuccess)
 
-export const getParticipantControllerGetCheckedInUrl = (eventId: string) => {
-  return `/events/${eventId}/participants/checked-in`;
-};
+export const getParticipantControllerGetCheckedInUrl = (eventId: string,) => {
 
-export const participantControllerGetCheckedIn = async (
-  eventId: string,
-  options?: RequestInit,
-): Promise<participantControllerGetCheckedInResponse> => {
-  return defaultMutator<participantControllerGetCheckedInResponse>(
-    getParticipantControllerGetCheckedInUrl(eventId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
 
-export const getParticipantControllerGetCheckedInQueryKey = (
-  eventId: string,
+  
+
+  return `/events/${eventId}/participants/checked-in`
+}
+
+export const participantControllerGetCheckedIn = async (eventId: string, options?: RequestInit): Promise<participantControllerGetCheckedInResponse> => {
+  
+  return defaultMutator<participantControllerGetCheckedInResponse>(getParticipantControllerGetCheckedInUrl(eventId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getParticipantControllerGetCheckedInQueryKey = (eventId: string,) => {
+    return [
+    `/events/${eventId}/participants/checked-in`
+    ] as const;
+    }
+
+    
+export const getParticipantControllerGetCheckedInQueryOptions = <TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError = unknown>(eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
-  return [`/events/${eventId}/participants/checked-in`] as const;
-};
 
-export const getParticipantControllerGetCheckedInQueryOptions = <
-  TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getParticipantControllerGetCheckedInQueryKey(eventId);
+  const queryKey =  queryOptions?.queryKey ?? getParticipantControllerGetCheckedInQueryKey(eventId);
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof participantControllerGetCheckedIn>>
-  > = ({ signal }) =>
-    participantControllerGetCheckedIn(eventId, { signal, ...requestOptions });
+  
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!eventId,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>> = ({ signal }) => participantControllerGetCheckedIn(eventId, { signal, ...requestOptions });
 
-export type ParticipantControllerGetCheckedInQueryResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerGetCheckedIn>>
->;
-export type ParticipantControllerGetCheckedInQueryError = unknown;
+      
 
-export function useParticipantControllerGetCheckedIn<
-  TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-  TError = unknown,
->(
-  eventId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+      
+
+   return  { queryKey, queryFn, enabled: !!(eventId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ParticipantControllerGetCheckedInQueryResult = NonNullable<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>>
+export type ParticipantControllerGetCheckedInQueryError = unknown
+
+
+export function useParticipantControllerGetCheckedIn<TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError = unknown>(
+ eventId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
           TError,
           Awaited<ReturnType<typeof participantControllerGetCheckedIn>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerGetCheckedIn<
-  TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerGetCheckedIn<TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError = unknown>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
           TError,
           Awaited<ReturnType<typeof participantControllerGetCheckedIn>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerGetCheckedIn<
-  TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerGetCheckedIn<TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError = unknown>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get checked-in participants
  */
 
-export function useParticipantControllerGetCheckedIn<
-  TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-  TError = unknown,
->(
-  eventId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerGetCheckedIn>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getParticipantControllerGetCheckedInQueryOptions(
-    eventId,
-    options,
-  );
+export function useParticipantControllerGetCheckedIn<TData = Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError = unknown>(
+ eventId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerGetCheckedIn>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getParticipantControllerGetCheckedInQueryOptions(eventId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * @summary Get participants by stage
  */
 export type participantControllerFindByStageResponse200 = {
-  data: EventParticipant[];
-  status: 200;
+  data: EventParticipant[]
+  status: 200
+}
+    
+export type participantControllerFindByStageResponseSuccess = (participantControllerFindByStageResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerFindByStageResponseSuccess =
-  participantControllerFindByStageResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerFindByStageResponse =
-  participantControllerFindByStageResponseSuccess;
+export type participantControllerFindByStageResponse = (participantControllerFindByStageResponseSuccess)
 
-export const getParticipantControllerFindByStageUrl = (
-  eventId: unknown,
-  stageId: string,
+export const getParticipantControllerFindByStageUrl = (eventId: unknown,
+    stageId: string,) => {
+
+
+  
+
+  return `/events/${eventId}/participants/stage/${stageId}`
+}
+
+export const participantControllerFindByStage = async (eventId: unknown,
+    stageId: string, options?: RequestInit): Promise<participantControllerFindByStageResponse> => {
+  
+  return defaultMutator<participantControllerFindByStageResponse>(getParticipantControllerFindByStageUrl(eventId,stageId),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getParticipantControllerFindByStageQueryKey = (eventId: unknown,
+    stageId: string,) => {
+    return [
+    `/events/${eventId}/participants/stage/${stageId}`
+    ] as const;
+    }
+
+    
+export const getParticipantControllerFindByStageQueryOptions = <TData = Awaited<ReturnType<typeof participantControllerFindByStage>>, TError = unknown>(eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindByStage>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
-  return `/events/${eventId}/participants/stage/${stageId}`;
-};
 
-export const participantControllerFindByStage = async (
-  eventId: unknown,
-  stageId: string,
-  options?: RequestInit,
-): Promise<participantControllerFindByStageResponse> => {
-  return defaultMutator<participantControllerFindByStageResponse>(
-    getParticipantControllerFindByStageUrl(eventId, stageId),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getParticipantControllerFindByStageQueryKey = (
-  eventId: unknown,
-  stageId: string,
-) => {
-  return [`/events/${eventId}/participants/stage/${stageId}`] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getParticipantControllerFindByStageQueryKey(eventId,stageId);
 
-export const getParticipantControllerFindByStageQueryOptions = <
-  TData = Awaited<ReturnType<typeof participantControllerFindByStage>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  stageId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindByStage>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getParticipantControllerFindByStageQueryKey(eventId, stageId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof participantControllerFindByStage>>> = ({ signal }) => participantControllerFindByStage(eventId,stageId, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof participantControllerFindByStage>>
-  > = ({ signal }) =>
-    participantControllerFindByStage(eventId, stageId, {
-      signal,
-      ...requestOptions,
-    });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(eventId && stageId),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof participantControllerFindByStage>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+      
 
-export type ParticipantControllerFindByStageQueryResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerFindByStage>>
->;
-export type ParticipantControllerFindByStageQueryError = unknown;
+   return  { queryKey, queryFn, enabled: !!(eventId && stageId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindByStage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useParticipantControllerFindByStage<
-  TData = Awaited<ReturnType<typeof participantControllerFindByStage>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  stageId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindByStage>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type ParticipantControllerFindByStageQueryResult = NonNullable<Awaited<ReturnType<typeof participantControllerFindByStage>>>
+export type ParticipantControllerFindByStageQueryError = unknown
+
+
+export function useParticipantControllerFindByStage<TData = Awaited<ReturnType<typeof participantControllerFindByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindByStage>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerFindByStage>>,
           TError,
           Awaited<ReturnType<typeof participantControllerFindByStage>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerFindByStage<
-  TData = Awaited<ReturnType<typeof participantControllerFindByStage>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  stageId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindByStage>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerFindByStage<TData = Awaited<ReturnType<typeof participantControllerFindByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindByStage>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerFindByStage>>,
           TError,
           Awaited<ReturnType<typeof participantControllerFindByStage>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerFindByStage<
-  TData = Awaited<ReturnType<typeof participantControllerFindByStage>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  stageId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindByStage>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerFindByStage<TData = Awaited<ReturnType<typeof participantControllerFindByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindByStage>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get participants by stage
  */
 
-export function useParticipantControllerFindByStage<
-  TData = Awaited<ReturnType<typeof participantControllerFindByStage>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  stageId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindByStage>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getParticipantControllerFindByStageQueryOptions(
-    eventId,
-    stageId,
-    options,
-  );
+export function useParticipantControllerFindByStage<TData = Awaited<ReturnType<typeof participantControllerFindByStage>>, TError = unknown>(
+ eventId: unknown,
+    stageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindByStage>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getParticipantControllerFindByStageQueryOptions(eventId,stageId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * @summary Get participant by ID
  */
 export type participantControllerFindOneResponse200 = {
-  data: EventParticipant;
-  status: 200;
+  data: EventParticipant
+  status: 200
+}
+    
+export type participantControllerFindOneResponseSuccess = (participantControllerFindOneResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerFindOneResponseSuccess =
-  participantControllerFindOneResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerFindOneResponse =
-  participantControllerFindOneResponseSuccess;
+export type participantControllerFindOneResponse = (participantControllerFindOneResponseSuccess)
 
-export const getParticipantControllerFindOneUrl = (
-  eventId: unknown,
-  id: string,
+export const getParticipantControllerFindOneUrl = (eventId: unknown,
+    id: string,) => {
+
+
+  
+
+  return `/events/${eventId}/participants/${id}`
+}
+
+export const participantControllerFindOne = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<participantControllerFindOneResponse> => {
+  
+  return defaultMutator<participantControllerFindOneResponse>(getParticipantControllerFindOneUrl(eventId,id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getParticipantControllerFindOneQueryKey = (eventId: unknown,
+    id: string,) => {
+    return [
+    `/events/${eventId}/participants/${id}`
+    ] as const;
+    }
+
+    
+export const getParticipantControllerFindOneQueryOptions = <TData = Awaited<ReturnType<typeof participantControllerFindOne>>, TError = unknown>(eventId: unknown,
+    id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindOne>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
 ) => {
-  return `/events/${eventId}/participants/${id}`;
-};
 
-export const participantControllerFindOne = async (
-  eventId: unknown,
-  id: string,
-  options?: RequestInit,
-): Promise<participantControllerFindOneResponse> => {
-  return defaultMutator<participantControllerFindOneResponse>(
-    getParticipantControllerFindOneUrl(eventId, id),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-export const getParticipantControllerFindOneQueryKey = (
-  eventId: unknown,
-  id: string,
-) => {
-  return [`/events/${eventId}/participants/${id}`] as const;
-};
+  const queryKey =  queryOptions?.queryKey ?? getParticipantControllerFindOneQueryKey(eventId,id);
 
-export const getParticipantControllerFindOneQueryOptions = <
-  TData = Awaited<ReturnType<typeof participantControllerFindOne>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindOne>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+  
 
-  const queryKey =
-    queryOptions?.queryKey ??
-    getParticipantControllerFindOneQueryKey(eventId, id);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof participantControllerFindOne>>> = ({ signal }) => participantControllerFindOne(eventId,id, { signal, ...requestOptions });
 
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof participantControllerFindOne>>
-  > = ({ signal }) =>
-    participantControllerFindOne(eventId, id, { signal, ...requestOptions });
+      
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(eventId && id),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof participantControllerFindOne>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+      
 
-export type ParticipantControllerFindOneQueryResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerFindOne>>
->;
-export type ParticipantControllerFindOneQueryError = unknown;
+   return  { queryKey, queryFn, enabled: !!(eventId && id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindOne>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-export function useParticipantControllerFindOne<
-  TData = Awaited<ReturnType<typeof participantControllerFindOne>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  id: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindOne>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+export type ParticipantControllerFindOneQueryResult = NonNullable<Awaited<ReturnType<typeof participantControllerFindOne>>>
+export type ParticipantControllerFindOneQueryError = unknown
+
+
+export function useParticipantControllerFindOne<TData = Awaited<ReturnType<typeof participantControllerFindOne>>, TError = unknown>(
+ eventId: unknown,
+    id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindOne>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerFindOne>>,
           TError,
           Awaited<ReturnType<typeof participantControllerFindOne>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerFindOne<
-  TData = Awaited<ReturnType<typeof participantControllerFindOne>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindOne>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerFindOne<TData = Awaited<ReturnType<typeof participantControllerFindOne>>, TError = unknown>(
+ eventId: unknown,
+    id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindOne>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof participantControllerFindOne>>,
           TError,
           Awaited<ReturnType<typeof participantControllerFindOne>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useParticipantControllerFindOne<
-  TData = Awaited<ReturnType<typeof participantControllerFindOne>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindOne>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useParticipantControllerFindOne<TData = Awaited<ReturnType<typeof participantControllerFindOne>>, TError = unknown>(
+ eventId: unknown,
+    id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindOne>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get participant by ID
  */
 
-export function useParticipantControllerFindOne<
-  TData = Awaited<ReturnType<typeof participantControllerFindOne>>,
-  TError = unknown,
->(
-  eventId: unknown,
-  id: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof participantControllerFindOne>>,
-        TError,
-        TData
-      >
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getParticipantControllerFindOneQueryOptions(
-    eventId,
-    id,
-    options,
-  );
+export function useParticipantControllerFindOne<TData = Awaited<ReturnType<typeof participantControllerFindOne>>, TError = unknown>(
+ eventId: unknown,
+    id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof participantControllerFindOne>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getParticipantControllerFindOneQueryOptions(eventId,id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 /**
  * @summary Remove participant
  */
 export type participantControllerRemoveResponse200 = {
-  data: void;
-  status: 200;
+  data: void
+  status: 200
+}
+    
+export type participantControllerRemoveResponseSuccess = (participantControllerRemoveResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerRemoveResponseSuccess =
-  participantControllerRemoveResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerRemoveResponse =
-  participantControllerRemoveResponseSuccess;
+export type participantControllerRemoveResponse = (participantControllerRemoveResponseSuccess)
 
-export const getParticipantControllerRemoveUrl = (
-  eventId: unknown,
-  id: string,
-) => {
-  return `/events/${eventId}/participants/${id}`;
-};
+export const getParticipantControllerRemoveUrl = (eventId: unknown,
+    id: string,) => {
 
-export const participantControllerRemove = async (
-  eventId: unknown,
-  id: string,
-  options?: RequestInit,
-): Promise<participantControllerRemoveResponse> => {
-  return defaultMutator<participantControllerRemoveResponse>(
-    getParticipantControllerRemoveUrl(eventId, id),
-    {
-      ...options,
-      method: "DELETE",
-    },
-  );
-};
 
-export const getParticipantControllerRemoveMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof participantControllerRemove>>,
-    TError,
-    { eventId: unknown; id: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof defaultMutator>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof participantControllerRemove>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  const mutationKey = ["participantControllerRemove"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof participantControllerRemove>>,
-    { eventId: unknown; id: string }
-  > = (props) => {
-    const { eventId, id } = props ?? {};
+  return `/events/${eventId}/participants/${id}`
+}
 
-    return participantControllerRemove(eventId, id, requestOptions);
-  };
+export const participantControllerRemove = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<participantControllerRemoveResponse> => {
+  
+  return defaultMutator<participantControllerRemoveResponse>(getParticipantControllerRemoveUrl(eventId,id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type ParticipantControllerRemoveMutationResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerRemove>>
->;
 
-export type ParticipantControllerRemoveMutationError = unknown;
 
-/**
+export const getParticipantControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerRemove>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerRemove>>, TError,{eventId: unknown;id: string}, TContext> => {
+
+const mutationKey = ['participantControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerRemove>>, {eventId: unknown;id: string}> = (props) => {
+          const {eventId,id} = props ?? {};
+
+          return  participantControllerRemove(eventId,id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerRemove>>>
+    
+    export type ParticipantControllerRemoveMutationError = unknown
+
+    /**
  * @summary Remove participant
  */
-export const useParticipantControllerRemove = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof participantControllerRemove>>,
-      TError,
-      { eventId: unknown; id: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof participantControllerRemove>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  return useMutation(
-    getParticipantControllerRemoveMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useParticipantControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerRemove>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerRemove>>,
+        TError,
+        {eventId: unknown;id: string},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerRemoveMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Check-in participant
  */
 export type participantControllerCheckinResponse200 = {
-  data: EventParticipant;
-  status: 200;
+  data: EventParticipant
+  status: 200
+}
+    
+export type participantControllerCheckinResponseSuccess = (participantControllerCheckinResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerCheckinResponseSuccess =
-  participantControllerCheckinResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerCheckinResponse =
-  participantControllerCheckinResponseSuccess;
+export type participantControllerCheckinResponse = (participantControllerCheckinResponseSuccess)
 
-export const getParticipantControllerCheckinUrl = (
-  eventId: unknown,
-  id: string,
-) => {
-  return `/events/${eventId}/participants/${id}/checkin`;
-};
+export const getParticipantControllerCheckinUrl = (eventId: unknown,
+    id: string,) => {
 
-export const participantControllerCheckin = async (
-  eventId: unknown,
-  id: string,
-  options?: RequestInit,
-): Promise<participantControllerCheckinResponse> => {
-  return defaultMutator<participantControllerCheckinResponse>(
-    getParticipantControllerCheckinUrl(eventId, id),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
 
-export const getParticipantControllerCheckinMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof participantControllerCheckin>>,
-    TError,
-    { eventId: unknown; id: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof defaultMutator>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof participantControllerCheckin>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  const mutationKey = ["participantControllerCheckin"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof participantControllerCheckin>>,
-    { eventId: unknown; id: string }
-  > = (props) => {
-    const { eventId, id } = props ?? {};
+  return `/events/${eventId}/participants/${id}/checkin`
+}
 
-    return participantControllerCheckin(eventId, id, requestOptions);
-  };
+export const participantControllerCheckin = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<participantControllerCheckinResponse> => {
+  
+  return defaultMutator<participantControllerCheckinResponse>(getParticipantControllerCheckinUrl(eventId,id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type ParticipantControllerCheckinMutationResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerCheckin>>
->;
 
-export type ParticipantControllerCheckinMutationError = unknown;
 
-/**
+export const getParticipantControllerCheckinMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerCheckin>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerCheckin>>, TError,{eventId: unknown;id: string}, TContext> => {
+
+const mutationKey = ['participantControllerCheckin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerCheckin>>, {eventId: unknown;id: string}> = (props) => {
+          const {eventId,id} = props ?? {};
+
+          return  participantControllerCheckin(eventId,id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerCheckinMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerCheckin>>>
+    
+    export type ParticipantControllerCheckinMutationError = unknown
+
+    /**
  * @summary Check-in participant
  */
-export const useParticipantControllerCheckin = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof participantControllerCheckin>>,
-      TError,
-      { eventId: unknown; id: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof participantControllerCheckin>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  return useMutation(
-    getParticipantControllerCheckinMutationOptions(options),
-    queryClient,
-  );
-};
-/**
+export const useParticipantControllerCheckin = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerCheckin>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerCheckin>>,
+        TError,
+        {eventId: unknown;id: string},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerCheckinMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Withdraw from event
  */
 export type participantControllerWithdrawResponse200 = {
-  data: EventParticipant;
-  status: 200;
+  data: EventParticipant
+  status: 200
+}
+    
+export type participantControllerWithdrawResponseSuccess = (participantControllerWithdrawResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerWithdrawResponseSuccess =
-  participantControllerWithdrawResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerWithdrawResponse =
-  participantControllerWithdrawResponseSuccess;
+export type participantControllerWithdrawResponse = (participantControllerWithdrawResponseSuccess)
 
-export const getParticipantControllerWithdrawUrl = (
-  eventId: unknown,
-  id: string,
-) => {
-  return `/events/${eventId}/participants/${id}/withdraw`;
-};
+export const getParticipantControllerWithdrawUrl = (eventId: unknown,
+    id: string,) => {
 
-export const participantControllerWithdraw = async (
-  eventId: unknown,
-  id: string,
-  options?: RequestInit,
-): Promise<participantControllerWithdrawResponse> => {
-  return defaultMutator<participantControllerWithdrawResponse>(
-    getParticipantControllerWithdrawUrl(eventId, id),
-    {
-      ...options,
-      method: "POST",
-    },
-  );
-};
 
-export const getParticipantControllerWithdrawMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof participantControllerWithdraw>>,
-    TError,
-    { eventId: unknown; id: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof defaultMutator>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof participantControllerWithdraw>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  const mutationKey = ["participantControllerWithdraw"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof participantControllerWithdraw>>,
-    { eventId: unknown; id: string }
-  > = (props) => {
-    const { eventId, id } = props ?? {};
+  return `/events/${eventId}/participants/${id}/withdraw`
+}
 
-    return participantControllerWithdraw(eventId, id, requestOptions);
-  };
+export const participantControllerWithdraw = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<participantControllerWithdrawResponse> => {
+  
+  return defaultMutator<participantControllerWithdrawResponse>(getParticipantControllerWithdrawUrl(eventId,id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type ParticipantControllerWithdrawMutationResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerWithdraw>>
->;
 
-export type ParticipantControllerWithdrawMutationError = unknown;
 
-/**
+export const getParticipantControllerWithdrawMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerWithdraw>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerWithdraw>>, TError,{eventId: unknown;id: string}, TContext> => {
+
+const mutationKey = ['participantControllerWithdraw'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerWithdraw>>, {eventId: unknown;id: string}> = (props) => {
+          const {eventId,id} = props ?? {};
+
+          return  participantControllerWithdraw(eventId,id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerWithdrawMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerWithdraw>>>
+    
+    export type ParticipantControllerWithdrawMutationError = unknown
+
+    /**
  * @summary Withdraw from event
  */
-export const useParticipantControllerWithdraw = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof participantControllerWithdraw>>,
-      TError,
-      { eventId: unknown; id: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof participantControllerWithdraw>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  return useMutation(
-    getParticipantControllerWithdrawMutationOptions(options),
-    queryClient,
-  );
+export const useParticipantControllerWithdraw = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerWithdraw>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerWithdraw>>,
+        TError,
+        {eventId: unknown;id: string},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerWithdrawMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Assign partner for a doubles participant
+ */
+export type participantControllerAssignPartnerResponse200 = {
+  data: EventParticipant
+  status: 200
+}
+    
+export type participantControllerAssignPartnerResponseSuccess = (participantControllerAssignPartnerResponse200) & {
+  headers: Headers;
 };
-/**
+;
+
+export type participantControllerAssignPartnerResponse = (participantControllerAssignPartnerResponseSuccess)
+
+export const getParticipantControllerAssignPartnerUrl = (eventId: unknown,
+    id: string,) => {
+
+
+  
+
+  return `/events/${eventId}/participants/${id}/partner`
+}
+
+export const participantControllerAssignPartner = async (eventId: unknown,
+    id: string,
+    participantControllerAssignPartnerBody: ParticipantControllerAssignPartnerBody, options?: RequestInit): Promise<participantControllerAssignPartnerResponse> => {
+  
+  return defaultMutator<participantControllerAssignPartnerResponse>(getParticipantControllerAssignPartnerUrl(eventId,id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      participantControllerAssignPartnerBody,)
+  }
+);}
+
+
+
+
+export const getParticipantControllerAssignPartnerMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerAssignPartner>>, TError,{eventId: unknown;id: string;data: ParticipantControllerAssignPartnerBody}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerAssignPartner>>, TError,{eventId: unknown;id: string;data: ParticipantControllerAssignPartnerBody}, TContext> => {
+
+const mutationKey = ['participantControllerAssignPartner'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerAssignPartner>>, {eventId: unknown;id: string;data: ParticipantControllerAssignPartnerBody}> = (props) => {
+          const {eventId,id,data} = props ?? {};
+
+          return  participantControllerAssignPartner(eventId,id,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerAssignPartnerMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerAssignPartner>>>
+    export type ParticipantControllerAssignPartnerMutationBody = ParticipantControllerAssignPartnerBody
+    export type ParticipantControllerAssignPartnerMutationError = unknown
+
+    /**
+ * @summary Assign partner for a doubles participant
+ */
+export const useParticipantControllerAssignPartner = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerAssignPartner>>, TError,{eventId: unknown;id: string;data: ParticipantControllerAssignPartnerBody}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerAssignPartner>>,
+        TError,
+        {eventId: unknown;id: string;data: ParticipantControllerAssignPartnerBody},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerAssignPartnerMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Remove partner from a doubles participant
+ */
+export type participantControllerRemovePartnerResponse200 = {
+  data: EventParticipant
+  status: 200
+}
+    
+export type participantControllerRemovePartnerResponseSuccess = (participantControllerRemovePartnerResponse200) & {
+  headers: Headers;
+};
+;
+
+export type participantControllerRemovePartnerResponse = (participantControllerRemovePartnerResponseSuccess)
+
+export const getParticipantControllerRemovePartnerUrl = (eventId: unknown,
+    id: string,) => {
+
+
+  
+
+  return `/events/${eventId}/participants/${id}/partner`
+}
+
+export const participantControllerRemovePartner = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<participantControllerRemovePartnerResponse> => {
+  
+  return defaultMutator<participantControllerRemovePartnerResponse>(getParticipantControllerRemovePartnerUrl(eventId,id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getParticipantControllerRemovePartnerMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerRemovePartner>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerRemovePartner>>, TError,{eventId: unknown;id: string}, TContext> => {
+
+const mutationKey = ['participantControllerRemovePartner'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerRemovePartner>>, {eventId: unknown;id: string}> = (props) => {
+          const {eventId,id} = props ?? {};
+
+          return  participantControllerRemovePartner(eventId,id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerRemovePartnerMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerRemovePartner>>>
+    
+    export type ParticipantControllerRemovePartnerMutationError = unknown
+
+    /**
+ * @summary Remove partner from a doubles participant
+ */
+export const useParticipantControllerRemovePartner = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerRemovePartner>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerRemovePartner>>,
+        TError,
+        {eventId: unknown;id: string},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerRemovePartnerMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Assign bib number
  */
 export type participantControllerAssignBibResponse200 = {
-  data: EventParticipant;
-  status: 200;
+  data: EventParticipant
+  status: 200
+}
+    
+export type participantControllerAssignBibResponseSuccess = (participantControllerAssignBibResponse200) & {
+  headers: Headers;
 };
+;
 
-export type participantControllerAssignBibResponseSuccess =
-  participantControllerAssignBibResponse200 & {
-    headers: Headers;
-  };
-export type participantControllerAssignBibResponse =
-  participantControllerAssignBibResponseSuccess;
+export type participantControllerAssignBibResponse = (participantControllerAssignBibResponseSuccess)
 
-export const getParticipantControllerAssignBibUrl = (
-  eventId: unknown,
-  id: string,
-) => {
-  return `/events/${eventId}/participants/${id}/bib`;
-};
+export const getParticipantControllerAssignBibUrl = (eventId: unknown,
+    id: string,) => {
 
-export const participantControllerAssignBib = async (
-  eventId: unknown,
-  id: string,
-  options?: RequestInit,
-): Promise<participantControllerAssignBibResponse> => {
-  return defaultMutator<participantControllerAssignBibResponse>(
-    getParticipantControllerAssignBibUrl(eventId, id),
-    {
-      ...options,
-      method: "PATCH",
-    },
-  );
-};
 
-export const getParticipantControllerAssignBibMutationOptions = <
-  TError = unknown,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof participantControllerAssignBib>>,
-    TError,
-    { eventId: unknown; id: string },
-    TContext
-  >;
-  request?: SecondParameter<typeof defaultMutator>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof participantControllerAssignBib>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  const mutationKey = ["participantControllerAssignBib"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
+  
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof participantControllerAssignBib>>,
-    { eventId: unknown; id: string }
-  > = (props) => {
-    const { eventId, id } = props ?? {};
+  return `/events/${eventId}/participants/${id}/bib`
+}
 
-    return participantControllerAssignBib(eventId, id, requestOptions);
-  };
+export const participantControllerAssignBib = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<participantControllerAssignBibResponse> => {
+  
+  return defaultMutator<participantControllerAssignBibResponse>(getParticipantControllerAssignBibUrl(eventId,id),
+  {      
+    ...options,
+    method: 'PATCH'
+    
+    
+  }
+);}
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type ParticipantControllerAssignBibMutationResult = NonNullable<
-  Awaited<ReturnType<typeof participantControllerAssignBib>>
->;
 
-export type ParticipantControllerAssignBibMutationError = unknown;
 
-/**
+export const getParticipantControllerAssignBibMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerAssignBib>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof participantControllerAssignBib>>, TError,{eventId: unknown;id: string}, TContext> => {
+
+const mutationKey = ['participantControllerAssignBib'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof participantControllerAssignBib>>, {eventId: unknown;id: string}> = (props) => {
+          const {eventId,id} = props ?? {};
+
+          return  participantControllerAssignBib(eventId,id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ParticipantControllerAssignBibMutationResult = NonNullable<Awaited<ReturnType<typeof participantControllerAssignBib>>>
+    
+    export type ParticipantControllerAssignBibMutationError = unknown
+
+    /**
  * @summary Assign bib number
  */
-export const useParticipantControllerAssignBib = <
-  TError = unknown,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof participantControllerAssignBib>>,
-      TError,
-      { eventId: unknown; id: string },
-      TContext
-    >;
-    request?: SecondParameter<typeof defaultMutator>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof participantControllerAssignBib>>,
-  TError,
-  { eventId: unknown; id: string },
-  TContext
-> => {
-  return useMutation(
-    getParticipantControllerAssignBibMutationOptions(options),
-    queryClient,
-  );
-};
+export const useParticipantControllerAssignBib = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof participantControllerAssignBib>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof participantControllerAssignBib>>,
+        TError,
+        {eventId: unknown;id: string},
+        TContext
+      > => {
+      return useMutation(getParticipantControllerAssignBibMutationOptions(options), queryClient);
+    }
+    

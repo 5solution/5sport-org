@@ -52,7 +52,8 @@ interface EventSessionsTabProps {
 
 const defaultSession = {
   name: '',
-  matchType: '',
+  competitionFormat: '',
+  requirePartner: false,
   startTime: '',
   endTime: '',
   ticketCode: '',
@@ -252,7 +253,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
   const handleCreate = async () => {
     const newErrors: Record<string, string> = {};
     if (!form.name.trim()) newErrors.name = 'Required';
-    if (!form.matchType) newErrors.matchType = 'Required';
+    if (!form.competitionFormat) newErrors.competitionFormat = 'Required';
     if (!form.startTime) newErrors.startTime = 'Required';
     if (!form.endTime) newErrors.endTime = 'Required';
     if (!form.ticketCode.trim()) newErrors.ticketCode = 'Required';
@@ -264,7 +265,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
         id: eventId,
         data: {
           name: form.name.trim(),
-          matchType: form.matchType as any,
+          competitionFormat: form.competitionFormat as any,
+          requirePartner: form.competitionFormat === 'DOUBLES' ? form.requirePartner : undefined,
           startTime: new Date(form.startTime).toISOString(),
           endTime: new Date(form.endTime).toISOString(),
           ticketCode: form.ticketCode.trim(),
@@ -273,7 +275,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       invalidate();
       setShowAdd(false);
       setForm(defaultSession);
-    } catch {}
+    } catch { }
   };
 
   const handleEdit = (session: any) => {
@@ -282,7 +284,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
     const endDate = new Date(session.endTime);
     setForm({
       name: session.name,
-      matchType: session.matchType,
+      competitionFormat: session.competitionFormat || session.matchType || '',
+      requirePartner: session.requirePartner ?? false,
       startTime: startDate.toISOString().slice(0, 16),
       endTime: endDate.toISOString().slice(0, 16),
       ticketCode: session.ticketCode,
@@ -293,7 +296,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
   const handleSaveEdit = async () => {
     const newErrors: Record<string, string> = {};
     if (!form.name.trim()) newErrors.name = 'Required';
-    if (!form.matchType) newErrors.matchType = 'Required';
+    if (!form.competitionFormat) newErrors.competitionFormat = 'Required';
     if (!form.startTime) newErrors.startTime = 'Required';
     if (!form.endTime) newErrors.endTime = 'Required';
     if (!form.ticketCode.trim()) newErrors.ticketCode = 'Required';
@@ -306,7 +309,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
         sessionId: editingSessionId!,
         data: {
           name: form.name.trim(),
-          matchType: form.matchType as any,
+          competitionFormat: form.competitionFormat as any,
+          requirePartner: form.competitionFormat === 'DOUBLES' ? form.requirePartner : undefined,
           startTime: new Date(form.startTime).toISOString(),
           endTime: new Date(form.endTime).toISOString(),
           ticketCode: form.ticketCode.trim(),
@@ -316,7 +320,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       setShowEdit(false);
       setEditingSessionId(null);
       setForm(defaultSession);
-    } catch {}
+    } catch { }
   };
 
   const handleDelete = (sessionId: string) => {
@@ -331,7 +335,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       invalidate();
       setShowDeleteConfirm(false);
       setDeletingSessionId(null);
-    } catch {}
+    } catch { }
   };
 
   const handleCreateTicketTier = async () => {
@@ -367,7 +371,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       setShowTicketTier(false);
       setSelectedSessionId(null);
       setTicketForm(defaultTicketTier);
-    } catch {}
+    } catch { }
   };
 
   // ===== Stage handlers =====
@@ -423,7 +427,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       setSelectedSessionForStage(null);
       setEditingStageId(null);
       setStageForm(defaultStage);
-    } catch {}
+    } catch { }
   };
 
   const handleDeleteStageClick = (stageId: string) => {
@@ -438,14 +442,14 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
       invalidate();
       setShowDeleteStage(false);
       setDeletingStageId(null);
-    } catch {}
+    } catch { }
   };
 
   const handleGenerateMatches = async (stageId: string) => {
     try {
       await generateMatches.mutateAsync({ eventId, stageId });
       invalidate();
-    } catch {}
+    } catch { }
   };
 
   // ===== Seed handlers (admin only) =====
@@ -512,7 +516,10 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                 <div>
                   <CardTitle className="text-sm font-semibold">{session.name}</CardTitle>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline">{session.matchType}</Badge>
+                    <Badge variant="outline">{session.competitionFormat || session.matchType}</Badge>
+                    {session.requirePartner && (
+                      <Badge variant="secondary" className="text-xs">Partner Required</Badge>
+                    )}
                     <Badge variant="secondary" className="font-mono text-xs">
                       {session.ticketCode}
                     </Badge>
@@ -638,8 +645,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>{t('matchType')} <span className="text-destructive">*</span></Label>
-                <Select value={form.matchType} onValueChange={(v) => setForm((f) => ({ ...f, matchType: v }))}>
+                <Label>Competition Format <span className="text-destructive">*</span></Label>
+                <Select value={form.competitionFormat} onValueChange={(v) => setForm((f) => ({ ...f, competitionFormat: v, requirePartner: v !== 'DOUBLES' ? false : f.requirePartner }))}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('select')} />
                   </SelectTrigger>
@@ -648,7 +655,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                     <SelectItem value="DOUBLES">{t('doubles')}</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.matchType && <p className="text-sm text-destructive">{errors.matchType}</p>}
+                {errors.competitionFormat && <p className="text-sm text-destructive">{errors.competitionFormat}</p>}
               </div>
               <div className="space-y-2">
                 <Label>{t('ticketCode')} <span className="text-destructive">*</span></Label>
@@ -662,6 +669,21 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                 {errors.ticketCode && <p className="text-sm text-destructive">{errors.ticketCode}</p>}
               </div>
             </div>
+            {form.competitionFormat === 'DOUBLES' && (
+              <div className="flex items-center gap-3 rounded-lg border p-3 bg-blue-50 border-blue-100">
+                <input
+                  type="checkbox"
+                  id="add-requirePartner"
+                  checked={form.requirePartner}
+                  onChange={(e) => setForm((f) => ({ ...f, requirePartner: e.target.checked }))}
+                  className="h-4 w-4 rounded border-gray-300 text-primary cursor-pointer"
+                />
+                <label htmlFor="add-requirePartner" className="text-sm font-medium cursor-pointer flex-1">
+                  Require Partner Registration
+                  <p className="text-xs text-muted-foreground font-normal">Participants must register as a pair</p>
+                </label>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{t('startTime')} <span className="text-destructive">*</span></Label>
@@ -884,8 +906,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                     config: v === 'ROUND_ROBIN_PLAYOFF'
                       ? { groupCount: 2, advancePerGroup: 2 }
                       : v === 'SINGLE_ELIMINATION' || v === 'DOUBLE_ELIMINATION'
-                      ? { seedingType: 'RANDOM' }
-                      : {},
+                        ? { seedingType: 'RANDOM' }
+                        : {},
                   }))
                 }
               >
@@ -1018,8 +1040,8 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>{t('matchType')} <span className="text-destructive">*</span></Label>
-                <Select value={form.matchType} onValueChange={(v) => setForm((f) => ({ ...f, matchType: v }))}>
+                <Label>Competition Format <span className="text-destructive">*</span></Label>
+                <Select value={form.competitionFormat} onValueChange={(v) => setForm((f) => ({ ...f, competitionFormat: v, requirePartner: v !== 'DOUBLES' ? false : f.requirePartner }))}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('select')} />
                   </SelectTrigger>
@@ -1028,7 +1050,7 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                     <SelectItem value="DOUBLES">{t('doubles')}</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.matchType && <p className="text-sm text-destructive">{errors.matchType}</p>}
+                {errors.competitionFormat && <p className="text-sm text-destructive">{errors.competitionFormat}</p>}
               </div>
               <div className="space-y-2">
                 <Label>{t('ticketCode')} <span className="text-destructive">*</span></Label>
@@ -1042,6 +1064,21 @@ export function EventSessionsTab({ eventId, sessions }: EventSessionsTabProps) {
                 {errors.ticketCode && <p className="text-sm text-destructive">{errors.ticketCode}</p>}
               </div>
             </div>
+            {form.competitionFormat === 'DOUBLES' && (
+              <div className="flex items-center gap-3 rounded-lg border p-3 bg-blue-50 border-blue-100">
+                <input
+                  type="checkbox"
+                  id="edit-requirePartner"
+                  checked={form.requirePartner}
+                  onChange={(e) => setForm((f) => ({ ...f, requirePartner: e.target.checked }))}
+                  className="h-4 w-4 rounded border-gray-300 text-primary cursor-pointer"
+                />
+                <label htmlFor="edit-requirePartner" className="text-sm font-medium cursor-pointer flex-1">
+                  Require Partner Registration
+                  <p className="text-xs text-muted-foreground font-normal">Participants must register as a pair</p>
+                </label>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{t('startTime')} <span className="text-destructive">*</span></Label>

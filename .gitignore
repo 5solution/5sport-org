@@ -2,3 +2,7 @@
 node_modules
 out
 .env*.local
+
+# IDE
+.idea
+.DS_Store

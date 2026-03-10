@@ -13,6 +13,9 @@ import {
   Play,
   Trophy,
   UserCheck,
+  UserPlus,
+  UserX,
+  Heart,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -21,6 +24,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import {
   useStageControllerFindOne,
   useStageControllerGenerateMatches,
   useStageControllerAdvanceWinners,
@@ -28,7 +46,12 @@ import {
   getStageControllerFindOneQueryKey,
   getStageControllerFindMatchesByStageQueryKey,
 } from '@/lib/services/stages/stages';
-import { useParticipantControllerFindByStage } from '@/lib/services/participants/participants';
+import {
+  useParticipantControllerFindByStage,
+  useParticipantControllerAssignPartner,
+  useParticipantControllerRemovePartner,
+  getParticipantControllerFindByStageQueryKey,
+} from '@/lib/services/participants/participants';
 
 const STAGE_TYPE_LABELS: Record<string, string> = {
   ROUND_ROBIN_PLAYOFF: 'Round Robin + Playoff',
@@ -66,6 +89,8 @@ export default function StageDetailPage() {
   const stageId = params?.stageId as string;
 
   const [activeTab, setActiveTab] = useState('matches');
+  const [assigningParticipant, setAssigningParticipant] = useState<any | null>(null);
+  const [selectedPartnerId, setSelectedPartnerId] = useState('');
 
   const { data: stageData, isLoading } = useStageControllerFindOne(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
@@ -85,6 +110,14 @@ export default function StageDetailPage() {
 
   const generateMatches = useStageControllerGenerateMatches();
   const advanceWinners = useStageControllerAdvanceWinners();
+  const assignPartner = useParticipantControllerAssignPartner();
+  const removePartner = useParticipantControllerRemovePartner();
+
+  const invalidateParticipants = () => {
+    queryClient.invalidateQueries({
+      queryKey: getParticipantControllerFindByStageQueryKey(eventId, stageId),
+    });
+  };
 
   const invalidate = () => {
     queryClient.invalidateQueries({
@@ -108,6 +141,34 @@ export default function StageDetailPage() {
       await advanceWinners.mutateAsync({ eventId, stageId });
       invalidate();
       toast.success('Winners advanced');
+    } catch { }
+  };
+
+  const handleAssignPartner = (participant: any) => {
+    setAssigningParticipant(participant);
+    setSelectedPartnerId('');
+  };
+
+  const confirmAssignPartner = async () => {
+    if (!assigningParticipant || !selectedPartnerId) return;
+    try {
+      await assignPartner.mutateAsync({
+        eventId,
+        id: assigningParticipant.id,
+        data: { partnerParticipantId: selectedPartnerId },
+      });
+      invalidateParticipants();
+      toast.success('Partner assigned successfully');
+      setAssigningParticipant(null);
+      setSelectedPartnerId('');
+    } catch { }
+  };
+
+  const handleRemovePartner = async (participantId: string) => {
+    try {
+      await removePartner.mutateAsync({ eventId, id: participantId });
+      invalidateParticipants();
+      toast.success('Partner removed');
     } catch { }
   };
 
@@ -150,7 +211,7 @@ export default function StageDetailPage() {
           variant="ghost"
           size="sm"
           className="mb-3 -ml-2 text-muted-foreground"
-          onClick={() => router.push(`/admin/events/${eventId}`)}
+          onClick={() => router.push(`/admin/events/${eventId}?tab=sessions`)}
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
           Back to Event
@@ -390,6 +451,9 @@ export default function StageDetailPage() {
                   <Badge variant="outline" className="text-xs font-normal">
                     {stageParticipants.length} total
                   </Badge>
+                  <Badge variant="secondary" className="text-xs font-normal ml-auto">
+                    {stageParticipants.filter((p: any) => p.partnerId).length} paired
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -403,46 +467,88 @@ export default function StageDetailPage() {
                     const sub =
                       participant.seedNumber != null
                         ? `Seed #${participant.seedNumber}`
-                        : `No rank`;
+                        : 'No rank';
+                    const hasPartner = !!participant.partnerId;
+                    const partnerName = participant.partner?.name || participant.partner?.fullName;
+                    const isAssigning = assignPartner.isPending;
+                    const isRemoving = removePartner.isPending;
+
                     return (
                       <div
                         key={participant.id}
-                        className="flex items-center justify-between rounded-md border p-3 text-sm"
+                        className="rounded-md border p-3 text-sm"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                            {index + 1}
-                          </span>
-                          <div>
-                            <p className="font-medium">{name}</p>
-                            {sub && (
+                        {/* Main row */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                              {index + 1}
+                            </span>
+                            <div>
+                              <p className="font-medium">{name}</p>
                               <p className="text-xs text-muted-foreground">{sub}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {participant.seedNumber != null && (
+                              <Badge variant="outline" className="text-xs">
+                                Seed #{participant.seedNumber}
+                              </Badge>
+                            )}
+                            {participant.status && (
+                              <span
+                                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${participant.status === 'CHECKED_IN'
+                                  ? 'bg-green-100 text-green-700'
+                                  : participant.status === 'REGISTERED'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-gray-100 text-gray-600'
+                                  }`}
+                              >
+                                {participant.status === 'CHECKED_IN'
+                                  ? 'Checked In'
+                                  : participant.status === 'REGISTERED'
+                                    ? 'Registered'
+                                    : participant.status}
+                              </span>
+                            )}
+                            {/* Partner actions */}
+                            {hasPartner ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => handleRemovePartner(participant.id)}
+                                disabled={isRemoving}
+                                title="Remove partner"
+                              >
+                                {isRemoving ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <UserX className="h-3.5 w-3.5" />
+                                )}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                onClick={() => handleAssignPartner(participant)}
+                                title="Assign partner"
+                              >
+                                <UserPlus className="h-3.5 w-3.5" />
+                              </Button>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {participant.seedNumber != null && (
-                            <Badge variant="outline" className="text-xs">
-                              Seed #{participant.seedNumber}
-                            </Badge>
-                          )}
-                          {participant.status && (
-                            <span
-                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${participant.status === 'CHECKED_IN'
-                                ? 'bg-green-100 text-green-700'
-                                : participant.status === 'REGISTERED'
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : 'bg-gray-100 text-gray-600'
-                                }`}
-                            >
-                              {participant.status === 'CHECKED_IN'
-                                ? 'Checked In'
-                                : participant.status === 'REGISTERED'
-                                  ? 'Registered'
-                                  : participant.status}
-                            </span>
-                          )}
-                        </div>
+
+                        {/* Partner info row */}
+                        {hasPartner && (
+                          <div className="mt-2 ml-10 flex items-center gap-1.5 rounded-md bg-pink-50 border border-pink-100 px-2.5 py-1.5">
+                            <Heart className="h-3 w-3 text-pink-500 shrink-0" />
+                            <span className="text-xs text-pink-700 font-medium">Partner:</span>
+                            <span className="text-xs text-pink-700">{partnerName || participant.partnerId}</span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -452,6 +558,75 @@ export default function StageDetailPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Assign Partner Dialog */}
+      <Dialog
+        open={!!assigningParticipant}
+        onOpenChange={(open) => { if (!open) { setAssigningParticipant(null); setSelectedPartnerId(''); } }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="h-4 w-4 text-pink-500" />
+              Assign Partner
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="rounded-lg bg-muted/50 border px-3 py-2 text-sm">
+              <span className="text-muted-foreground">Assigning partner for: </span>
+              <span className="font-medium">
+                {assigningParticipant?.athlete?.name ||
+                  assigningParticipant?.team?.name ||
+                  assigningParticipant?.name ||
+                  'Participant'}
+              </span>
+            </div>
+            <div className="space-y-2">
+              <Label>Select Partner <span className="text-destructive">*</span></Label>
+              <Select value={selectedPartnerId} onValueChange={setSelectedPartnerId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a participant..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {stageParticipants
+                    .filter((p: any) =>
+                      p.id !== assigningParticipant?.id && !p.partnerId
+                    )
+                    .map((p: any) => {
+                      const pName =
+                        p.athlete?.name || p.team?.name || p.name || p.id;
+                      return (
+                        <SelectItem key={p.id} value={p.id}>
+                          {pName}
+                          {p.seedNumber != null && (
+                            <span className="ml-1 text-muted-foreground text-xs">(Seed #{p.seedNumber})</span>
+                          )}
+                        </SelectItem>
+                      );
+                    })}
+                </SelectContent>
+              </Select>
+              {stageParticipants.filter((p: any) => p.id !== assigningParticipant?.id && !p.partnerId).length === 0 && (
+                <p className="text-xs text-muted-foreground">No available participants without a partner.</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setAssigningParticipant(null); setSelectedPartnerId(''); }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmAssignPartner}
+              disabled={!selectedPartnerId || assignPartner.isPending}
+              className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+            >
+              {assignPartner.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Heart className="mr-2 h-4 w-4" />
+              Assign Partner
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

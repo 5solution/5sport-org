@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -41,6 +41,8 @@ export default function EventDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const eventId = params?.id as string;
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams?.get('tab') || 'overview';
 
   const t = useTranslations('admin.events');
   const tButtons = useTranslations('common.buttons');
@@ -145,7 +147,7 @@ export default function EventDetailPage() {
         isLoading={isMutating}
       />
 
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue={defaultTab}>
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="overview">{t('detail.tabs.overview')}</TabsTrigger>
           <TabsTrigger value="sessions">{t('detail.tabs.sessions')}</TabsTrigger>

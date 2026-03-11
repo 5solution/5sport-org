@@ -5,14 +5,17 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import type { OrderItemDto } from './orderItemDto';
+import type { AthleteInfoDto } from './athleteInfoDto';
 
 export interface CreateOrderDto {
   /** Họ và tên đệm */
   lastName: string;
   /** Tên */
   firstName: string;
+  /** Email */
   email?: string;
+  /** Số điện thoại */
   phoneNumber: string;
-  items: OrderItemDto[];
+  /** Danh sách vận động viên */
+  athletes: AthleteInfoDto[];
 }

@@ -1,0 +1,73 @@
+{
+  "title": "Campaigns",
+  "description": "Manage sales campaigns, products, and orders",
+  "noCampaigns": "No campaigns yet",
+  "noCampaignsDescription": "Create your first campaign to start selling products.",
+  "createCampaign": "Create Campaign",
+  "editCampaign": "Edit Campaign",
+  "name": "Name",
+  "namePlaceholder": "e.g. Early Bird Sale",
+  "slug": "Slug",
+  "slugPlaceholder": "e.g. early-bird-sale",
+  "campaignDescription": "Description",
+  "descriptionPlaceholder": "Campaign description...",
+  "bannerUrl": "Banner URL",
+  "bannerUrlPlaceholder": "https://...",
+  "startTime": "Start Time",
+  "endTime": "End Time",
+  "status": "Status",
+  "statuses": {
+    "DRAFT": "Draft",
+    "ACTIVE": "Active",
+    "CLOSED": "Closed",
+    "CANCELLED": "Cancelled"
+  },
+  "updateStatus": "Update Status",
+  "deleteCampaign": "Delete Campaign",
+  "deleteCampaignConfirm": "Are you sure you want to delete this campaign? This action cannot be undone.",
+  "products": {
+    "title": "Products",
+    "addProduct": "Add Product",
+    "editProduct": "Edit Product",
+    "noProducts": "No products yet",
+    "name": "Name",
+    "namePlaceholder": "e.g. Standard Ticket",
+    "productDescription": "Description",
+    "originalPrice": "Original Price (VND)",
+    "totalQuantity": "Total Quantity",
+    "maxPerOrder": "Max Per Order",
+    "sortOrder": "Sort Order",
+    "isVisible": "Visible",
+    "deleteProduct": "Delete Product",
+    "deleteProductConfirm": "Are you sure you want to delete this product?"
+  },
+  "orders": {
+    "title": "Orders",
+    "noOrders": "No orders yet",
+    "orderId": "Order ID",
+    "customerName": "Customer Name",
+    "phone": "Phone",
+    "email": "Email",
+    "paymentStatus": "Payment Status",
+    "createdAt": "Created At",
+    "viewDetail": "View Detail",
+    "allStatuses": "All Statuses",
+    "filterByPayment": "Filter by payment status",
+    "paymentStatuses": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "FAILED": "Failed",
+      "REFUNDED": "Refunded"
+    }
+  },
+  "messages": {
+    "createSuccess": "Campaign created successfully",
+    "updateSuccess": "Campaign updated successfully",
+    "deleteSuccess": "Campaign deleted successfully",
+    "statusUpdateSuccess": "Campaign status updated",
+    "productCreateSuccess": "Product created successfully",
+    "productUpdateSuccess": "Product updated successfully",
+    "productDeleteSuccess": "Product deleted successfully",
+    "error": "An error occurred"
+  }
+}

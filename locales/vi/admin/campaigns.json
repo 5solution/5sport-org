@@ -1,0 +1,73 @@
+{
+  "title": "Chiến dịch",
+  "description": "Quản lý chiến dịch bán hàng, sản phẩm và đơn hàng",
+  "noCampaigns": "Chưa có chiến dịch",
+  "noCampaignsDescription": "Tạo chiến dịch đầu tiên để bắt đầu bán sản phẩm.",
+  "createCampaign": "Tạo chiến dịch",
+  "editCampaign": "Sửa chiến dịch",
+  "name": "Tên",
+  "namePlaceholder": "VD: Ưu đãi sớm",
+  "slug": "Slug",
+  "slugPlaceholder": "VD: uu-dai-som",
+  "campaignDescription": "Mô tả",
+  "descriptionPlaceholder": "Mô tả chiến dịch...",
+  "bannerUrl": "URL Banner",
+  "bannerUrlPlaceholder": "https://...",
+  "startTime": "Thời gian bắt đầu",
+  "endTime": "Thời gian kết thúc",
+  "status": "Trạng thái",
+  "statuses": {
+    "DRAFT": "Nháp",
+    "ACTIVE": "Đang hoạt động",
+    "CLOSED": "Đã đóng",
+    "CANCELLED": "Đã hủy"
+  },
+  "updateStatus": "Cập nhật trạng thái",
+  "deleteCampaign": "Xóa chiến dịch",
+  "deleteCampaignConfirm": "Bạn có chắc muốn xóa chiến dịch này? Hành động này không thể hoàn tác.",
+  "products": {
+    "title": "Sản phẩm",
+    "addProduct": "Thêm sản phẩm",
+    "editProduct": "Sửa sản phẩm",
+    "noProducts": "Chưa có sản phẩm",
+    "name": "Tên",
+    "namePlaceholder": "VD: Vé tiêu chuẩn",
+    "productDescription": "Mô tả",
+    "originalPrice": "Giá gốc (VND)",
+    "totalQuantity": "Tổng số lượng",
+    "maxPerOrder": "Tối đa mỗi đơn",
+    "sortOrder": "Thứ tự",
+    "isVisible": "Hiển thị",
+    "deleteProduct": "Xóa sản phẩm",
+    "deleteProductConfirm": "Bạn có chắc muốn xóa sản phẩm này?"
+  },
+  "orders": {
+    "title": "Đơn hàng",
+    "noOrders": "Chưa có đơn hàng",
+    "orderId": "Mã đơn",
+    "customerName": "Tên khách hàng",
+    "phone": "Điện thoại",
+    "email": "Email",
+    "paymentStatus": "Trạng thái thanh toán",
+    "createdAt": "Ngày tạo",
+    "viewDetail": "Xem chi tiết",
+    "allStatuses": "Tất cả trạng thái",
+    "filterByPayment": "Lọc theo trạng thái thanh toán",
+    "paymentStatuses": {
+      "PENDING": "Chờ thanh toán",
+      "PAID": "Đã thanh toán",
+      "FAILED": "Thất bại",
+      "REFUNDED": "Đã hoàn tiền"
+    }
+  },
+  "messages": {
+    "createSuccess": "Tạo chiến dịch thành công",
+    "updateSuccess": "Cập nhật chiến dịch thành công",
+    "deleteSuccess": "Xóa chiến dịch thành công",
+    "statusUpdateSuccess": "Cập nhật trạng thái chiến dịch thành công",
+    "productCreateSuccess": "Tạo sản phẩm thành công",
+    "productUpdateSuccess": "Cập nhật sản phẩm thành công",
+    "productDeleteSuccess": "Xóa sản phẩm thành công",
+    "error": "Đã xảy ra lỗi"
+  }
+}

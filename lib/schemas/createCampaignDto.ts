@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { CreateCampaignDtoPaymentConfig } from './createCampaignDtoPaymentConfig';
+import type { DistanceItemDto } from './distanceItemDto';
 
 export interface CreateCampaignDto {
   name: string;
@@ -14,5 +15,19 @@ export interface CreateCampaignDto {
   bannerUrl?: string;
   startTime: string;
   endTime: string;
+  /** Danh sách cự ly và giá */
+  distances?: DistanceItemDto[];
+  /** Tên nhóm */
+  groupName?: string;
+  /** Trưởng nhóm */
+  groupLeader?: string;
+  /** Link nhóm Zalo */
+  zaloGroupUrl?: string;
+  /** Hotline */
+  hotline?: string;
+  /** Link điều lệ giải */
+  regulationsUrl?: string;
+  /** Link fanpage */
+  fanpageUrl?: string;
   paymentConfig?: CreateCampaignDtoPaymentConfig;
 }

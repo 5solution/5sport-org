@@ -7,11 +7,15 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Package,
   ShoppingCart,
   ChevronDown,
   ChevronUp,
   Megaphone,
+  X,
+  Ruler,
+  Users,
+  Phone,
+  Link,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -21,7 +25,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -54,19 +57,11 @@ import {
   getCampaignControllerFindAllQueryKey,
 } from '@/lib/services/campaigns/campaigns';
 import {
-  useCampaignProductControllerFindProducts,
-  useCampaignProductControllerCreateProduct,
-  useCampaignProductControllerUpdateProduct,
-  useCampaignProductControllerRemoveProduct,
-  getCampaignProductControllerFindProductsQueryKey,
-} from '@/lib/services/campaign-products/campaign-products';
-import {
   useCampaignOrderControllerFindAll,
 } from '@/lib/services/campaign-orders/campaign-orders';
 import { UpdateCampaignStatusDtoStatus } from '@/lib/schemas/updateCampaignStatusDtoStatus';
 import { CampaignOrderControllerFindAllPaymentStatus } from '@/lib/schemas/campaignOrderControllerFindAllPaymentStatus';
 import type { CreateCampaignDto } from '@/lib/schemas/createCampaignDto';
-import type { CreateCampaignProductDto } from '@/lib/schemas/createCampaignProductDto';
 
 const statusColors: Record<string, string> = {
   DRAFT: 'bg-gray-100 text-gray-800',
@@ -82,90 +77,108 @@ const paymentStatusColors: Record<string, string> = {
   REFUNDED: 'bg-purple-100 text-purple-800',
 };
 
+interface DistanceEntry {
+  name: string;
+  price: string;
+}
+
+function parseDistances(distances: any[] = []): DistanceEntry[] {
+  return distances.map((d) => {
+    if (typeof d === 'object' && d !== null) {
+      return { name: String(d.distance ?? d.name ?? ''), price: String(d.price ?? '') };
+    }
+    return { name: String(d), price: '' };
+  });
+}
+
+function serializeDistances(entries: DistanceEntry[]): { distance: string; price: number }[] {
+  return entries
+    .filter((e) => e.name.trim())
+    .map((e) => ({ distance: e.name.trim(), price: Number(e.price) || 0 }));
+}
+
+const defaultForm: Omit<CreateCampaignDto, 'distances'> = {
+  name: '',
+  slug: '',
+  startTime: '',
+  endTime: '',
+  description: '',
+  bannerUrl: '',
+  groupName: '',
+  groupLeader: '',
+  zaloGroupUrl: '',
+  hotline: '',
+  regulationsUrl: '',
+  fanpageUrl: '',
+};
+
 export default function CampaignsPage() {
   const t = useTranslations('admin.campaigns');
   const tButtons = useTranslations('common.buttons');
   const queryClient = useQueryClient();
 
-  // Campaign list
   const { data: campaignsData, isLoading: campaignsLoading } = useCampaignControllerFindAll();
-  console.log('Campaigns data:', campaignsData);
   const campaigns = Array.isArray(campaignsData) ? campaignsData : [];
 
-  // Mutations
   const createCampaign = useCampaignControllerCreate();
   const updateCampaign = useCampaignControllerUpdate();
   const removeCampaign = useCampaignControllerRemove();
   const updateStatus = useCampaignControllerUpdateStatus();
-  const createProduct = useCampaignProductControllerCreateProduct();
-  const updateProduct = useCampaignProductControllerUpdateProduct();
-  const removeProduct = useCampaignProductControllerRemoveProduct();
 
-  // UI state
-  const [showCampaignDialog, setShowCampaignDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<any>(null);
-  const [showProductDialog, setShowProductDialog] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [productCampaignId, setProductCampaignId] = useState<string>('');
   const [expandedCampaign, setExpandedCampaign] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<'products' | 'orders'>('products');
-  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'campaign' | 'product'; id: string; campaignId?: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  // Campaign form
-  const [campaignForm, setCampaignForm] = useState<CreateCampaignDto>({
-    name: '',
-    slug: '',
-    startTime: '',
-    endTime: '',
-    description: '',
-    bannerUrl: '',
-  });
-
-  // Product form
-  const [productForm, setProductForm] = useState<CreateCampaignProductDto>({
-    name: '',
-    originalPrice: 0,
-    totalQuantity: 0,
-    description: '',
-    maxPerOrder: 1,
-    sortOrder: 0,
-    isVisible: true,
-  });
+  const [form, setForm] = useState<Omit<CreateCampaignDto, 'distances'>>(defaultForm);
+  const [distances, setDistances] = useState<DistanceEntry[]>([]);
 
   const invalidateCampaigns = () => {
     queryClient.invalidateQueries({ queryKey: getCampaignControllerFindAllQueryKey() });
   };
 
-  const openCreateCampaign = () => {
+  const openCreate = () => {
     setEditingCampaign(null);
-    setCampaignForm({ name: '', slug: '', startTime: '', endTime: '', description: '', bannerUrl: '' });
-    setShowCampaignDialog(true);
+    setForm(defaultForm);
+    setDistances([]);
+    setShowDialog(true);
   };
 
-  const openEditCampaign = (campaign: any) => {
+  const openEdit = (campaign: any) => {
     setEditingCampaign(campaign);
-    setCampaignForm({
-      name: campaign.name,
-      slug: campaign.slug,
+    setForm({
+      name: campaign.name || '',
+      slug: campaign.slug || '',
       startTime: campaign.startTime?.slice(0, 16) || '',
       endTime: campaign.endTime?.slice(0, 16) || '',
       description: campaign.description || '',
       bannerUrl: campaign.bannerUrl || '',
+      groupName: campaign.groupName || '',
+      groupLeader: campaign.groupLeader || '',
+      zaloGroupUrl: campaign.zaloGroupUrl || '',
+      hotline: campaign.hotline || '',
+      regulationsUrl: campaign.regulationsUrl || '',
+      fanpageUrl: campaign.fanpageUrl || '',
     });
-    setShowCampaignDialog(true);
+    setDistances(parseDistances(campaign.distances || []));
+    setShowDialog(true);
   };
 
-  const handleSaveCampaign = async () => {
+  const handleSave = async () => {
+    const payload = {
+      ...form,
+      distances: serializeDistances(distances),
+    };
     try {
       if (editingCampaign) {
-        await updateCampaign.mutateAsync({ id: editingCampaign._id, data: campaignForm as any });
+        await updateCampaign.mutateAsync({ id: editingCampaign._id, data: payload as any });
         toast.success(t('messages.updateSuccess'));
       } else {
-        await createCampaign.mutateAsync({ data: campaignForm });
+        await createCampaign.mutateAsync({ data: payload as any });
         toast.success(t('messages.createSuccess'));
       }
       invalidateCampaigns();
-      setShowCampaignDialog(false);
+      setShowDialog(false);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || t('messages.error'));
     }
@@ -184,18 +197,10 @@ export default function CampaignsPage() {
   const handleDelete = async () => {
     if (!deleteConfirm) return;
     try {
-      if (deleteConfirm.type === 'campaign') {
-        await removeCampaign.mutateAsync({ id: deleteConfirm.id });
-        toast.success(t('messages.deleteSuccess'));
-        invalidateCampaigns();
-        if (expandedCampaign === deleteConfirm.id) setExpandedCampaign(null);
-      } else if (deleteConfirm.type === 'product' && deleteConfirm.campaignId) {
-        await removeProduct.mutateAsync({ campaignId: deleteConfirm.campaignId, id: deleteConfirm.id });
-        toast.success(t('messages.productDeleteSuccess'));
-        queryClient.invalidateQueries({
-          queryKey: getCampaignProductControllerFindProductsQueryKey(deleteConfirm.campaignId),
-        });
-      }
+      await removeCampaign.mutateAsync({ id: deleteConfirm });
+      toast.success(t('messages.deleteSuccess'));
+      invalidateCampaigns();
+      if (expandedCampaign === deleteConfirm) setExpandedCampaign(null);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || t('messages.error'));
     } finally {
@@ -203,54 +208,38 @@ export default function CampaignsPage() {
     }
   };
 
-  const openCreateProduct = (campaignId: string) => {
-    setEditingProduct(null);
-    setProductCampaignId(campaignId);
-    setProductForm({ name: '', originalPrice: 0, totalQuantity: 0, description: '', maxPerOrder: 1, sortOrder: 0, isVisible: true });
-    setShowProductDialog(true);
-  };
-
-  const openEditProduct = (campaignId: string, product: any) => {
-    setEditingProduct(product);
-    setProductCampaignId(campaignId);
-    setProductForm({
-      name: product.name,
-      originalPrice: product.originalPrice,
-      totalQuantity: product.totalQuantity,
-      description: product.description || '',
-      maxPerOrder: product.maxPerOrder || 1,
-      sortOrder: product.sortOrder || 0,
-      isVisible: product.isVisible ?? true,
-    });
-    setShowProductDialog(true);
-  };
-
-  const handleSaveProduct = async () => {
-    try {
-      if (editingProduct) {
-        await updateProduct.mutateAsync({ campaignId: productCampaignId, id: editingProduct.id, data: productForm as any });
-        toast.success(t('messages.productUpdateSuccess'));
-      } else {
-        await createProduct.mutateAsync({ campaignId: productCampaignId, data: productForm });
-        toast.success(t('messages.productCreateSuccess'));
-      }
-      queryClient.invalidateQueries({
-        queryKey: getCampaignProductControllerFindProductsQueryKey(productCampaignId),
-      });
-      setShowProductDialog(false);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('messages.error'));
+  const addDistance = () => setDistances([...distances, { name: '', price: '' }]);
+  const removeDistance = (i: number) => setDistances(distances.filter((_, idx) => idx !== i));
+  const updateDistance = (i: number, field: 'name' | 'price', value: string) => {
+    const next = [...distances];
+    if (field === 'price') {
+      // Strip non-digits, store as plain number string
+      value = value.replace(/[^\d]/g, '');
     }
+    next[i] = { ...next[i], [field]: value };
+    setDistances(next);
+  };
+
+  const formatPriceInput = (raw: string) => {
+    const num = raw.replace(/[^\d]/g, '');
+    if (!num) return '';
+    return Number(num).toLocaleString('vi-VN');
   };
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString();
+    return new Date(dateStr).toLocaleString('vi-VN');
+  };
+
+  const formatPrice = (price: string) => {
+    const num = Number(price);
+    if (!num) return price;
+    return num.toLocaleString('vi-VN') + 'đ';
   };
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Page Header */}
+      {/* Header */}
       <div className="flex flex-col gap-4 pt-12 lg:pt-0 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
@@ -260,13 +249,13 @@ export default function CampaignsPage() {
             {t('description')}
           </p>
         </div>
-        <Button className="w-full sm:w-auto" onClick={openCreateCampaign}>
+        <Button className="w-full sm:w-auto" onClick={openCreate}>
           <Plus className="mr-2 h-4 w-4" />
           {t('createCampaign')}
         </Button>
       </div>
 
-      {/* Campaign List */}
+      {/* List */}
       {campaignsLoading ? (
         <div className="flex h-64 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -277,7 +266,7 @@ export default function CampaignsPage() {
             <Megaphone className="mb-4 h-12 w-12" />
             <p className="text-lg font-medium text-foreground">{t('noCampaigns')}</p>
             <p className="text-sm">{t('noCampaignsDescription')}</p>
-            <Button className="mt-4" onClick={openCreateCampaign}>
+            <Button className="mt-4" onClick={openCreate}>
               <Plus className="mr-2 h-4 w-4" />
               {t('createCampaign')}
             </Button>
@@ -288,14 +277,40 @@ export default function CampaignsPage() {
           {campaigns.map((campaign: any) => (
             <Card key={campaign._id}>
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <CardTitle className="text-sm font-semibold">{campaign.name}</CardTitle>
-                    <Badge className={statusColors[campaign.status] || ''} variant="secondary">
-                      {t(`statuses.${campaign.status}`)}
-                    </Badge>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardTitle className="text-sm font-semibold">{campaign.name}</CardTitle>
+                      <Badge className={statusColors[campaign.status] || ''} variant="secondary">
+                        {t(`statuses.${campaign.status}`)}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      <span>Slug: {campaign.slug}</span>
+                      <span>{t('startTime')}: {formatDate(campaign.startTime)}</span>
+                      <span>{t('endTime')}: {formatDate(campaign.endTime)}</span>
+                      {campaign.hotline && (
+                        <span className="flex items-center gap-1">
+                          <Phone className="h-3 w-3" />{campaign.hotline}
+                        </span>
+                      )}
+                    </div>
+                    {/* Distances preview */}
+                    {campaign.distances?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {campaign.distances.map((d: any, i: number) => {
+                          const parsed = parseDistances([d])[0];
+                          return (
+                            <Badge key={i} variant="outline" className="text-xs font-normal">
+                              <Ruler className="h-3 w-3 mr-1" />
+                              {parsed.name}{parsed.price ? ` — ${formatPrice(parsed.price)}` : ''}
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 shrink-0">
                     <Select
                       value={campaign.status}
                       onValueChange={(val) => handleUpdateStatus(campaign._id, val)}
@@ -311,14 +326,14 @@ export default function CampaignsPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditCampaign(campaign)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(campaign)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive"
-                      onClick={() => setDeleteConfirm({ type: 'campaign', id: campaign._id })}
+                      onClick={() => setDeleteConfirm(campaign._id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -328,49 +343,23 @@ export default function CampaignsPage() {
                       className="h-8 w-8"
                       onClick={() => setExpandedCampaign(expandedCampaign === campaign._id ? null : campaign._id)}
                     >
-                      {expandedCampaign === campaign._id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      {expandedCampaign === campaign._id ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
-                </div>
-                <div className="flex gap-4 text-xs text-muted-foreground">
-                  <span>{t('slug')}: {campaign.slug}</span>
-                  <span>{t('startTime')}: {formatDate(campaign.startTime)}</span>
-                  <span>{t('endTime')}: {formatDate(campaign.endTime)}</span>
                 </div>
               </CardHeader>
 
               {expandedCampaign === campaign._id && (
                 <CardContent className="pt-0">
-                  <div className="flex gap-2 mb-4">
-                    <Button
-                      variant={activeSection === 'products' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActiveSection('products')}
-                    >
-                      <Package className="mr-2 h-4 w-4" />
-                      {t('products.title')}
-                    </Button>
-                    <Button
-                      variant={activeSection === 'orders' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setActiveSection('orders')}
-                    >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      {t('orders.title')}
-                    </Button>
+                  <div className="flex items-center gap-2 mb-3">
+                    <ShoppingCart className="h-4 w-4" />
+                    <span className="text-sm font-medium">{t('orders.title')}</span>
                   </div>
-
-                  {activeSection === 'products' ? (
-                    <CampaignProducts
-                      campaignId={campaign._id}
-                      t={t}
-                      onAdd={() => openCreateProduct(campaign._id)}
-                      onEdit={(product: any) => openEditProduct(campaign._id, product)}
-                      onDelete={(productId: string) => setDeleteConfirm({ type: 'product', id: productId, campaignId: campaign._id })}
-                    />
-                  ) : (
-                    <CampaignOrders campaignId={campaign._id} t={t} />
-                  )}
+                  <CampaignOrders campaignId={campaign._id} t={t} />
                 </CardContent>
               )}
             </Card>
@@ -379,153 +368,216 @@ export default function CampaignsPage() {
       )}
 
       {/* Campaign Dialog */}
-      <Dialog open={showCampaignDialog} onOpenChange={setShowCampaignDialog}>
-        <DialogContent className="max-w-lg">
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingCampaign ? t('editCampaign') : t('createCampaign')}</DialogTitle>
+            <DialogTitle>
+              {editingCampaign ? t('editCampaign') : t('createCampaign')}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>{t('name')}</Label>
-              <Input
-                placeholder={t('namePlaceholder')}
-                value={campaignForm.name}
-                onChange={(e) => setCampaignForm({ ...campaignForm, name: e.target.value })}
-              />
+
+          <div className="space-y-5">
+            {/* Basic info */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t('name')} *</Label>
+                <Input
+                  placeholder={t('namePlaceholder')}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('slug')} *</Label>
+                <Input
+                  placeholder={t('slugPlaceholder')}
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>{t('slug')}</Label>
-              <Input
-                placeholder={t('slugPlaceholder')}
-                value={campaignForm.slug}
-                onChange={(e) => setCampaignForm({ ...campaignForm, slug: e.target.value })}
-              />
-            </div>
+
             <div className="space-y-2">
               <Label>{t('campaignDescription')}</Label>
               <Input
                 placeholder={t('descriptionPlaceholder')}
-                value={campaignForm.description || ''}
-                onChange={(e) => setCampaignForm({ ...campaignForm, description: e.target.value })}
+                value={form.description || ''}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
               />
             </div>
+
             <div className="space-y-2">
               <Label>{t('bannerUrl')}</Label>
               <Input
                 placeholder={t('bannerUrlPlaceholder')}
-                value={campaignForm.bannerUrl || ''}
-                onChange={(e) => setCampaignForm({ ...campaignForm, bannerUrl: e.target.value })}
+                value={form.bannerUrl || ''}
+                onChange={(e) => setForm({ ...form, bannerUrl: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{t('startTime')}</Label>
-                <Input
-                  type="datetime-local"
-                  value={campaignForm.startTime}
-                  onChange={(e) => setCampaignForm({ ...campaignForm, startTime: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>{t('endTime')}</Label>
-                <Input
-                  type="datetime-local"
-                  value={campaignForm.endTime}
-                  onChange={(e) => setCampaignForm({ ...campaignForm, endTime: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCampaignDialog(false)}>
-              {tButtons('cancel')}
-            </Button>
-            <Button
-              onClick={handleSaveCampaign}
-              disabled={createCampaign.isPending || updateCampaign.isPending || !campaignForm.name || !campaignForm.slug}
-            >
-              {(createCampaign.isPending || updateCampaign.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {tButtons('save')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Product Dialog */}
-      <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editingProduct ? t('products.editProduct') : t('products.addProduct')}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>{t('products.name')}</Label>
-              <Input
-                placeholder={t('products.namePlaceholder')}
-                value={productForm.name}
-                onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>{t('products.productDescription')}</Label>
-              <Input
-                value={productForm.description || ''}
-                onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-              />
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>{t('products.originalPrice')}</Label>
+                <Label>{t('startTime')} *</Label>
                 <Input
-                  type="number"
-                  value={productForm.originalPrice}
-                  onChange={(e) => setProductForm({ ...productForm, originalPrice: Number(e.target.value) })}
+                  type="datetime-local"
+                  value={form.startTime}
+                  onChange={(e) => setForm({ ...form, startTime: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>{t('products.totalQuantity')}</Label>
+                <Label>{t('endTime')} *</Label>
                 <Input
-                  type="number"
-                  value={productForm.totalQuantity}
-                  onChange={(e) => setProductForm({ ...productForm, totalQuantity: Number(e.target.value) })}
+                  type="datetime-local"
+                  value={form.endTime}
+                  onChange={(e) => setForm({ ...form, endTime: e.target.value })}
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>{t('products.maxPerOrder')}</Label>
-                <Input
-                  type="number"
-                  value={productForm.maxPerOrder || ''}
-                  onChange={(e) => setProductForm({ ...productForm, maxPerOrder: Number(e.target.value) })}
-                />
+
+            <hr className="border-border" />
+
+            {/* Distances */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Ruler className="h-4 w-4 text-primary" />
+                  <Label className="text-base font-semibold">{t('distances.title')}</Label>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addDistance}>
+                  <Plus className="mr-2 h-3 w-3" />
+                  {t('distances.add')}
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label>{t('products.sortOrder')}</Label>
-                <Input
-                  type="number"
-                  value={productForm.sortOrder || ''}
-                  onChange={(e) => setProductForm({ ...productForm, sortOrder: Number(e.target.value) })}
-                />
+
+              {distances.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-3 rounded-lg border border-dashed">
+                  {t('distances.noDistances')}
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2 text-xs text-muted-foreground px-1">
+                    <span>{t('distances.distanceName')}</span>
+                    <span>{t('distances.price')}</span>
+                    <span className="w-8" />
+                  </div>
+                  {distances.map((entry, i) => (
+                    <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                      <Input
+                        placeholder={t('distances.distancePlaceholder')}
+                        value={entry.name}
+                        onChange={(e) => updateDistance(i, 'name', e.target.value)}
+                      />
+                      <Input
+                        placeholder="0"
+                        value={formatPriceInput(entry.price)}
+                        onChange={(e) => updateDistance(i, 'price', e.target.value)}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-destructive"
+                        onClick={() => removeDistance(i)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Group info */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary" />
+                <Label className="text-base font-semibold">{t('groupInfo')}</Label>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('groupName')}</Label>
+                  <Input
+                    placeholder={t('groupNamePlaceholder')}
+                    value={form.groupName || ''}
+                    onChange={(e) => setForm({ ...form, groupName: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('groupLeader')}</Label>
+                  <Input
+                    placeholder={t('groupLeaderPlaceholder')}
+                    value={form.groupLeader || ''}
+                    onChange={(e) => setForm({ ...form, groupLeader: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('hotline')}</Label>
+                  <Input
+                    placeholder={t('hotlinePlaceholder')}
+                    value={form.hotline || ''}
+                    onChange={(e) => setForm({ ...form, hotline: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('zaloGroupUrl')}</Label>
+                  <Input
+                    placeholder={t('zaloGroupUrlPlaceholder')}
+                    value={form.zaloGroupUrl || ''}
+                    onChange={(e) => setForm({ ...form, zaloGroupUrl: e.target.value })}
+                  />
+                </div>
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <Label>{t('products.isVisible')}</Label>
-              <Switch
-                checked={productForm.isVisible ?? true}
-                onCheckedChange={(val) => setProductForm({ ...productForm, isVisible: val })}
-              />
+
+            <hr className="border-border" />
+
+            {/* Links */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Link className="h-4 w-4 text-primary" />
+                <Label className="text-base font-semibold">Links</Label>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('regulationsUrl')}</Label>
+                  <Input
+                    placeholder={t('regulationsUrlPlaceholder')}
+                    value={form.regulationsUrl || ''}
+                    onChange={(e) => setForm({ ...form, regulationsUrl: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('fanpageUrl')}</Label>
+                  <Input
+                    placeholder={t('fanpageUrlPlaceholder')}
+                    value={form.fanpageUrl || ''}
+                    onChange={(e) => setForm({ ...form, fanpageUrl: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowProductDialog(false)}>
+
+          <DialogFooter className="mt-2">
+            <Button variant="outline" onClick={() => setShowDialog(false)}>
               {tButtons('cancel')}
             </Button>
             <Button
-              onClick={handleSaveProduct}
-              disabled={createProduct.isPending || updateProduct.isPending || !productForm.name}
+              onClick={handleSave}
+              disabled={
+                createCampaign.isPending ||
+                updateCampaign.isPending ||
+                !form.name ||
+                !form.slug
+              }
             >
-              {(createProduct.isPending || updateProduct.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {(createCampaign.isPending || updateCampaign.isPending) && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               {tButtons('save')}
             </Button>
           </DialogFooter>
@@ -536,19 +588,19 @@ export default function CampaignsPage() {
       <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {deleteConfirm?.type === 'campaign' ? t('deleteCampaign') : t('products.deleteProduct')}
-            </DialogTitle>
-            <DialogDescription>
-              {deleteConfirm?.type === 'campaign' ? t('deleteCampaignConfirm') : t('products.deleteProductConfirm')}
-            </DialogDescription>
+            <DialogTitle>{t('deleteCampaign')}</DialogTitle>
+            <DialogDescription>{t('deleteCampaignConfirm')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
               {tButtons('cancel')}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={removeCampaign.isPending || removeProduct.isPending}>
-              {(removeCampaign.isPending || removeProduct.isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={removeCampaign.isPending}
+            >
+              {removeCampaign.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {tButtons('delete')}
             </Button>
           </DialogFooter>
@@ -558,107 +610,37 @@ export default function CampaignsPage() {
   );
 }
 
-// Sub-component: Campaign Products
-function CampaignProducts({
-  campaignId,
-  t,
-  onAdd,
-  onEdit,
-  onDelete,
-}: {
-  campaignId: string;
-  t: any;
-  onAdd: () => void;
-  onEdit: (product: any) => void;
-  onDelete: (productId: string) => void;
-}) {
-  const { data: productsData, isLoading } = useCampaignProductControllerFindProducts(campaignId);
-  const products = Array.isArray(productsData) ? productsData : [];
-
-  if (isLoading) {
-    return <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin" /></div>;
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">{t('products.title')}</h4>
-        <Button size="sm" variant="outline" onClick={onAdd}>
-          <Plus className="mr-2 h-3 w-3" />
-          {t('products.addProduct')}
-        </Button>
-      </div>
-      {products.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-4 text-center">{t('products.noProducts')}</p>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('products.name')}</TableHead>
-              <TableHead>{t('products.originalPrice')}</TableHead>
-              <TableHead>{t('products.totalQuantity')}</TableHead>
-              <TableHead>{t('products.maxPerOrder')}</TableHead>
-              <TableHead>{t('products.isVisible')}</TableHead>
-              <TableHead className="w-[80px]" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.map((product: any) => (
-              <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{product.originalPrice?.toLocaleString()}</TableCell>
-                <TableCell>{product.totalQuantity}</TableCell>
-                <TableCell>{product.maxPerOrder || '-'}</TableCell>
-                <TableCell>
-                  <Badge variant={product.isVisible ? 'default' : 'secondary'}>
-                    {product.isVisible ? 'Yes' : 'No'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(product)}>
-                      <Pencil className="h-3 w-3" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => onDelete(product.id)}>
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </div>
-  );
-}
-
-// Sub-component: Campaign Orders
 function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
   const [paymentFilter, setPaymentFilter] = useState<string>('');
   const [page, setPage] = useState(1);
 
-  const { data: ordersData, isLoading } = useCampaignOrderControllerFindAll(
-    campaignId,
-    {
-      paymentStatus: paymentFilter ? (paymentFilter as any) : undefined,
-      page,
-      limit: 10,
-    },
-  );
+  const { data: ordersData, isLoading } = useCampaignOrderControllerFindAll(campaignId, {
+    paymentStatus: paymentFilter ? (paymentFilter as any) : undefined,
+    page,
+    limit: 10,
+  });
 
   const orders = Array.isArray(ordersData) ? ordersData : (ordersData as any)?.data ?? [];
   const total = (ordersData as any)?.total ?? orders.length;
 
   if (isLoading) {
-    return <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin" /></div>;
+    return (
+      <div className="flex justify-center py-4">
+        <Loader2 className="h-5 w-5 animate-spin" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">{t('orders.title')}</h4>
-        <Select value={paymentFilter} onValueChange={(val) => { setPaymentFilter(val === 'all' ? '' : val); setPage(1); }}>
+      <div className="flex items-center justify-end">
+        <Select
+          value={paymentFilter}
+          onValueChange={(val) => {
+            setPaymentFilter(val === 'all' ? '' : val);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="h-8 w-[160px] text-xs">
             <SelectValue placeholder={t('orders.allStatuses')} />
           </SelectTrigger>
@@ -700,7 +682,9 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
                       {t(`orders.paymentStatuses.${order.paymentStatus}`)}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs">{new Date(order.createdAt).toLocaleString()}</TableCell>
+                  <TableCell className="text-xs">
+                    {new Date(order.createdAt).toLocaleString('vi-VN')}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -713,7 +697,12 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
               <span className="flex items-center text-sm text-muted-foreground">
                 {page} / {Math.ceil(total / 10)}
               </span>
-              <Button size="sm" variant="outline" disabled={page >= Math.ceil(total / 10)} onClick={() => setPage(page + 1)}>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={page >= Math.ceil(total / 10)}
+                onClick={() => setPage(page + 1)}
+              >
                 Next
               </Button>
             </div>

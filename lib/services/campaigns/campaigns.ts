@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CampaignControllerFindPublicParams,
   CreateCampaignDto,
   UpdateCampaignDto,
   UpdateCampaignStatusDto
@@ -208,6 +209,117 @@ export function useCampaignControllerFindAll<TData = Awaited<ReturnType<typeof c
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCampaignControllerFindAllQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+export type campaignControllerFindPublicResponse200 = {
+  data: void
+  status: 200
+}
+    
+export type campaignControllerFindPublicResponseSuccess = (campaignControllerFindPublicResponse200) & {
+  headers: Headers;
+};
+;
+
+export type campaignControllerFindPublicResponse = (campaignControllerFindPublicResponseSuccess)
+
+export const getCampaignControllerFindPublicUrl = (params?: CampaignControllerFindPublicParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/campaigns/public?${stringifiedParams}` : `/campaigns/public`
+}
+
+export const campaignControllerFindPublic = async (params?: CampaignControllerFindPublicParams, options?: RequestInit): Promise<campaignControllerFindPublicResponse> => {
+  
+  return defaultMutator<campaignControllerFindPublicResponse>(getCampaignControllerFindPublicUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getCampaignControllerFindPublicQueryKey = (params?: CampaignControllerFindPublicParams,) => {
+    return [
+    `/campaigns/public`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getCampaignControllerFindPublicQueryOptions = <TData = Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError = unknown>(params?: CampaignControllerFindPublicParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCampaignControllerFindPublicQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignControllerFindPublic>>> = ({ signal }) => campaignControllerFindPublic(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CampaignControllerFindPublicQueryResult = NonNullable<Awaited<ReturnType<typeof campaignControllerFindPublic>>>
+export type CampaignControllerFindPublicQueryError = unknown
+
+
+export function useCampaignControllerFindPublic<TData = Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError = unknown>(
+ params: undefined |  CampaignControllerFindPublicParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof campaignControllerFindPublic>>,
+          TError,
+          Awaited<ReturnType<typeof campaignControllerFindPublic>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCampaignControllerFindPublic<TData = Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError = unknown>(
+ params?: CampaignControllerFindPublicParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof campaignControllerFindPublic>>,
+          TError,
+          Awaited<ReturnType<typeof campaignControllerFindPublic>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCampaignControllerFindPublic<TData = Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError = unknown>(
+ params?: CampaignControllerFindPublicParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCampaignControllerFindPublic<TData = Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError = unknown>(
+ params?: CampaignControllerFindPublicParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignControllerFindPublic>>, TError, TData>>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCampaignControllerFindPublicQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

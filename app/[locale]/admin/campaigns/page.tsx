@@ -158,7 +158,7 @@ export default function CampaignsPage() {
   const handleSaveCampaign = async () => {
     try {
       if (editingCampaign) {
-        await updateCampaign.mutateAsync({ id: editingcampaign._id, data: campaignForm as any });
+        await updateCampaign.mutateAsync({ id: editingCampaign._id, data: campaignForm as any });
         toast.success(t('messages.updateSuccess'));
       } else {
         await createCampaign.mutateAsync({ data: campaignForm });

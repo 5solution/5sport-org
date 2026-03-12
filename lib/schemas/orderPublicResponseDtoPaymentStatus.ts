@@ -6,10 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 
-export type CampaignOrderControllerFindAllPaymentStatus = typeof CampaignOrderControllerFindAllPaymentStatus[keyof typeof CampaignOrderControllerFindAllPaymentStatus];
+/**
+ * Trạng thái thanh toán
+ */
+export type OrderPublicResponseDtoPaymentStatus = typeof OrderPublicResponseDtoPaymentStatus[keyof typeof OrderPublicResponseDtoPaymentStatus];
 
 
-export const CampaignOrderControllerFindAllPaymentStatus = {
+export const OrderPublicResponseDtoPaymentStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',
   FAILED: 'FAILED',

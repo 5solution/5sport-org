@@ -5,105 +5,121 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation
-} from '@tanstack/react-query';
+import { useMutation } from "@tanstack/react-query";
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult
-} from '@tanstack/react-query';
+  UseMutationResult,
+} from "@tanstack/react-query";
 
-import type {
-  UploadControllerUploadFileBody
-} from '../../schemas';
+import type { UploadControllerUploadFileBody } from "../../schemas";
 
-import { defaultMutator } from '../../api/axiosInstance';
-
+import { defaultMutator, AXIOS_INSTANCE } from "../../api/axiosInstance";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-
 export type uploadControllerUploadFileResponse201 = {
-  data: void
-  status: 201
-}
-    
-export type uploadControllerUploadFileResponseSuccess = (uploadControllerUploadFileResponse201) & {
-  headers: Headers;
+  data: void;
+  status: 201;
 };
-;
 
-export type uploadControllerUploadFileResponse = (uploadControllerUploadFileResponseSuccess)
+export type uploadControllerUploadFileResponseSuccess =
+  uploadControllerUploadFileResponse201 & {
+    headers: Headers;
+  };
+export type uploadControllerUploadFileResponse =
+  uploadControllerUploadFileResponseSuccess;
 
 export const getUploadControllerUploadFileUrl = () => {
+  return `/upload`;
+};
 
-
-  
-
-  return `/upload`
-}
-
-export const uploadControllerUploadFile = async (uploadControllerUploadFileBody: UploadControllerUploadFileBody, options?: RequestInit): Promise<uploadControllerUploadFileResponse> => {
-    const formData = new FormData();
-if(uploadControllerUploadFileBody.file !== undefined) {
- formData.append(`file`, uploadControllerUploadFileBody.file);
- }
-
-  return defaultMutator<uploadControllerUploadFileResponse>(getUploadControllerUploadFileUrl(),
-  {      
-    ...options,
-    method: 'POST'
-    ,
-    body: 
-      formData,
+export const uploadControllerUploadFile = async (
+  uploadControllerUploadFileBody: UploadControllerUploadFileBody,
+  _options?: RequestInit,
+): Promise<uploadControllerUploadFileResponse> => {
+  const formData = new FormData();
+  if (uploadControllerUploadFileBody.file !== undefined) {
+    formData.append("file", uploadControllerUploadFileBody.file);
   }
-);}
 
+  // Use AXIOS_INSTANCE directly so the browser sets the correct
+  // multipart/form-data Content-Type with the proper boundary.
+  // The global 'Content-Type: application/json' would otherwise
+  // cause FormData to be serialized as a JSON object {}.
+  return AXIOS_INSTANCE.post(getUploadControllerUploadFileUrl(), formData, {
+    headers: { "Content-Type": undefined },
+  }).then((res) => res.data);
+};
 
+export const getUploadControllerUploadFileMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof uploadControllerUploadFile>>,
+    TError,
+    { data: UploadControllerUploadFileBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof defaultMutator>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof uploadControllerUploadFile>>,
+  TError,
+  { data: UploadControllerUploadFileBody },
+  TContext
+> => {
+  const mutationKey = ["uploadControllerUploadFile"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof uploadControllerUploadFile>>,
+    { data: UploadControllerUploadFileBody }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const getUploadControllerUploadFileMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadControllerUploadFile>>, TError,{data: UploadControllerUploadFileBody}, TContext>, request?: SecondParameter<typeof defaultMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof uploadControllerUploadFile>>, TError,{data: UploadControllerUploadFileBody}, TContext> => {
+    return uploadControllerUploadFile(data, requestOptions);
+  };
 
-const mutationKey = ['uploadControllerUploadFile'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+  return { mutationFn, ...mutationOptions };
+};
 
-      
+export type UploadControllerUploadFileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof uploadControllerUploadFile>>
+>;
+export type UploadControllerUploadFileMutationBody =
+  UploadControllerUploadFileBody;
+export type UploadControllerUploadFileMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadControllerUploadFile>>, {data: UploadControllerUploadFileBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  uploadControllerUploadFile(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UploadControllerUploadFileMutationResult = NonNullable<Awaited<ReturnType<typeof uploadControllerUploadFile>>>
-    export type UploadControllerUploadFileMutationBody = UploadControllerUploadFileBody
-    export type UploadControllerUploadFileMutationError = unknown
-
-    export const useUploadControllerUploadFile = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadControllerUploadFile>>, TError,{data: UploadControllerUploadFileBody}, TContext>, request?: SecondParameter<typeof defaultMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof uploadControllerUploadFile>>,
-        TError,
-        {data: UploadControllerUploadFileBody},
-        TContext
-      > => {
-      return useMutation(getUploadControllerUploadFileMutationOptions(options), queryClient);
-    }
-    
+export const useUploadControllerUploadFile = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof uploadControllerUploadFile>>,
+      TError,
+      { data: UploadControllerUploadFileBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof defaultMutator>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof uploadControllerUploadFile>>,
+  TError,
+  { data: UploadControllerUploadFileBody },
+  TContext
+> => {
+  return useMutation(
+    getUploadControllerUploadFileMutationOptions(options),
+    queryClient,
+  );
+};

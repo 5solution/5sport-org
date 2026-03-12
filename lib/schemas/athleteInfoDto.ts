@@ -5,7 +5,6 @@
  * API documentation for 5Sport authentication and services
  * OpenAPI spec version: 1.0
  */
-import type { AthleteInfoDtoSizeShirt } from './athleteInfoDtoSizeShirt';
 
 export interface AthleteInfoDto {
   /** Cự ly đăng ký */
@@ -16,6 +15,8 @@ export interface AthleteInfoDto {
   firstName: string;
   /** Số điện thoại */
   phoneNumber: string;
+  /** Số CCCD / Hộ chiếu */
+  identityCard?: string;
   /** Địa chỉ */
   location?: string;
   /** Quốc tịch */
@@ -24,8 +25,8 @@ export interface AthleteInfoDto {
   provinceCode?: string;
   /** Ngày sinh */
   dateOfBirth?: string;
-  /** Size áo */
-  sizeShirt?: AthleteInfoDtoSizeShirt;
+  /** Size áo (theo danh sách sizeShirtOptions của campaign) */
+  sizeShirt?: string;
   /** Câu lạc bộ */
   club?: string;
   /** Tên trên BIB */

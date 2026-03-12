@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Loader2,
@@ -17,6 +17,8 @@ import {
   Phone,
   Link,
   RotateCcw,
+  Upload,
+  Shirt,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -60,6 +62,7 @@ import {
 import {
   useCampaignOrderControllerFindAll,
 } from '@/lib/services/campaign-orders/campaign-orders';
+import { useUploadControllerUploadFile } from '@/lib/services/upload/upload';
 import { UpdateCampaignStatusDtoStatus } from '@/lib/schemas/updateCampaignStatusDtoStatus';
 import { CampaignOrderControllerFindAllPaymentStatus } from '@/lib/schemas/campaignOrderControllerFindAllPaymentStatus';
 import type { CreateCampaignDto } from '@/lib/schemas/createCampaignDto';
@@ -98,6 +101,8 @@ function serializeDistances(entries: DistanceEntry[]): { distance: string; price
     .map((e) => ({ distance: e.name.trim(), price: Number(e.price) || 0 }));
 }
 
+const DEFAULT_SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
 const defaultForm: Omit<CreateCampaignDto, 'distances'> = {
   name: '',
   slug: '',
@@ -111,6 +116,7 @@ const defaultForm: Omit<CreateCampaignDto, 'distances'> = {
   hotline: '',
   regulationsUrl: '',
   fanpageUrl: '',
+  sizeShirtOptions: [...DEFAULT_SHIRT_SIZES],
 };
 
 export default function CampaignsPage() {
@@ -133,9 +139,25 @@ export default function CampaignsPage() {
 
   const [form, setForm] = useState<Omit<CreateCampaignDto, 'distances'>>(defaultForm);
   const [distances, setDistances] = useState<DistanceEntry[]>([]);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const uploadFile = useUploadControllerUploadFile();
 
   const invalidateCampaigns = () => {
     queryClient.invalidateQueries({ queryKey: getCampaignControllerFindAllQueryKey() });
+  };
+
+  const handleBannerUpload = async (file: File) => {
+    setIsUploadingBanner(true);
+    try {
+      const result = await uploadFile.mutateAsync({ data: { file } });
+      const url = (result as any)?.url ?? (result as any)?.fileUrl ?? String(result ?? '');
+      setForm((prev) => ({ ...prev, bannerUrl: url }));
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Upload failed');
+    } finally {
+      setIsUploadingBanner(false);
+    }
   };
 
   const openCreate = () => {
@@ -160,6 +182,9 @@ export default function CampaignsPage() {
       hotline: campaign.hotline || '',
       regulationsUrl: campaign.regulationsUrl || '',
       fanpageUrl: campaign.fanpageUrl || '',
+      sizeShirtOptions: campaign.sizeShirtOptions?.length
+        ? campaign.sizeShirtOptions
+        : [...DEFAULT_SHIRT_SIZES],
     });
     setDistances(parseDistances(campaign.distances || []));
     setShowDialog(true);
@@ -407,13 +432,63 @@ export default function CampaignsPage() {
               />
             </div>
 
+            {/* Banner Upload */}
             <div className="space-y-2">
               <Label>{t('bannerUrl')}</Label>
-              <Input
-                placeholder={t('bannerUrlPlaceholder')}
-                value={form.bannerUrl || ''}
-                onChange={(e) => setForm({ ...form, bannerUrl: e.target.value })}
+              <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleBannerUpload(file);
+                  e.target.value = '';
+                }}
               />
+              <div className="relative rounded-lg border-2 border-dashed border-gray-200 hover:border-primary/50 transition-colors overflow-hidden bg-muted/30 aspect-[3/1] max-w-[400px]">
+                {form.bannerUrl ? (
+                  <>
+                    <img
+                      src={form.bannerUrl}
+                      alt="Campaign Banner"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => bannerInputRef.current?.click()}
+                        disabled={isUploadingBanner}
+                      >
+                        {isUploadingBanner ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Upload className="h-4 w-4 mr-1" />
+                        )}
+                        Replace
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer p-4"
+                    onClick={() => bannerInputRef.current?.click()}
+                    disabled={isUploadingBanner}
+                  >
+                    {isUploadingBanner ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Upload Banner</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -486,6 +561,78 @@ export default function CampaignsPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Shirt Sizes */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Shirt className="h-4 w-4 text-primary" />
+                <Label className="text-base font-semibold">Size áo</Label>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(form.sizeShirtOptions || []).map((size) => (
+                  <span
+                    key={size}
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+                  >
+                    {size}
+                    <button
+                      type="button"
+                      className="ml-1 rounded-full hover:bg-primary/20 p-0.5 transition-colors"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          sizeShirtOptions: (prev.sizeShirtOptions || []).filter((s) => s !== size),
+                        }))
+                      }
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  id="new-shirt-size-input"
+                  placeholder="Thêm size (vd: XXXL)"
+                  className="max-w-[160px] h-8 text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const val = (e.target as HTMLInputElement).value.trim().toUpperCase();
+                      if (val && !(form.sizeShirtOptions || []).includes(val)) {
+                        setForm((prev) => ({
+                          ...prev,
+                          sizeShirtOptions: [...(prev.sizeShirtOptions || []), val],
+                        }));
+                      }
+                      (e.target as HTMLInputElement).value = '';
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => {
+                    const input = document.getElementById('new-shirt-size-input') as HTMLInputElement;
+                    const val = input?.value.trim().toUpperCase();
+                    if (val && !(form.sizeShirtOptions || []).includes(val)) {
+                      setForm((prev) => ({
+                        ...prev,
+                        sizeShirtOptions: [...(prev.sizeShirtOptions || []), val],
+                      }));
+                      input.value = '';
+                    }
+                  }}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Thêm
+                </Button>
+              </div>
             </div>
 
             <hr className="border-border" />

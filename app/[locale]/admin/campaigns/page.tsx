@@ -845,6 +845,11 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: (key: string
     limit,
   });
 
+  const handleReload = () => {
+    setPage(1);
+    refetch();
+  };
+
   const handleExportExcel = async () => {
     setIsExporting(true);
     try {

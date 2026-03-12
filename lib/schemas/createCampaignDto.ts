@@ -29,5 +29,7 @@ export interface CreateCampaignDto {
   regulationsUrl?: string;
   /** Link fanpage */
   fanpageUrl?: string;
+  /** Danh sách size áo của campaign */
+  sizeShirtOptions?: string[];
   paymentConfig?: CreateCampaignDtoPaymentConfig;
 }

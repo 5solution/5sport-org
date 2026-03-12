@@ -16,6 +16,7 @@ import {
   Users,
   Phone,
   Link,
+  RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -613,15 +614,22 @@ export default function CampaignsPage() {
 function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
   const [paymentFilter, setPaymentFilter] = useState<string>('');
   const [page, setPage] = useState(1);
+  const limit = 10;
 
-  const { data: ordersData, isLoading } = useCampaignOrderControllerFindAll(campaignId, {
+  const { data: ordersData, isLoading, refetch } = useCampaignOrderControllerFindAll(campaignId, {
     paymentStatus: paymentFilter ? (paymentFilter as any) : undefined,
     page,
-    limit: 10,
+    limit,
   });
+
+  const handleReload = () => {
+    setPage(1);
+    refetch();
+  };
 
   const orders = Array.isArray(ordersData) ? ordersData : (ordersData as any)?.data ?? [];
   const total = (ordersData as any)?.total ?? orders.length;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
 
   if (isLoading) {
     return (
@@ -633,7 +641,7 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-2">
         <Select
           value={paymentFilter}
           onValueChange={(val) => {
@@ -653,6 +661,19 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleReload}
+          disabled={isLoading}
+          className="h-8"
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RotateCcw className="h-4 w-4" />
+          )}
+        </Button>
       </div>
 
       {orders.length === 0 ? (
@@ -662,51 +683,64 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('orders.orderId')}</TableHead>
+                <TableHead>{t('orders.orderCode')}</TableHead>
                 <TableHead>{t('orders.customerName')}</TableHead>
-                <TableHead>{t('orders.phone')}</TableHead>
-                <TableHead>{t('orders.email')}</TableHead>
+                <TableHead>{t('orders.totalAmount')}</TableHead>
                 <TableHead>{t('orders.paymentStatus')}</TableHead>
+                <TableHead>{t('orders.paidAt')}</TableHead>
                 <TableHead>{t('orders.createdAt')}</TableHead>
+                <TableHead>{t('orders.athletes')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {orders.map((order: any) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-mono text-xs">{order.id?.slice(0, 8)}...</TableCell>
+                <TableRow key={order._id}>
+                  <TableCell className="font-mono text-xs">{order.orderCode}</TableCell>
                   <TableCell>{order.lastName} {order.firstName}</TableCell>
-                  <TableCell>{order.phoneNumber}</TableCell>
-                  <TableCell>{order.email || '-'}</TableCell>
+                  <TableCell className="text-xs whitespace-nowrap">
+                    {order.totalAmount?.toLocaleString('vi-VN')} ₫
+                  </TableCell>
                   <TableCell>
                     <Badge className={paymentStatusColors[order.paymentStatus] || ''} variant="secondary">
                       {t(`orders.paymentStatuses.${order.paymentStatus}`)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs">
+                    {order.paidAt ? new Date(order.paidAt).toLocaleString('vi-VN') : '-'}
+                  </TableCell>
+                  <TableCell className="text-xs">
                     {new Date(order.createdAt).toLocaleString('vi-VN')}
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      {(order.athletes || []).map((athlete: any) => (
+                        <div key={athlete._id} className="text-xs">
+                          <span className="font-medium">{athlete.lastName} {athlete.firstName}</span>
+                          <span className="text-muted-foreground"> · {athlete.distance} · {athlete.unitPrice?.toLocaleString('vi-VN')} ₫</span>
+                        </div>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          {total > 10 && (
-            <div className="flex justify-center gap-2">
-              <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                Previous
-              </Button>
-              <span className="flex items-center text-sm text-muted-foreground">
-                {page} / {Math.ceil(total / 10)}
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page >= Math.ceil(total / 10)}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </Button>
-            </div>
-          )}
+          <div className="flex justify-center items-center gap-2">
+            <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+              {t('orders.previous')}
+            </Button>
+            <span className="flex items-center text-sm text-muted-foreground">
+              {page} / {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              {t('orders.next')}
+            </Button>
+          </div>
         </>
       )}
     </div>

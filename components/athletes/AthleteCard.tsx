@@ -3,8 +3,22 @@
 import Link from 'next/link';
 import { User, MapPin, Trophy, Target, TrendingUp } from 'lucide-react';
 
+interface Athlete {
+  id: string | number;
+  name: string;
+  profileImageUrl?: string;
+  isVerified?: boolean;
+  city?: string;
+  sportType?: string;
+  currentRating?: number;
+  totalMatches?: number;
+  wins?: number;
+  losses?: number;
+  winRate?: number;
+}
+
 interface AthleteCardProps {
-  athlete: any; // Will be typed when API is generated
+  athlete: Athlete;
   showStats?: boolean;
   locale?: string;
 }

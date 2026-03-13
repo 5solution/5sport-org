@@ -20,7 +20,7 @@ export function useGoogleAuth() {
     if (session?.accessToken && status === 'authenticated') {
       // Get the ID token from the session
       // Note: You need to ensure NextAuth provides the id_token in the session
-      const idToken = (session as any).idToken;
+      const idToken = (session as { idToken?: string }).idToken;
 
       if (idToken && !localStorage.getItem('authToken')) {
         // Send ID token to backend for verification

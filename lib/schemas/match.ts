@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { Athlete } from './athlete';
+import type { Court } from './court';
 import type { EventSession } from './eventSession';
 import type { MatchScore } from './matchScore';
 import type { MatchStatus } from './matchStatus';
@@ -34,8 +35,13 @@ export interface Match {
   matchNumber?: number;
   /** Round name */
   round?: string;
-  /** Court number */
+  /** Court number (deprecated, use courtId) */
   courtNumber?: number;
+  /** Court ID */
+  courtId?: string;
+  court?: Court;
+  /** Match priority for auto-assign */
+  priority: number;
   /** Scheduled time */
   scheduledTime: string;
   /** Start time */

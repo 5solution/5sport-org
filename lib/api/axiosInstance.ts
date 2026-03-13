@@ -40,7 +40,7 @@ AXIOS_INSTANCE.interceptors.response.use(
   },
   (error: AxiosError) => {
     const status = error.response?.status;
-    const data = error.response?.data as any;
+    const data = error.response?.data as { message?: string; error?: string };
     const message = data?.message || data?.error || error.message;
 
     if (status === 401) {

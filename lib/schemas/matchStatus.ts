@@ -13,7 +13,9 @@ export type MatchStatus = typeof MatchStatus[keyof typeof MatchStatus];
 
 
 export const MatchStatus = {
+  PENDING: 'PENDING',
   SCHEDULED: 'SCHEDULED',
+  WARM_UP: 'WARM_UP',
   IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED',

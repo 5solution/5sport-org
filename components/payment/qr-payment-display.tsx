@@ -152,7 +152,7 @@ export function QRPaymentDisplay({
           <p className="font-semibold text-blue-900">Payment Instructions:</p>
           <ol className="list-decimal list-inside space-y-1 text-blue-800 text-xs">
             <li>Open your banking app</li>
-            <li>Select "Transfer" or "Scan QR"</li>
+            <li>Select &quot;Transfer&quot; or &quot;Scan QR&quot;</li>
             <li>Scan the QR code above</li>
             <li>Confirm the payment details</li>
             <li>Complete the transaction</li>

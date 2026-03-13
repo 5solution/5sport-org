@@ -69,13 +69,17 @@
       "PAID": "Đã thanh toán",
       "FAILED": "Thất bại",
       "REFUNDED": "Đã hoàn tiền"
-    }
+    },
+    "exportExcel": "Xuất Excel",
+    "fromDate": "Từ ngày",
+    "toDate": "Đến ngày"
   },
   "messages": {
     "createSuccess": "Tạo chiến dịch thành công",
     "updateSuccess": "Cập nhật chiến dịch thành công",
     "deleteSuccess": "Xóa chiến dịch thành công",
     "statusUpdateSuccess": "Cập nhật trạng thái chiến dịch thành công",
+    "exportSuccess": "Xuất dữ liệu thành công",
     "error": "Đã xảy ra lỗi"
   }
 }

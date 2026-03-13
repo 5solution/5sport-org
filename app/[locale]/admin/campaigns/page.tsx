@@ -19,6 +19,7 @@ import {
   RotateCcw,
   Upload,
   Shirt,
+  Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -63,6 +64,7 @@ import {
   useCampaignOrderControllerFindAll,
 } from '@/lib/services/campaign-orders/campaign-orders';
 import { useUploadControllerUploadFile } from '@/lib/services/upload/upload';
+import { AXIOS_INSTANCE } from '@/lib/api/axiosInstance';
 import { UpdateCampaignStatusDtoStatus } from '@/lib/schemas/updateCampaignStatusDtoStatus';
 import { CampaignOrderControllerFindAllPaymentStatus } from '@/lib/schemas/campaignOrderControllerFindAllPaymentStatus';
 import type { CreateCampaignDto } from '@/lib/schemas/createCampaignDto';
@@ -760,6 +762,9 @@ export default function CampaignsPage() {
 
 function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
   const [paymentFilter, setPaymentFilter] = useState<string>('');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
+  const [isExporting, setIsExporting] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -768,6 +773,35 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
     page,
     limit,
   });
+
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    try {
+      const response = await AXIOS_INSTANCE.get(`/campaigns/${campaignId}/orders/export/excel`, {
+        params: { fromDate, toDate },
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `orders-${campaignId}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success(t('messages.exportSuccess'));
+    } catch (err: any) {
+      console.error('Export error:', err);
+      toast.error(err?.response?.data?.message || t('messages.error'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleReload = () => {
     setPage(1);
@@ -788,39 +822,75 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-end gap-2">
-        <Select
-          value={paymentFilter}
-          onValueChange={(val) => {
-            setPaymentFilter(val === 'all' ? '' : val);
-            setPage(1);
-          }}
-        >
-          <SelectTrigger className="h-8 w-[160px] text-xs">
-            <SelectValue placeholder={t('orders.allStatuses')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('orders.allStatuses')}</SelectItem>
-            {Object.values(CampaignOrderControllerFindAllPaymentStatus).map((s) => (
-              <SelectItem key={s} value={s}>
-                {t(`orders.paymentStatuses.${s}`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleReload}
-          disabled={isLoading}
-          className="h-8"
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RotateCcw className="h-4 w-4" />
-          )}
-        </Button>
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex items-center gap-2 mr-auto mb-2 sm:mb-0 flex-wrap">
+          <div className="flex items-center gap-1">
+            <Label className="text-[10px] text-muted-foreground uppercase">{t('orders.fromDate')}</Label>
+            <Input
+              type="date"
+              className="h-8 w-[130px] text-xs"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <Label className="text-[10px] text-muted-foreground uppercase">{t('orders.toDate')}</Label>
+            <Input
+              type="date"
+              className="h-8 w-[130px] text-xs"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleExportExcel}
+            disabled={isExporting}
+            className="h-8"
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            {t('orders.exportExcel')}
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select
+            value={paymentFilter}
+            onValueChange={(val) => {
+              setPaymentFilter(val === 'all' ? '' : val);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-8 w-[160px] text-xs">
+              <SelectValue placeholder={t('orders.allStatuses')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('orders.allStatuses')}</SelectItem>
+              {Object.values(CampaignOrderControllerFindAllPaymentStatus).map((s) => (
+                <SelectItem key={s} value={s}>
+                  {t(`orders.paymentStatuses.${s}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleReload}
+            disabled={isLoading}
+            className="h-8"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RotateCcw className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {orders.length === 0 ? (

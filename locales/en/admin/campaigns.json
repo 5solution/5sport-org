@@ -69,13 +69,17 @@
       "PAID": "Paid",
       "FAILED": "Failed",
       "REFUNDED": "Refunded"
-    }
+    },
+    "exportExcel": "Export Excel",
+    "fromDate": "From Date",
+    "toDate": "To Date"
   },
   "messages": {
     "createSuccess": "Campaign created successfully",
     "updateSuccess": "Campaign updated successfully",
     "deleteSuccess": "Campaign deleted successfully",
     "statusUpdateSuccess": "Campaign status updated",
+    "exportSuccess": "Data exported successfully",
     "error": "An error occurred"
   }
 }

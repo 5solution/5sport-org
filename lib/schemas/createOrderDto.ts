@@ -13,7 +13,7 @@ export interface CreateOrderDto {
   /** Tên */
   firstName: string;
   /** Email */
-  email?: string;
+  email: string;
   /** Số điện thoại */
   phoneNumber: string;
   /** Danh sách vận động viên */

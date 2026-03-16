@@ -1,6 +1,10 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState, useRef } from 'react';
+
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
+const MDPreview = dynamic(() => import('@uiw/react-md-editor').then((m) => m.default.Markdown), { ssr: false });
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Loader2,
@@ -117,6 +121,7 @@ const defaultForm: Omit<CreateCampaignDto, 'distances'> = {
   zaloGroupUrl: '',
   hotline: '',
   regulationsUrl: '',
+  regulations: '',
   fanpageUrl: '',
   sizeShirtOptions: [...DEFAULT_SHIRT_SIZES],
 };
@@ -183,6 +188,7 @@ export default function CampaignsPage() {
       zaloGroupUrl: campaign.zaloGroupUrl || '',
       hotline: campaign.hotline || '',
       regulationsUrl: campaign.regulationsUrl || '',
+      regulations: campaign.regulations || '',
       fanpageUrl: campaign.fanpageUrl || '',
       sizeShirtOptions: campaign.sizeShirtOptions?.length
         ? campaign.sizeShirtOptions
@@ -710,6 +716,14 @@ export default function CampaignsPage() {
                 </div>
               </div>
             </div>
+
+            <hr className="border-border" />
+
+            {/* Regulations Markdown */}
+            <RegulationsEditor
+              value={form.regulations || ''}
+              onChange={(val) => setForm((prev) => ({ ...prev, regulations: val }))}
+            />
           </div>
 
           <DialogFooter className="mt-2">
@@ -756,6 +770,62 @@ export default function CampaignsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function RegulationsEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [tab, setTab] = useState<'edit' | 'preview'>('edit');
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-base font-semibold">Thể lệ giải (Markdown)</Label>
+        <div className="flex rounded-md border border-border overflow-hidden text-xs">
+          <button
+            type="button"
+            className={`px-3 py-1.5 transition-colors ${tab === 'edit' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+            onClick={() => setTab('edit')}
+          >
+            Soạn thảo
+          </button>
+          <button
+            type="button"
+            className={`px-3 py-1.5 transition-colors ${tab === 'preview' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+            onClick={() => setTab('preview')}
+          >
+            Xem trước
+          </button>
+        </div>
+      </div>
+
+      {tab === 'edit' ? (
+        <div data-color-mode="light">
+          <MDEditor
+            value={value}
+            onChange={(val) => onChange(val ?? '')}
+            height={320}
+            preview="edit"
+          />
+        </div>
+      ) : (
+        <div
+          data-color-mode="light"
+          className="min-h-[320px] rounded-md border border-input bg-background p-4 prose prose-sm max-w-none"
+        >
+          {value ? (
+            <MDPreview source={value} />
+          ) : (
+            <p className="text-muted-foreground text-sm">Chưa có nội dung.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

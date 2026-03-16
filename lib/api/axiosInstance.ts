@@ -43,10 +43,16 @@ export const defaultMutator = <T>(
   url: string,
   config?: RequestInit
 ): Promise<T> => {
+  const isFormData = config?.body instanceof FormData;
+
   return AXIOS_INSTANCE({
     url,
-    method: config?.method as AxiosRequestConfig['method'],
-    headers: config?.headers as AxiosRequestConfig['headers'],
+    method: config?.method as AxiosRequestConfig["method"],
+    headers: {
+      ...(config?.headers as AxiosRequestConfig["headers"]),
+      // Remove Content-Type for FormData so Axios sets multipart/form-data with boundary automatically
+      ...(isFormData && { "Content-Type": undefined }),
+    },
     data: config?.body,
   }).then((res) => res.data);
 };

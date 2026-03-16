@@ -6,3 +6,6 @@ out
 # IDE
 .idea
 .DS_Store
+
+# Create Fake Data
+create-fake-orders.sh

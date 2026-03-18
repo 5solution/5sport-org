@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import QRCode from 'qrcode';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,6 +20,9 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
+  QrCode,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -85,8 +89,21 @@ const MATCH_STATUS_CONFIG: Record<string, { className: string; label: string }> 
   CANCELLED: { className: 'bg-gray-500 text-white', label: 'Cancelled' },
 };
 
-function MatchRow({ match, statusConfig }: { match: any; statusConfig: Record<string, { className: string; label: string }> }) {
+function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: Record<string, { className: string; label: string }>; eventId: string }) {
   const [showScore, setShowScore] = useState(false);
+  const [showQrDialog, setShowQrDialog] = useState(false);
+  const [qrImage, setQrImage] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const refereeUrl = `${process.env.REFEREE_UI_URL || 'https://dev-trongtai.5sport.vn'}/vi/events/${eventId}/matches/${match.id}`;
+
+  useEffect(() => {
+    if (showQrDialog) {
+      QRCode.toDataURL(refereeUrl, { width: 256, margin: 2 })
+        .then(setQrImage)
+        .catch(console.error);
+    }
+  }, [showQrDialog, refereeUrl]);
 
   const { data: scoresData, isFetching: isFetchingScores, refetch } = useMatchScoreControllerFindAll(
     match.id,
@@ -105,6 +122,7 @@ function MatchRow({ match, statusConfig }: { match: any; statusConfig: Record<st
   const scores: any[] = Array.isArray(scoresData) ? scoresData : (scoresData as any)?.data ?? [];
 
   return (
+    <>
     <div
       className={`flex items-center justify-between rounded-md border p-3 text-sm ${match.status === 'IN_PROGRESS' ? 'bg-red-50 border-red-300' : match.status === 'COMPLETED' ? 'bg-green-50 border-green-300' : match.status === 'CANCELLED' ? 'bg-gray-100 border-gray-300' : ''}`}
     >
@@ -179,6 +197,15 @@ function MatchRow({ match, statusConfig }: { match: any; statusConfig: Record<st
           variant="outline"
           size="sm"
           className="h-7 px-2 text-xs"
+          onClick={() => setShowQrDialog(true)}
+        >
+          <QrCode className="h-3 w-3 mr-1" />
+          QR Code
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 px-2 text-xs"
           onClick={showScore ? handleHideScore : handleShowScore}
           disabled={isFetchingScores}
         >
@@ -208,6 +235,41 @@ function MatchRow({ match, statusConfig }: { match: any; statusConfig: Record<st
         </span>
       </div>
     </div>
+
+    <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Referee QR Code</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col items-center gap-4 py-2">
+          <p className="text-sm text-muted-foreground text-center">
+            {match.name}
+          </p>
+          {qrImage ? (
+            <img src={qrImage} alt="Referee QR Code" className="rounded-lg border" />
+          ) : (
+            <div className="w-64 h-64 flex items-center justify-center bg-muted rounded-lg">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex items-center gap-1.5 w-full">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(refereeUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+              title="Copy URL"
+            >
+              {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+            </button>
+            <p className="text-xs text-muted-foreground break-all">{refereeUrl}</p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 
@@ -510,7 +572,7 @@ export default function StageDetailPage() {
                       {roundMatches
                         .sort((a: any, b: any) => (a.matchNumber || 0) - (b.matchNumber || 0))
                         .map((match: any) => (
-                          <MatchRow key={`${match.id}-${reloadCount}`} match={match} statusConfig={MATCH_STATUS_CONFIG} />
+                          <MatchRow key={`${match.id}-${reloadCount}`} match={match} statusConfig={MATCH_STATUS_CONFIG} eventId={eventId} />
                         ))}
                     </div>
                   </CardContent>

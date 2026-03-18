@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin('./i18n.ts');
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  env: {
+    REFEREE_UI_URL: process.env.REFEREE_UI_URL,
+  },
   async rewrites() {
     return [
       {

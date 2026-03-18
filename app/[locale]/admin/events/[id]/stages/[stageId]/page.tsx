@@ -16,6 +16,9 @@ import {
   UserPlus,
   UserX,
   Heart,
+  RefreshCw,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -52,6 +55,7 @@ import {
   useParticipantControllerRemovePartner,
   getParticipantControllerFindByStageQueryKey,
 } from '@/lib/services/participants/participants';
+import { useMatchScoreControllerFindAll } from '@/lib/services/match-scores/match-scores';
 
 const STAGE_TYPE_LABELS: Record<string, string> = {
   ROUND_ROBIN_PLAYOFF: 'Round Robin + Playoff',
@@ -81,6 +85,132 @@ const MATCH_STATUS_CONFIG: Record<string, { className: string; label: string }> 
   CANCELLED: { className: 'bg-gray-500 text-white', label: 'Cancelled' },
 };
 
+function MatchRow({ match, statusConfig }: { match: any; statusConfig: Record<string, { className: string; label: string }> }) {
+  const [showScore, setShowScore] = useState(false);
+
+  const { data: scoresData, isFetching: isFetchingScores, refetch } = useMatchScoreControllerFindAll(
+    match.id,
+    { query: { enabled: false } },
+  );
+
+  const handleShowScore = () => {
+    setShowScore(true);
+    refetch();
+  };
+
+  const handleHideScore = () => {
+    setShowScore(false);
+  };
+
+  const scores: any[] = Array.isArray(scoresData) ? scoresData : (scoresData as any)?.data ?? [];
+
+  return (
+    <div
+      className={`flex items-center justify-between rounded-md border p-3 text-sm ${match.status === 'IN_PROGRESS' ? 'bg-red-50 border-red-300' : match.status === 'COMPLETED' ? 'bg-green-50 border-green-300' : match.status === 'CANCELLED' ? 'bg-gray-100 border-gray-300' : ''}`}
+    >
+      <div className="flex items-center gap-4">
+        <span className="text-xs text-muted-foreground w-6 text-right font-mono">
+          #{match.matchNumber || '-'}
+        </span>
+        <div className="min-w-0">
+          <p className="font-medium truncate">{match.name}</p>
+          {(match.startTime || match.endTime) && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {match.startTime && (
+                <span>Start: {new Date(match.startTime).toLocaleString()}</span>
+              )}
+              {match.startTime && match.endTime && <span className="mx-1">·</span>}
+              {match.endTime && (
+                <span>End: {new Date(match.endTime).toLocaleString()}</span>
+              )}
+            </p>
+          )}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+            {match.isBye ? (
+              <span className="italic">BYE</span>
+            ) : (
+              <>
+                <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                  {match.team1Name ||
+                    [match.team1Player1?.name, match.team1Player2?.name].filter(Boolean).join(' / ') ||
+                    'TBD'}
+                </span>
+                <span>vs</span>
+                <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                  {match.team2Name ||
+                    [match.team2Player1?.name, match.team2Player2?.name].filter(Boolean).join(' / ') ||
+                    'TBD'}
+                </span>
+              </>
+            )}
+          </div>
+          {showScore && (
+            <div className="mt-1.5">
+              {isFetchingScores ? (
+                <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+              ) : scores.length > 0 ? (
+                <div className="flex flex-col gap-1 font-mono text-xs">
+                  {scores
+                    .sort((a: any, b: any) => a.setNumber - b.setNumber)
+                    .map((score: any) => (
+                      <span
+                        key={score.id}
+                        className={`px-1.5 py-0.5 rounded ${
+                          score.winnerTeam === 1
+                            ? 'bg-green-100 text-green-800'
+                            : score.winnerTeam === 2
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        Set {score.setNumber}: {score.team1Points}-{score.team2Points}
+                      </span>
+                    ))}
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground italic">No scores yet</span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={showScore ? handleHideScore : handleShowScore}
+          disabled={isFetchingScores}
+        >
+          {isFetchingScores ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : showScore ? (
+            <>
+              <EyeOff className="h-3 w-3 mr-1" />
+              Hide Score
+            </>
+          ) : (
+            <>
+              <Eye className="h-3 w-3 mr-1" />
+              Show Score
+            </>
+          )}
+        </Button>
+        {match.bracketType && (
+          <Badge variant="outline" className="text-xs">
+            {match.bracketType}
+          </Badge>
+        )}
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig[match.status]?.className || 'bg-gray-100 text-gray-600'}`}
+        >
+          {statusConfig[match.status]?.label || match.status}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function StageDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -91,6 +221,7 @@ export default function StageDetailPage() {
   const [activeTab, setActiveTab] = useState('matches');
   const [assigningParticipant, setAssigningParticipant] = useState<any | null>(null);
   const [selectedPartnerId, setSelectedPartnerId] = useState('');
+  const [reloadCount, setReloadCount] = useState(0);
 
   const { data: stageData, isLoading } = useStageControllerFindOne(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
@@ -98,7 +229,7 @@ export default function StageDetailPage() {
   const stage = stageData as any;
 
   // Correct: use stageId directly for matches
-  const { data: matchesData } = useStageControllerFindMatchesByStage(eventId, stageId, {
+  const { data: matchesData, refetch: refetchMatches, isFetching: isFetchingMatches } = useStageControllerFindMatchesByStage(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
   });
 
@@ -314,6 +445,7 @@ export default function StageDetailPage() {
 
       {/* Tabs: Matches / Participants */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="matches" className="flex items-center gap-1.5">
             <Swords className="h-4 w-4" />
@@ -334,6 +466,16 @@ export default function StageDetailPage() {
             )}
           </TabsTrigger>
         </TabsList>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { refetchMatches(); setReloadCount(c => c + 1); }}
+          disabled={isFetchingMatches}
+        >
+          <RefreshCw className={`h-4 w-4 mr-1.5 ${isFetchingMatches ? 'animate-spin' : ''}`} />
+          Reload
+        </Button>
+        </div>
 
         {/* Matches Tab */}
         <TabsContent value="matches" className="mt-4">
@@ -368,55 +510,7 @@ export default function StageDetailPage() {
                       {roundMatches
                         .sort((a: any, b: any) => (a.matchNumber || 0) - (b.matchNumber || 0))
                         .map((match: any) => (
-                          <div
-                            key={match.id}
-                            className={`flex items-center justify-between rounded-md border p-3 text-sm ${match.status === 'IN_PROGRESS' ? 'bg-red-50 border-red-300' : match.status === 'COMPLETED' ? 'bg-green-50 border-green-300' : match.status === 'CANCELLED' ? 'bg-gray-100 border-gray-300' : ''}`}
-                          >
-                            <div className="flex items-center gap-4">
-                              <span className="text-xs text-muted-foreground w-6 text-right font-mono">
-                                #{match.matchNumber || '-'}
-                              </span>
-                              <div className="min-w-0">
-                                <p className="font-medium truncate">{match.name}</p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                                  {match.isBye ? (
-                                    <span className="italic">BYE</span>
-                                  ) : (
-                                    <>
-                                      <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                                        {match.team1Name ||
-                                          [match.team1Player1?.name, match.team1Player2?.name].filter(Boolean).join(' / ') ||
-                                          'TBD'}
-                                      </span>
-                                      <span>vs</span>
-                                      <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                                        {match.team2Name ||
-                                          [match.team2Player1?.name, match.team2Player2?.name].filter(Boolean).join(' / ') ||
-                                          'TBD'}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              {match.team1Score && match.team2Score && (
-                                <span className="font-mono text-sm">
-                                  {match.team1Score.total ?? '-'} : {match.team2Score.total ?? '-'}
-                                </span>
-                              )}
-                              {match.bracketType && (
-                                <Badge variant="outline" className="text-xs">
-                                  {match.bracketType}
-                                </Badge>
-                              )}
-                              <span
-                                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${MATCH_STATUS_CONFIG[match.status]?.className || 'bg-gray-100 text-gray-600'}`}
-                              >
-                                {MATCH_STATUS_CONFIG[match.status]?.label || match.status}
-                              </span>
-                            </div>
-                          </div>
+                          <MatchRow key={`${match.id}-${reloadCount}`} match={match} statusConfig={MATCH_STATUS_CONFIG} />
                         ))}
                     </div>
                   </CardContent>

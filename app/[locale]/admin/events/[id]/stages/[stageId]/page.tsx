@@ -76,9 +76,9 @@ const STAGE_STATUS_CONFIG: Record<string, { className: string; label: string }> 
 
 const MATCH_STATUS_CONFIG: Record<string, { className: string; label: string }> = {
   SCHEDULED: { className: 'bg-gray-100 text-gray-600', label: 'Scheduled' },
-  IN_PROGRESS: { className: 'bg-yellow-100 text-yellow-700', label: 'In Progress' },
-  COMPLETED: { className: 'bg-green-100 text-green-700', label: 'Completed' },
-  CANCELLED: { className: 'bg-red-100 text-red-700', label: 'Cancelled' },
+  IN_PROGRESS: { className: 'bg-red-500 text-white', label: 'In Progress' },
+  COMPLETED: { className: 'bg-green-500 text-white', label: 'Completed' },
+  CANCELLED: { className: 'bg-gray-500 text-white', label: 'Cancelled' },
 };
 
 export default function StageDetailPage() {
@@ -370,7 +370,7 @@ export default function StageDetailPage() {
                         .map((match: any) => (
                           <div
                             key={match.id}
-                            className="flex items-center justify-between rounded-md border p-3 text-sm"
+                            className={`flex items-center justify-between rounded-md border p-3 text-sm ${match.status === 'IN_PROGRESS' ? 'bg-red-50 border-red-300' : match.status === 'COMPLETED' ? 'bg-green-50 border-green-300' : match.status === 'CANCELLED' ? 'bg-gray-100 border-gray-300' : ''}`}
                           >
                             <div className="flex items-center gap-4">
                               <span className="text-xs text-muted-foreground w-6 text-right font-mono">

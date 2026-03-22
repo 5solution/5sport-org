@@ -69,9 +69,13 @@ import {
 } from '@/lib/services/campaign-orders/campaign-orders';
 import { useUploadControllerUploadFile } from '@/lib/services/upload/upload';
 import { AXIOS_INSTANCE } from '@/lib/api/axiosInstance';
+import { unwrapApi } from '@/lib/api/helpers';
 import { UpdateCampaignStatusDtoStatus } from '@/lib/schemas/updateCampaignStatusDtoStatus';
 import { CampaignOrderControllerFindAllPaymentStatus } from '@/lib/schemas/campaignOrderControllerFindAllPaymentStatus';
 import type { CreateCampaignDto } from '@/lib/schemas/createCampaignDto';
+import type { CampaignResponseDto } from '@/lib/schemas/campaignResponseDto';
+import type { DistanceItemResponseDto } from '@/lib/schemas/distanceItemResponseDto';
+import type { OrderResponseDto } from '@/lib/schemas/orderResponseDto';
 
 const statusColors: Record<string, string> = {
   DRAFT: 'bg-gray-100 text-gray-800',
@@ -92,13 +96,11 @@ interface DistanceEntry {
   price: string;
 }
 
-function parseDistances(distances: any[] = []): DistanceEntry[] {
-  return distances.map((d) => {
-    if (typeof d === 'object' && d !== null) {
-      return { name: String(d.distance ?? d.name ?? ''), price: String(d.price ?? '') };
-    }
-    return { name: String(d), price: '' };
-  });
+function parseDistances(distances: DistanceItemResponseDto[] = []): DistanceEntry[] {
+  return distances.map((d) => ({
+    name: d.distance ?? '',
+    price: String(d.price ?? ''),
+  }));
 }
 
 function serializeDistances(entries: DistanceEntry[]): { distance: string; price: number }[] {
@@ -131,8 +133,8 @@ export default function CampaignsPage() {
   const tButtons = useTranslations('common.buttons');
   const queryClient = useQueryClient();
 
-  const { data: campaignsData, isLoading: campaignsLoading } = useCampaignControllerFindAll();
-  const campaigns = Array.isArray(campaignsData) ? campaignsData : [];
+  const { data: campaignsRaw, isLoading: campaignsLoading } = useCampaignControllerFindAll();
+  const campaigns = unwrapApi(campaignsRaw) ?? [];
 
   const createCampaign = useCampaignControllerCreate();
   const updateCampaign = useCampaignControllerUpdate();
@@ -140,7 +142,7 @@ export default function CampaignsPage() {
   const updateStatus = useCampaignControllerUpdateStatus();
 
   const [showDialog, setShowDialog] = useState(false);
-  const [editingCampaign, setEditingCampaign] = useState<any>(null);
+  const [editingCampaign, setEditingCampaign] = useState<CampaignResponseDto | null>(null);
   const [expandedCampaign, setExpandedCampaign] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
@@ -158,10 +160,12 @@ export default function CampaignsPage() {
     setIsUploadingBanner(true);
     try {
       const result = await uploadFile.mutateAsync({ data: { file } });
-      const url = (result as any)?.url ?? (result as any)?.fileUrl ?? String(result ?? '');
+      const uploadData = result?.data as unknown as { url?: string; fileUrl?: string } | undefined;
+      const url = uploadData?.url ?? uploadData?.fileUrl ?? '';
       setForm((prev) => ({ ...prev, bannerUrl: url }));
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Upload failed');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Upload failed';
+      toast.error(message);
     } finally {
       setIsUploadingBanner(false);
     }
@@ -174,7 +178,7 @@ export default function CampaignsPage() {
     setShowDialog(true);
   };
 
-  const openEdit = (campaign: any) => {
+  const openEdit = (campaign: CampaignResponseDto) => {
     setEditingCampaign(campaign);
     setForm({
       name: campaign.name || '',
@@ -205,26 +209,26 @@ export default function CampaignsPage() {
     };
     try {
       if (editingCampaign) {
-        await updateCampaign.mutateAsync({ id: editingCampaign._id, data: payload as any });
+        await updateCampaign.mutateAsync({ id: editingCampaign.id, data: payload });
         toast.success(t('messages.updateSuccess'));
       } else {
-        await createCampaign.mutateAsync({ data: payload as any });
+        await createCampaign.mutateAsync({ data: payload });
         toast.success(t('messages.createSuccess'));
       }
       invalidateCampaigns();
       setShowDialog(false);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('messages.error'));
+    } catch {
+      toast.error(t('messages.error'));
     }
   };
 
-  const handleUpdateStatus = async (campaignId: string, status: string) => {
+  const handleUpdateStatus = async (campaignId: string, status: UpdateCampaignStatusDtoStatus) => {
     try {
-      await updateStatus.mutateAsync({ id: campaignId, data: { status: status as any } });
+      await updateStatus.mutateAsync({ id: campaignId, data: { status } });
       toast.success(t('messages.statusUpdateSuccess'));
       invalidateCampaigns();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('messages.error'));
+    } catch {
+      toast.error(t('messages.error'));
     }
   };
 
@@ -235,8 +239,8 @@ export default function CampaignsPage() {
       toast.success(t('messages.deleteSuccess'));
       invalidateCampaigns();
       if (expandedCampaign === deleteConfirm) setExpandedCampaign(null);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('messages.error'));
+    } catch {
+      toast.error(t('messages.error'));
     } finally {
       setDeleteConfirm(null);
     }
@@ -308,8 +312,8 @@ export default function CampaignsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {campaigns.map((campaign: any) => (
-            <Card key={campaign._id}>
+          {campaigns.map((campaign) => (
+            <Card key={campaign.id}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-1 min-w-0">
@@ -332,22 +336,19 @@ export default function CampaignsPage() {
                     {/* Distances preview */}
                     {campaign.distances?.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {campaign.distances.map((d: any, i: number) => {
-                          const parsed = parseDistances([d])[0];
-                          return (
+                        {campaign.distances.map((d, i) => (
                             <Badge key={i} variant="outline" className="text-xs font-normal">
                               <Ruler className="h-3 w-3 mr-1" />
-                              {parsed.name}{parsed.price ? ` — ${formatPrice(parsed.price)}` : ''}
+                              {d.distance}{d.price ? ` — ${formatPrice(String(d.price))}` : ''}
                             </Badge>
-                          );
-                        })}
+                        ))}
                       </div>
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Select
                       value={campaign.status}
-                      onValueChange={(val) => handleUpdateStatus(campaign._id, val)}
+                      onValueChange={(val) => handleUpdateStatus(campaign.id, val as UpdateCampaignStatusDtoStatus)}
                     >
                       <SelectTrigger className="h-8 w-[140px] text-xs">
                         <SelectValue />
@@ -367,7 +368,7 @@ export default function CampaignsPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive"
-                      onClick={() => setDeleteConfirm(campaign._id)}
+                      onClick={() => setDeleteConfirm(campaign.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -375,9 +376,9 @@ export default function CampaignsPage() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => setExpandedCampaign(expandedCampaign === campaign._id ? null : campaign._id)}
+                      onClick={() => setExpandedCampaign(expandedCampaign === campaign.id ? null : campaign.id)}
                     >
-                      {expandedCampaign === campaign._id ? (
+                      {expandedCampaign === campaign.id ? (
                         <ChevronUp className="h-4 w-4" />
                       ) : (
                         <ChevronDown className="h-4 w-4" />
@@ -387,13 +388,13 @@ export default function CampaignsPage() {
                 </div>
               </CardHeader>
 
-              {expandedCampaign === campaign._id && (
+              {expandedCampaign === campaign.id && (
                 <CardContent className="pt-0">
                   <div className="flex items-center gap-2 mb-3">
                     <ShoppingCart className="h-4 w-4" />
                     <span className="text-sm font-medium">{t('orders.title')}</span>
                   </div>
-                  <CampaignOrders campaignId={campaign._id} t={t} />
+                  <CampaignOrders campaignId={campaign.id} t={t} />
                 </CardContent>
               )}
             </Card>
@@ -830,7 +831,7 @@ function RegulationsEditor({
   );
 }
 
-function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
+function CampaignOrders({ campaignId, t }: { campaignId: string; t: (key: string) => string }) {
   const [paymentFilter, setPaymentFilter] = useState<string>('');
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
@@ -838,8 +839,8 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data: ordersData, isLoading, refetch } = useCampaignOrderControllerFindAll(campaignId, {
-    paymentStatus: paymentFilter ? (paymentFilter as any) : undefined,
+  const { data: ordersResponse, isLoading, refetch } = useCampaignOrderControllerFindAll(campaignId, {
+    paymentStatus: paymentFilter ? paymentFilter as CampaignOrderControllerFindAllPaymentStatus : undefined,
     page,
     limit,
   });
@@ -865,9 +866,8 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
       window.URL.revokeObjectURL(url);
 
       toast.success(t('messages.exportSuccess'));
-    } catch (err: any) {
-      console.error('Export error:', err);
-      toast.error(err?.response?.data?.message || t('messages.error'));
+    } catch {
+      toast.error(t('messages.error'));
     } finally {
       setIsExporting(false);
     }
@@ -878,9 +878,9 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
     refetch();
   };
 
-  const orders = Array.isArray(ordersData) ? ordersData : (ordersData as any)?.data ?? [];
-  const total = (ordersData as any)?.total ?? orders.length;
-  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const ordersPage = unwrapApi(ordersResponse);
+  const orders: OrderResponseDto[] = ordersPage?.data ?? [];
+  const totalPages = Math.max(1, Math.ceil(orders.length / limit));
 
   if (isLoading) {
     return (
@@ -980,8 +980,8 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map((order: any) => (
-                <TableRow key={order._id}>
+              {orders.map((order) => (
+                <TableRow key={order.id}>
                   <TableCell className="font-mono text-xs">{order.orderCode}</TableCell>
                   <TableCell>{order.lastName} {order.firstName}</TableCell>
                   <TableCell className="text-xs whitespace-nowrap">
@@ -1000,12 +1000,15 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: any }) {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      {(order.athletes || []).map((athlete: any) => (
-                        <div key={athlete._id} className="text-xs">
-                          <span className="font-medium">{athlete.lastName} {athlete.firstName}</span>
-                          <span className="text-muted-foreground"> · {athlete.distance} · {athlete.unitPrice?.toLocaleString('vi-VN')} ₫</span>
-                        </div>
-                      ))}
+                      {order.athletes.map((athlete, idx) => {
+                        const a = athlete as Record<string, unknown>;
+                        return (
+                          <div key={String(a['_id'] ?? idx)} className="text-xs">
+                            <span className="font-medium">{String(a['lastName'] ?? '')} {String(a['firstName'] ?? '')}</span>
+                            <span className="text-muted-foreground"> · {String(a['distance'] ?? '')} · {Number(a['unitPrice'] ?? 0).toLocaleString('vi-VN')} ₫</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </TableCell>
                 </TableRow>

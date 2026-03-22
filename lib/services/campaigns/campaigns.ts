@@ -25,8 +25,14 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CampaignControllerCreate201,
+  CampaignControllerFindAll200,
+  CampaignControllerFindBySlug200,
+  CampaignControllerFindOne200,
+  CampaignControllerFindPublic200,
   CampaignControllerFindPublicParams,
-  CampaignPublicResponseDto,
+  CampaignControllerUpdate200,
+  CampaignControllerUpdateStatus200,
   CreateCampaignDto,
   UpdateCampaignDto,
   UpdateCampaignStatusDto
@@ -40,7 +46,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 export type campaignControllerCreateResponse201 = {
-  data: void
+  data: CampaignControllerCreate201
   status: 201
 }
     
@@ -116,7 +122,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCampaignControllerCreateMutationOptions(options), queryClient);
     }
     export type campaignControllerFindAllResponse200 = {
-  data: void
+  data: CampaignControllerFindAll200
   status: 200
 }
     
@@ -220,7 +226,7 @@ export function useCampaignControllerFindAll<TData = Awaited<ReturnType<typeof c
 
 
 export type campaignControllerFindPublicResponse200 = {
-  data: CampaignPublicResponseDto[]
+  data: CampaignControllerFindPublic200
   status: 200
 }
     
@@ -331,7 +337,7 @@ export function useCampaignControllerFindPublic<TData = Awaited<ReturnType<typeo
 
 
 export type campaignControllerFindBySlugResponse200 = {
-  data: CampaignPublicResponseDto
+  data: CampaignControllerFindBySlug200
   status: 200
 }
     
@@ -435,7 +441,7 @@ export function useCampaignControllerFindBySlug<TData = Awaited<ReturnType<typeo
 
 
 export type campaignControllerFindOneResponse200 = {
-  data: void
+  data: CampaignControllerFindOne200
   status: 200
 }
     
@@ -539,7 +545,7 @@ export function useCampaignControllerFindOne<TData = Awaited<ReturnType<typeof c
 
 
 export type campaignControllerUpdateResponse200 = {
-  data: void
+  data: CampaignControllerUpdate200
   status: 200
 }
     
@@ -615,12 +621,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCampaignControllerUpdateMutationOptions(options), queryClient);
     }
-    export type campaignControllerRemoveResponse200 = {
+    export type campaignControllerRemoveResponse204 = {
   data: void
-  status: 200
+  status: 204
 }
     
-export type campaignControllerRemoveResponseSuccess = (campaignControllerRemoveResponse200) & {
+export type campaignControllerRemoveResponseSuccess = (campaignControllerRemoveResponse204) & {
   headers: Headers;
 };
 ;
@@ -691,7 +697,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCampaignControllerRemoveMutationOptions(options), queryClient);
     }
     export type campaignControllerUpdateStatusResponse200 = {
-  data: void
+  data: CampaignControllerUpdateStatus200
   status: 200
 }
     

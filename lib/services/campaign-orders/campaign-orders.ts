@@ -25,10 +25,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CampaignOrderControllerCreate201,
   CampaignOrderControllerExportExcelParams,
+  CampaignOrderControllerFindAll200,
   CampaignOrderControllerFindAllParams,
-  CreateOrderDto,
-  CreateOrderResponseDto
+  CampaignOrderControllerFindOne200,
+  CampaignOrderControllerResendEmail200,
+  CreateOrderDto
 } from '../../schemas';
 
 import { defaultMutator } from '../../api/axiosInstance';
@@ -39,7 +42,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 export type campaignOrderControllerCreateResponse201 = {
-  data: CreateOrderResponseDto
+  data: CampaignOrderControllerCreate201
   status: 201
 }
     
@@ -116,7 +119,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCampaignOrderControllerCreateMutationOptions(options), queryClient);
     }
     export type campaignOrderControllerFindAllResponse200 = {
-  data: void
+  data: CampaignOrderControllerFindAll200
   status: 200
 }
     
@@ -234,8 +237,85 @@ export function useCampaignOrderControllerFindAll<TData = Awaited<ReturnType<typ
 
 
 
-export type campaignOrderControllerFindOneResponse200 = {
-  data: void
+export type campaignOrderControllerResendEmailResponse200 = {
+  data: CampaignOrderControllerResendEmail200
+  status: 200
+}
+    
+export type campaignOrderControllerResendEmailResponseSuccess = (campaignOrderControllerResendEmailResponse200) & {
+  headers: Headers;
+};
+;
+
+export type campaignOrderControllerResendEmailResponse = (campaignOrderControllerResendEmailResponseSuccess)
+
+export const getCampaignOrderControllerResendEmailUrl = (campaignId: string,
+    orderCode: string,) => {
+
+
+  
+
+  return `/campaigns/${campaignId}/orders/${orderCode}/resend-email`
+}
+
+export const campaignOrderControllerResendEmail = async (campaignId: string,
+    orderCode: string, options?: RequestInit): Promise<campaignOrderControllerResendEmailResponse> => {
+  
+  return defaultMutator<campaignOrderControllerResendEmailResponse>(getCampaignOrderControllerResendEmailUrl(campaignId,orderCode),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getCampaignOrderControllerResendEmailMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, TError,{campaignId: string;orderCode: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, TError,{campaignId: string;orderCode: string}, TContext> => {
+
+const mutationKey = ['campaignOrderControllerResendEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, {campaignId: string;orderCode: string}> = (props) => {
+          const {campaignId,orderCode} = props ?? {};
+
+          return  campaignOrderControllerResendEmail(campaignId,orderCode,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CampaignOrderControllerResendEmailMutationResult = NonNullable<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>>
+    
+    export type CampaignOrderControllerResendEmailMutationError = unknown
+
+    export const useCampaignOrderControllerResendEmail = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, TError,{campaignId: string;orderCode: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>,
+        TError,
+        {campaignId: string;orderCode: string},
+        TContext
+      > => {
+      return useMutation(getCampaignOrderControllerResendEmailMutationOptions(options), queryClient);
+    }
+    export type campaignOrderControllerFindOneResponse200 = {
+  data: CampaignOrderControllerFindOne200
   status: 200
 }
     

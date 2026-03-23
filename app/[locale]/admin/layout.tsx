@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
-import { LayoutDashboard, Users, LogOut, Settings, Menu, Calendar, Trophy, Medal, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Settings, Menu, Calendar, Trophy, Medal, Megaphone, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -42,6 +42,7 @@ export default function AdminLayout({
     { name: t('athletes'), href: `/${locale}/admin/athletes`, icon: Trophy },
     { name: t('leaderboards'), href: `/${locale}/admin/leaderboards`, icon: Medal },
     { name: t('users'), href: `/${locale}/admin/users`, icon: Users },
+    { name: t('feedback'), href: `/${locale}/admin/feedback`, icon: MessageSquare },
     { name: t('settings'), href: `/${locale}/admin/settings`, icon: Settings },
   ];
 

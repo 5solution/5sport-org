@@ -685,6 +685,89 @@ export const useMatchControllerEnd = <TError = unknown,
       return useMutation(getMatchControllerEndMutationOptions(options), queryClient);
     }
     /**
+ * @summary Close match (admin only)
+ */
+export type matchControllerCloseResponse200 = {
+  data: Match
+  status: 200
+}
+    
+export type matchControllerCloseResponseSuccess = (matchControllerCloseResponse200) & {
+  headers: Headers;
+};
+;
+
+export type matchControllerCloseResponse = (matchControllerCloseResponseSuccess)
+
+export const getMatchControllerCloseUrl = (eventId: unknown,
+    id: string,) => {
+
+
+  
+
+  return `/events/${eventId}/matches/${id}/close`
+}
+
+export const matchControllerClose = async (eventId: unknown,
+    id: string, options?: RequestInit): Promise<matchControllerCloseResponse> => {
+  
+  return defaultMutator<matchControllerCloseResponse>(getMatchControllerCloseUrl(eventId,id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getMatchControllerCloseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchControllerClose>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof matchControllerClose>>, TError,{eventId: unknown;id: string}, TContext> => {
+
+const mutationKey = ['matchControllerClose'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof matchControllerClose>>, {eventId: unknown;id: string}> = (props) => {
+          const {eventId,id} = props ?? {};
+
+          return  matchControllerClose(eventId,id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MatchControllerCloseMutationResult = NonNullable<Awaited<ReturnType<typeof matchControllerClose>>>
+    
+    export type MatchControllerCloseMutationError = unknown
+
+    /**
+ * @summary Close match (admin only)
+ */
+export const useMatchControllerClose = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchControllerClose>>, TError,{eventId: unknown;id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof matchControllerClose>>,
+        TError,
+        {eventId: unknown;id: string},
+        TContext
+      > => {
+      return useMutation(getMatchControllerCloseMutationOptions(options), queryClient);
+    }
+    /**
  * @summary Update match score
  */
 export type matchControllerUpdateScoreResponse200 = {

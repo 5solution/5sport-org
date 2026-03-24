@@ -23,6 +23,7 @@ import {
   QrCode,
   Copy,
   Check,
+  Pencil,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -45,6 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   useStageControllerFindOne,
   useStageControllerGenerateMatches,
@@ -60,6 +62,11 @@ import {
   getParticipantControllerFindByStageQueryKey,
 } from '@/lib/services/participants/participants';
 import { useMatchScoreControllerFindAll } from '@/lib/services/match-scores/match-scores';
+import {
+  useMatchControllerFindOne,
+  useMatchControllerUpdate,
+  useMatchControllerClose,
+} from '@/lib/services/matches/matches';
 
 const STAGE_TYPE_LABELS: Record<string, string> = {
   ROUND_ROBIN_PLAYOFF: 'Round Robin + Playoff',
@@ -89,11 +96,21 @@ const MATCH_STATUS_CONFIG: Record<string, { className: string; label: string }> 
   CANCELLED: { className: 'bg-gray-500 text-white', label: 'Cancelled' },
 };
 
-function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: Record<string, { className: string; label: string }>; eventId: string }) {
+function MatchRow({ match, statusConfig, eventId, stageId, onMatchUpdated }: { match: any; statusConfig: Record<string, { className: string; label: string }>; eventId: string; stageId: string; onMatchUpdated: () => void }) {
   const [showScore, setShowScore] = useState(false);
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [qrImage, setQrImage] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    round: '',
+    scheduledTime: '',
+    team1Player1Id: '',
+    team1Player2Id: '',
+    team2Player1Id: '',
+    team2Player2Id: '',
+  });
 
   const refereeUrl = `${process.env.REFEREE_UI_URL || 'https://dev-trongtai.5sport.vn'}/vi/events/${eventId}/matches/${match.id}`;
 
@@ -109,6 +126,93 @@ function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: 
     match.id,
     { query: { enabled: false } },
   );
+
+  const { data: matchDetail, isFetching: isFetchingDetail, refetch: refetchDetail } = useMatchControllerFindOne(
+    eventId,
+    match.id,
+    { query: { enabled: false } },
+  );
+  const updateMatch = useMatchControllerUpdate();
+  const closeMatch = useMatchControllerClose();
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+
+  const { data: participantsData } = useParticipantControllerFindByStage(eventId, stageId, {
+    query: { enabled: !!eventId && !!stageId },
+  });
+  const participants: any[] = (participantsData as any) || [];
+
+  const handleOpenEdit = async () => {
+    setShowEditDialog(true);
+    const result = await refetchDetail();
+    const detail = result.data as any;
+    if (detail) {
+      setEditForm({
+        name: detail.name || match.name || '',
+        round: detail.round || match.round || '',
+        scheduledTime: detail.scheduledTime ? detail.scheduledTime.slice(0, 16) : '',
+        team1Player1Id: detail.team1Player1Id || '',
+        team1Player2Id: detail.team1Player2Id || '',
+        team2Player1Id: detail.team2Player1Id || '',
+        team2Player2Id: detail.team2Player2Id || '',
+      });
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    const selectedIds = [
+      editForm.team1Player1Id,
+      editForm.team1Player2Id,
+      editForm.team2Player1Id,
+      editForm.team2Player2Id,
+    ].filter(Boolean);
+
+    const team1Count = [editForm.team1Player1Id, editForm.team1Player2Id].filter(Boolean).length;
+    const team2Count = [editForm.team2Player1Id, editForm.team2Player2Id].filter(Boolean).length;
+    if (team1Count !== team2Count) {
+      toast.error('Both teams must have the same number of players');
+      return;
+    }
+
+    if (new Set(selectedIds).size !== selectedIds.length) {
+      toast.error('All players in a match must be different');
+      return;
+    }
+
+    try {
+      await updateMatch.mutateAsync({
+        eventId,
+        id: match.id,
+        data: {
+          name: editForm.name,
+          round: editForm.round || undefined,
+          scheduledTime: editForm.scheduledTime ? new Date(editForm.scheduledTime).toISOString() : undefined,
+          team1Player1Id: editForm.team1Player1Id || undefined,
+          team1Player2Id: editForm.team1Player2Id || undefined,
+          team2Player1Id: editForm.team2Player1Id || undefined,
+          team2Player2Id: editForm.team2Player2Id || undefined,
+        },
+      });
+      toast.success('Match updated successfully');
+      setShowEditDialog(false);
+      onMatchUpdated();
+    } catch {
+      toast.error('Failed to update match');
+    }
+  };
+
+  const handleConfirmClose = async () => {
+    try {
+      await closeMatch.mutateAsync({ eventId, id: match.id });
+      toast.success('Match closed');
+      setShowCloseConfirm(false);
+      setShowEditDialog(false);
+      onMatchUpdated();
+    } catch {
+      toast.error('Failed to close match');
+    }
+  };
+
+  const matchData = (matchDetail as any) || match;
 
   const handleShowScore = () => {
     setShowScore(true);
@@ -146,21 +250,46 @@ function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: 
           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
             {match.isBye ? (
               <span className="italic">BYE</span>
-            ) : (
-              <>
-                <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
-                  {match.team1Name ||
-                    [match.team1Player1?.name, match.team1Player2?.name].filter(Boolean).join(' / ') ||
-                    'TBD'}
-                </span>
-                <span>vs</span>
-                <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
-                  {match.team2Name ||
-                    [match.team2Player1?.name, match.team2Player2?.name].filter(Boolean).join(' / ') ||
-                    'TBD'}
-                </span>
-              </>
-            )}
+            ) : (() => {
+              const playerCount = [match.team1Player1, match.team1Player2, match.team2Player1, match.team2Player2].filter(Boolean).length;
+              if (playerCount === 2) {
+                return (
+                  <>
+                    <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                      {match.team1Player1?.name || 'TBD'}
+                    </span>
+                    <span>vs</span>
+                    <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                      {match.team2Player1?.name || 'TBD'}
+                    </span>
+                  </>
+                );
+              }
+              if (playerCount === 4) {
+                return (
+                  <>
+                    <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                      {match.team1Player1?.name} / {match.team1Player2?.name}
+                    </span>
+                    <span>vs</span>
+                    <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                      {match.team2Player1?.name} / {match.team2Player2?.name}
+                    </span>
+                  </>
+                );
+              }
+              return (
+                <>
+                  <span className={match.winnerTeam === 1 ? 'font-semibold text-foreground' : ''}>
+                    {match.team1Name || 'TBD'}
+                  </span>
+                  <span>vs</span>
+                  <span className={match.winnerTeam === 2 ? 'font-semibold text-foreground' : ''}>
+                    {match.team2Name || 'TBD'}
+                  </span>
+                </>
+              );
+            })()}
           </div>
           {showScore && (
             <div className="mt-1.5">
@@ -197,10 +326,10 @@ function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: 
           variant="outline"
           size="sm"
           className="h-7 px-2 text-xs"
-          onClick={() => setShowQrDialog(true)}
+          onClick={handleOpenEdit}
         >
-          <QrCode className="h-3 w-3 mr-1" />
-          QR Code
+          <Pencil className="h-3 w-3 mr-1" />
+          Edit
         </Button>
         <Button
           variant="outline"
@@ -222,6 +351,15 @@ function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: 
               Show Score
             </>
           )}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => setShowQrDialog(true)}
+          title="QR Code"
+        >
+          <QrCode className="h-3 w-3" />
         </Button>
         {match.bracketType && (
           <Badge variant="outline" className="text-xs">
@@ -267,6 +405,176 @@ function MatchRow({ match, statusConfig, eventId }: { match: any; statusConfig: 
             <p className="text-xs text-muted-foreground break-all">{refereeUrl}</p>
           </div>
         </div>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={showEditDialog} onOpenChange={(open) => { if (!open) setShowEditDialog(false); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Pencil className="h-4 w-4" />
+            Edit Match
+          </DialogTitle>
+        </DialogHeader>
+        {isFetchingDetail ? (
+          <div className="flex h-32 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto pr-1">
+            <div className="space-y-1.5">
+              <Label>Name</Label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Round</Label>
+              <Input
+                value={editForm.round}
+                onChange={(e) => setEditForm(f => ({ ...f, round: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Scheduled Time</Label>
+              <Input
+                type="datetime-local"
+                value={editForm.scheduledTime}
+                onChange={(e) => setEditForm(f => ({ ...f, scheduledTime: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-3">
+              <Label>Team 1</Label>
+              <div className="space-y-2 pl-1">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Player 1</Label>
+                  <Select
+                    value={editForm.team1Player1Id}
+                    onValueChange={(v) => setEditForm(f => ({ ...f, team1Player1Id: v === '__none__' ? '' : v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select player..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— None —</SelectItem>
+                      {participants.map((p: any) => (
+                        <SelectItem key={p.id} value={p.athleteId}>
+                          {p.athlete?.name || p.athleteId}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Player 2</Label>
+                  <Select
+                    value={editForm.team1Player2Id}
+                    onValueChange={(v) => setEditForm(f => ({ ...f, team1Player2Id: v === '__none__' ? '' : v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select player..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— None —</SelectItem>
+                      {participants.map((p: any) => (
+                        <SelectItem key={p.id} value={p.athleteId}>
+                          {p.athlete?.name || p.athleteId}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Label>Team 2</Label>
+              <div className="space-y-2 pl-1">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Player 1</Label>
+                  <Select
+                    value={editForm.team2Player1Id}
+                    onValueChange={(v) => setEditForm(f => ({ ...f, team2Player1Id: v === '__none__' ? '' : v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select player..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— None —</SelectItem>
+                      {participants.map((p: any) => (
+                        <SelectItem key={p.id} value={p.athleteId}>
+                          {p.athlete?.name || p.athleteId}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Player 2</Label>
+                  <Select
+                    value={editForm.team2Player2Id}
+                    onValueChange={(v) => setEditForm(f => ({ ...f, team2Player2Id: v === '__none__' ? '' : v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select player..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— None —</SelectItem>
+                      {participants.map((p: any) => (
+                        <SelectItem key={p.id} value={p.athleteId}>
+                          {p.athlete?.name || p.athleteId}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+          <Button
+            variant="destructive"
+            onClick={() => setShowCloseConfirm(true)}
+            disabled={isFetchingDetail || updateMatch.isPending || closeMatch.isPending}
+          >
+            Close Match
+          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={isFetchingDetail || updateMatch.isPending || closeMatch.isPending}
+            >
+              {updateMatch.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={showCloseConfirm} onOpenChange={(open) => { if (!open) setShowCloseConfirm(false); }}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Close Match</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground py-2">
+          Are you sure you want to close <span className="font-medium text-foreground">{match.name}</span>? This action cannot be undone.
+        </p>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowCloseConfirm(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleConfirmClose}
+            disabled={closeMatch.isPending}
+          >
+            {closeMatch.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Close Match
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
     </>
@@ -572,7 +880,7 @@ export default function StageDetailPage() {
                       {roundMatches
                         .sort((a: any, b: any) => (a.matchNumber || 0) - (b.matchNumber || 0))
                         .map((match: any) => (
-                          <MatchRow key={`${match.id}-${reloadCount}`} match={match} statusConfig={MATCH_STATUS_CONFIG} eventId={eventId} />
+                          <MatchRow key={`${match.id}-${reloadCount}`} match={match} statusConfig={MATCH_STATUS_CONFIG} eventId={eventId} stageId={stageId} onMatchUpdated={refetchMatches} />
                         ))}
                     </div>
                   </CardContent>

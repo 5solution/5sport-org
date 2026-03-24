@@ -234,7 +234,84 @@ export function useCampaignOrderControllerFindAll<TData = Awaited<ReturnType<typ
 
 
 
-export type campaignOrderControllerFindOneResponse200 = {
+export type campaignOrderControllerResendEmailResponse201 = {
+  data: void
+  status: 201
+}
+    
+export type campaignOrderControllerResendEmailResponseSuccess = (campaignOrderControllerResendEmailResponse201) & {
+  headers: Headers;
+};
+;
+
+export type campaignOrderControllerResendEmailResponse = (campaignOrderControllerResendEmailResponseSuccess)
+
+export const getCampaignOrderControllerResendEmailUrl = (campaignId: string,
+    orderCode: string,) => {
+
+
+  
+
+  return `/campaigns/${campaignId}/orders/${orderCode}/resend-email`
+}
+
+export const campaignOrderControllerResendEmail = async (campaignId: string,
+    orderCode: string, options?: RequestInit): Promise<campaignOrderControllerResendEmailResponse> => {
+  
+  return defaultMutator<campaignOrderControllerResendEmailResponse>(getCampaignOrderControllerResendEmailUrl(campaignId,orderCode),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getCampaignOrderControllerResendEmailMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, TError,{campaignId: string;orderCode: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, TError,{campaignId: string;orderCode: string}, TContext> => {
+
+const mutationKey = ['campaignOrderControllerResendEmail'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, {campaignId: string;orderCode: string}> = (props) => {
+          const {campaignId,orderCode} = props ?? {};
+
+          return  campaignOrderControllerResendEmail(campaignId,orderCode,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CampaignOrderControllerResendEmailMutationResult = NonNullable<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>>
+    
+    export type CampaignOrderControllerResendEmailMutationError = unknown
+
+    export const useCampaignOrderControllerResendEmail = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>, TError,{campaignId: string;orderCode: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof campaignOrderControllerResendEmail>>,
+        TError,
+        {campaignId: string;orderCode: string},
+        TContext
+      > => {
+      return useMutation(getCampaignOrderControllerResendEmailMutationOptions(options), queryClient);
+    }
+    export type campaignOrderControllerFindOneResponse200 = {
   data: void
   status: 200
 }

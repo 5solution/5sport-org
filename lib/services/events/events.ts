@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AddMediaDto,
   CreateCustomFieldDto,
   CreateDescriptionDto,
   CreateEventDto,
@@ -32,6 +33,7 @@ import type {
   CreateTicketTierDto,
   EventControllerAddCustomField201,
   EventControllerAddDescription201,
+  EventControllerAddMedia201,
   EventControllerCancel200,
   EventControllerCreate201,
   EventControllerCreateSession201,
@@ -2404,7 +2406,7 @@ export function useEventControllerGetBlacklist<TData = Awaited<ReturnType<typeof
  * @summary Add media to event
  */
 export type eventControllerAddMediaResponse201 = {
-  data: void
+  data: EventControllerAddMedia201
   status: 201
 }
     
@@ -2423,14 +2425,16 @@ export const getEventControllerAddMediaUrl = (id: string,) => {
   return `/events/${id}/media`
 }
 
-export const eventControllerAddMedia = async (id: string, options?: RequestInit): Promise<eventControllerAddMediaResponse> => {
+export const eventControllerAddMedia = async (id: string,
+    addMediaDto: AddMediaDto, options?: RequestInit): Promise<eventControllerAddMediaResponse> => {
   
   return defaultMutator<eventControllerAddMediaResponse>(getEventControllerAddMediaUrl(id),
   {      
     ...options,
-    method: 'POST'
-    
-    
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      addMediaDto,)
   }
 );}
 
@@ -2438,8 +2442,8 @@ export const eventControllerAddMedia = async (id: string, options?: RequestInit)
 
 
 export const getEventControllerAddMediaMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string;data: AddMediaDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string;data: AddMediaDto}, TContext> => {
 
 const mutationKey = ['eventControllerAddMedia'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -2451,10 +2455,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventControllerAddMedia>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventControllerAddMedia>>, {id: string;data: AddMediaDto}> = (props) => {
+          const {id,data} = props ?? {};
 
-          return  eventControllerAddMedia(id,requestOptions)
+          return  eventControllerAddMedia(id,data,requestOptions)
         }
 
 
@@ -2465,18 +2469,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type EventControllerAddMediaMutationResult = NonNullable<Awaited<ReturnType<typeof eventControllerAddMedia>>>
-    
+    export type EventControllerAddMediaMutationBody = AddMediaDto
     export type EventControllerAddMediaMutationError = unknown
 
     /**
  * @summary Add media to event
  */
 export const useEventControllerAddMedia = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof defaultMutator>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventControllerAddMedia>>, TError,{id: string;data: AddMediaDto}, TContext>, request?: SecondParameter<typeof defaultMutator>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof eventControllerAddMedia>>,
         TError,
-        {id: string},
+        {id: string;data: AddMediaDto},
         TContext
       > => {
       return useMutation(getEventControllerAddMediaMutationOptions(options), queryClient);

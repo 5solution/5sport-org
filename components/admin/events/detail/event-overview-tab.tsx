@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import { Pencil, X, Save, Loader2, Upload, ImageIcon, Trash2 } from 'lucide-react';
+import { Pencil, X, Save, Loader2, Upload, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { AXIOS_INSTANCE } from '@/lib/api/axiosInstance';
 
@@ -160,12 +160,8 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
   const setStr = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
-  const handleUploadImage = async (
-    file: File,
-    field: 'bannerImageUrl',
-    setLoading: (v: boolean) => void,
-  ) => {
-    setLoading(true);
+  const handleUploadBanner = async (file: File) => {
+    setIsUploadingBanner(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -175,16 +171,18 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
       const url = typeof res.data === 'string' ? res.data : res.data?.url || res.data;
       if (!url) throw new Error('Upload failed');
 
-      await updateMutation.mutateAsync({
-        id: event.id,
-        data: { [field]: url } as any,
+      await AXIOS_INSTANCE.post(`/events/${event.id}/media`, {
+        type: 'WALLPAPER',
+        url,
+        fileSize: file.size,
+        mimeType: file.type,
       });
       queryClient.invalidateQueries({ queryKey: getEventControllerFindOneQueryKey(event.id) });
-      toast.success('Image uploaded and saved');
+      toast.success('Banner uploaded');
     } catch {
       // Error handled by interceptor
     } finally {
-      setLoading(false);
+      setIsUploadingBanner(false);
     }
   };
 
@@ -217,8 +215,9 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
     }
   };
 
-  const logoMedia = (event as any).media?.find((m: any) => m.type === 'LOGO');
-  const wallpaperMedia = (event as any).media?.find((m: any) => m.type === 'WALLPAPER');
+  const mediaList: any[] = (event as any).media ?? [];
+  const logoMedia = [...mediaList].filter((m: any) => m.type === 'LOGO').pop();
+  const wallpaperMedia = [...mediaList].filter((m: any) => m.type === 'WALLPAPER').pop();
 
   return (
     <div className="space-y-4">
@@ -320,10 +319,10 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
             <div className="space-y-2">
               <p className="text-sm font-medium">Banner</p>
               <div className="relative rounded-lg border-2 border-dashed border-gray-200 hover:border-primary/50 transition-colors overflow-hidden bg-muted/30 aspect-[3/1] max-w-[400px]">
-                {(event as any).bannerImageUrl ? (
+                {wallpaperMedia?.url ? (
                   <>
                     <img
-                      src={(event as any).bannerImageUrl}
+                      src={wallpaperMedia.url}
                       alt="Event Banner"
                       className="w-full h-full object-cover"
                     />
@@ -364,7 +363,7 @@ export function EventOverviewTab({ event }: { event: EventResponseDto }) {
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) handleUploadImage(file, 'bannerImageUrl', setIsUploadingBanner);
+                  if (file) handleUploadBanner(file);
                   e.target.value = '';
                 }}
               />

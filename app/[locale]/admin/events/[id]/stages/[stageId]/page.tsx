@@ -57,6 +57,7 @@ import {
   getStageControllerFindMatchesByStageQueryKey,
 } from '@/lib/services/stages/stages';
 import {
+  useParticipantControllerFindAll,
   useParticipantControllerFindByStage,
   useParticipantControllerAssignPartner,
   useParticipantControllerRemovePartner,
@@ -603,7 +604,7 @@ export default function StageDetailPage() {
   });
   const allParticipants = (participantsData as any) || [];
 
-  const { data: matchesData } = useStageControllerFindAllBySession(eventId, stageId, {
+  const { data: matchesData, refetch: refetchMatches, isFetching: isFetchingMatches } = useStageControllerFindAllBySession(eventId, stageId, {
     query: { enabled: !!eventId && !!stageId },
   });
 
@@ -612,6 +613,7 @@ export default function StageDetailPage() {
     useParticipantControllerFindByStage(eventId, stageId, {
       query: { enabled: !!eventId && !!stageId },
     });
+  const stageParticipants = (stageParticipantsData as any) || [];
 
   const generateMatches = useStageControllerGenerateMatches();
   const advanceWinners = useStageControllerAdvanceWinners();

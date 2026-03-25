@@ -878,11 +878,6 @@ function CampaignOrders({ campaignId, t }: { campaignId: string; t: (key: string
     }
   };
 
-  const handleReload = () => {
-    setPage(1);
-    refetch();
-  };
-
   const ordersPage = unwrapApi(ordersResponse);
   const orders: OrderResponseDto[] = ordersPage?.data ?? [];
   const totalPages = Math.max(1, Math.ceil(orders.length / limit));

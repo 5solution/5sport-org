@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
+export * from "./addMediaDto";
+export * from "./addMediaDtoType";
 export * from "./assignMatchDto";
 export * from "./athlete";
 export * from "./athleteControllerFindAllParams";
@@ -104,6 +106,7 @@ export * from "./errorResponseDto";
 export * from "./event";
 export * from "./eventControllerAddCustomField201";
 export * from "./eventControllerAddDescription201";
+export * from "./eventControllerAddMedia201";
 export * from "./eventControllerCancel200";
 export * from "./eventControllerCreate201";
 export * from "./eventControllerCreateSession201";
@@ -126,6 +129,7 @@ export * from "./eventControllerUpdateCustomField200";
 export * from "./eventControllerUpdateDescription200";
 export * from "./eventControllerUpdateSession200";
 export * from "./eventControllerUpdateTicketTier200";
+export * from "./eventMedia";
 export * from "./eventOrderControllerCreate201";
 export * from "./eventOrderControllerFindAll200";
 export * from "./eventOrderControllerFindAllParams";

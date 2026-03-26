@@ -25,6 +25,7 @@ import { EventDescriptionsTab } from '@/components/admin/events/detail/event-des
 import { EventScoringTab } from '@/components/admin/events/detail/event-scoring-tab';
 import { EventBlacklistTab } from '@/components/admin/events/detail/event-blacklist-tab';
 import { EventSettingsTab } from '@/components/admin/events/detail/event-settings-tab';
+import { EventOrdersTab } from '@/components/admin/events/detail/event-orders-tab';
 import {
   useEventControllerFindOne,
   useEventControllerPublish,
@@ -154,6 +155,7 @@ export default function EventDetailPage() {
           <TabsTrigger value="fields">{t('detail.tabs.fields')}</TabsTrigger>
           <TabsTrigger value="descriptions">{t('detail.tabs.descriptions')}</TabsTrigger>
           <TabsTrigger value="scoring">{t('detail.tabs.scoring')}</TabsTrigger>
+          <TabsTrigger value="orders">Đơn hàng</TabsTrigger>
           <TabsTrigger value="blacklist">{t('detail.tabs.blacklist')}</TabsTrigger>
           <TabsTrigger value="settings">{t('detail.tabs.settings')}</TabsTrigger>
         </TabsList>
@@ -176,6 +178,10 @@ export default function EventDetailPage() {
 
         <TabsContent value="scoring">
           <EventScoringTab eventId={eventId} sportType={validEvent.sportType} />
+        </TabsContent>
+
+        <TabsContent value="orders">
+          <EventOrdersTab eventId={eventId} />
         </TabsContent>
 
         <TabsContent value="blacklist">
